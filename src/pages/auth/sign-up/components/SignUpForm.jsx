@@ -1,8 +1,10 @@
 import { useState } from "react";
+import "../Page.css";
 
 export default function SignUpForm() {
   const [form, setForm] = useState({
     name: "",
+    username: "",
     email: "",
     password: "",
   });
@@ -19,16 +21,22 @@ export default function SignUpForm() {
         headers: {  "Content-Type": "application/json" },
         body: JSON.stringify(form),
       });
+      const data = await response.json();
+      if (!response.ok) {
+        alert(data.message || "Failed to sign up. Please try again.");
+        return;
+      }
+      alert("Sign up successful!");
     } catch (error) {
       console.error("Error during sign up:", error);
       alert("Failed to sign up. Please try again.");
     }
-    alert(`Signed up as successfully!)`);
   };
 
   return (
     <form className="SignUpForm" onSubmit={handleSubmit}>
       <h2>Sign Up</h2>
+      <div>Already have an account? <a href="#">Sign in</a></div>
       <div>
         <label>
           Your name:
@@ -78,7 +86,7 @@ export default function SignUpForm() {
         </label>
       </div>
       <div>
-        <button type="submit">Sign Up</button>
+        <button className="submitButton" type="submit">Sign Up</button>
       </div>
     </form>
   );
