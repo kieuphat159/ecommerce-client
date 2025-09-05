@@ -1,11 +1,11 @@
 import Navigation from "./components/Navigation/Navigation";
+import Banner from "./components/Banner/Banner";
 
 export default function ProductsPage() {
     return (
-        <div>
+        <>
             <Navigation />
-            <h1>Products Page</h1>
-            <p>List of products will be displayed here.</p>
-        </div>
+            <Banner />
+        </>
     );
 }
