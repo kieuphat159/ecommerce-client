@@ -33,7 +33,7 @@ export default function SignInForm() {
   return (
     <form className="SignInForm" onSubmit={handleSubmit}>
       <h2>Sign In</h2>
-      <div>Don't have any account yet? <a href="#">Sign up</a></div>
+      <div>Don't have any account yet? <a href="/signup">Sign up</a></div>
       <div>
         <label>
           Username:

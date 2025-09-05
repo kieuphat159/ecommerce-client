@@ -1,0 +1,38 @@
+nav {
+  position: fixed;   
+  top: 0;            
+  left: 0;           
+  width: 100%;       
+  height: 60px;       
+  color: white;      
+  display: flex;     
+  align-items: center; 
+  padding: 0 20px;   
+  z-index: 1000;    
+}
+
+.center a {
+    margin: 0 30px 0 30px;
+}
+
+.leftSide {
+  font-size: 28px;
+  font-weight: bold;
+  text-align: center;
+  justify-content: center;
+  letter-spacing: 1px;
+  color: rgba(0, 0, 0, 0.639);
+}
+
+.center {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+}
+
+.rightSide {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 20px;
+}

@@ -36,7 +36,7 @@ export default function SignUpForm() {
   return (
     <form className="SignUpForm" onSubmit={handleSubmit}>
       <h2>Sign Up</h2>
-      <div>Already have an account? <a href="#">Sign in</a></div>
+      <div>Already have an account? <a href="/signin">Sign in</a></div>
       <div>
         <label>
           Your name:
