@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 export default function SignInForm() {
   const [form, setForm] = useState({
@@ -6,12 +7,15 @@ export default function SignInForm() {
     password: "",
   });
 
+  const Navigate = useNavigate();
+
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
   
   async function handleSubmit(e) {
     e.preventDefault();
+  
     try {
       const response = await fetch("http://localhost:5000/api/auth/signin", {
         method: "POST",
@@ -24,6 +28,11 @@ export default function SignInForm() {
         return;
       }
       alert("Sign in successful!");
+      if (data.redirectTo) {
+        Navigate(data.redirectTo);
+      } else {
+        Navigate("/");
+      }
     } catch (error) {
       console.error("Error during sign in:", error);
       alert("Failed to sign in. Please try again.");

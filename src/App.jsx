@@ -4,16 +4,18 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import ProductsPage from "./pages/user/products/Page";
 
 function App() {
-  /*return (
-    <Router>
-      <Routes>
-        <Route path="/" element={<SignInPage />} />
-        <Route path="/signin" element={<SignInPage />} />
-        <Route path="/signup" element={<SignUpPage />} />
-      </Routes>
-    </Router>
-  );*/
-  return <ProductsPage />;
+    
+  return (
+    <>
+        <Routes>
+          <Route path="/" element={<ProductsPage />} />
+          <Route path="/user/products" element={<ProductsPage />} />
+          <Route path="/signin" element={<SignInPage />} />
+          <Route path="/signup" element={<SignUpPage />} />
+        </Routes>
+      
+    </>
+    );
 }
 
 export default App;

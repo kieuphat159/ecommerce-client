@@ -1,4 +1,5 @@
 import "./Navigation.css";
+import { Link } from "react-router-dom";
 
 export default function Navigation() {
     return (
@@ -6,13 +7,13 @@ export default function Navigation() {
             <div className="leftSide">3legant.</div>
             <div className="center">
                 <a href="#">Home</a>
-                <a href="#">Products</a>
-                <a href="#">Cart</a>
-                <a href="#">Profile</a>
+                <a href="#">Shop</a>
+                <a href="#">Product</a>
+                <a href="#">Contact Us</a>
             </div>
             <div className="rightSide">
                 <button>search</button>
-                <button>profile</button>
+                <Link to="/signin">profile</Link>
                 <button>cart</button>
             </div>
             
