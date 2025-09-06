@@ -3,9 +3,9 @@ import Banner from "./components/Banner/Banner";
 import Products from "./components/Products/Products";
 import Footer from "./components/Footer/Footer";
 import "./Page.css";
-export default function ProductsPage() {
+export default function HomePage() {
     return (
-        <div className="ProductsPage">
+        <div className="HomePage">
             <Navigation />
             <Banner />
             <Products />

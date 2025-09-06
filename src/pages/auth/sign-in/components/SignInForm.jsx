@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import useAuth from "../../../../hooks/useAuth"
 
 export default function SignInForm() {
   const [form, setForm] = useState({
@@ -7,7 +8,11 @@ export default function SignInForm() {
     password: "",
   });
 
+  const [error, setError] = useState('');
+  const [isloading, setIsLoading] = useState(false);
+
   const Navigate = useNavigate();
+  const { login } = useAuth();
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -15,23 +20,15 @@ export default function SignInForm() {
   
   async function handleSubmit(e) {
     e.preventDefault();
+    setIsLoading(true);
+    setError('');
   
     try {
-      const response = await fetch("http://localhost:5000/api/auth/signin", {
-        method: "POST",
-        headers: {  "Content-Type": "application/json" },
-        body: JSON.stringify(form),
-      });
-      const data = await response.json();
-      if (!response.ok) {
-        alert(data.message || "Failed to sign in. Please try again.");
-        return;
-      }
-      alert("Sign in successful!");
-      if (data.redirectTo) {
-        Navigate(data.redirectTo);
+      const response = await login(form);
+      if (response.role === 'seller') {
+        Navigate('/seller');
       } else {
-        Navigate("/");
+        Navigate('/');
       }
     } catch (error) {
       console.error("Error during sign in:", error);
