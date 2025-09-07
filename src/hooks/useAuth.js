@@ -4,7 +4,7 @@ import AuthService from '../services/authService'
 const useAuth = () => {
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const [user, setUser] = useState(null);
-    const [loading, setLoading] = useState(true); // có đang check auth status?
+    const [loading, setLoading] = useState(true); // co dang check auth status?
 
     useEffect(() => {
         console.log('checking auth status');
@@ -19,13 +19,13 @@ const useAuth = () => {
             if (token && userInfo) {
                 const payload = JSON.parse(atob(token.split('.')[1]));
                 const currentTime = Date.now() / 1000;
-                if (payload > currentTime) {
+                if (payload.exp > currentTime) {
                     console.log('Valid token');
                     setIsAuthenticated(true);
                     setUser(userInfo);
                 } else {
                     console.log('Outdated toke');
-                    LogOut();
+                    logout();
                 }
             } else {
                 console.log('No token or user info found');
@@ -87,7 +87,8 @@ const useAuth = () => {
     loading,
     login,
     logout,
-    checkAuthStatus
+    checkAuthStatus,
+    refreshAuth
   };
 }
 

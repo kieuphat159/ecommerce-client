@@ -28,7 +28,7 @@ export default function SignInForm() {
       if (response.role === 'seller') {
         Navigate('/seller');
       } else {
-        Navigate('/');
+        Navigate('/user/home');
       }
     } catch (error) {
       console.error("Error during sign in:", error);

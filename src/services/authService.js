@@ -7,6 +7,7 @@ class AuthService {
 
     setToken(token) {
         this.token = token;
+        localStorage.setItem('authToken', token);
     }
 
     getToken() {
@@ -56,7 +57,16 @@ class AuthService {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(credential)
             });
-            return await response.json();
+            const data = await response.json();
+            if (data.token) {
+                this.logout();
+                this.setToken(data.token);
+
+                if (data.userInfo) {
+                    this.setUserInfo(data.userInfo);
+                }
+            }
+            return data;
         } catch (error) {
             console.error('Signin error:', error);
             throw error;
@@ -80,7 +90,7 @@ class AuthService {
             const result = await respone.json();
 
             if (respone.status === 401 || respone.status === 403) {
-                this.clearToken();
+                this.clearAuthData();
             }
             return result;
         } catch (error) {
@@ -96,7 +106,7 @@ class AuthService {
 
     // logout
     logout() {
-        this.clearToken();
+        this.clearAuthData();
     }
 
     isAuthenticated() {
@@ -107,13 +117,13 @@ class AuthService {
             const payload = JSON.parse(atob(token.split('.')[1]));
             const currentTime = Math.floor(Date.now() / 1000);
             if (payload.exp <= currentTime) {
-                this.clearToken();
+                this.clearAuthData();
                 return false;
             }
             return true;
         } catch (error) {
             console.error('Token validation error:', error);
-            this.clearToken();
+            this.clearAuthData();
             return false;
         }
     }
@@ -134,7 +144,7 @@ class AuthService {
         if (this.isAuthenticated()) {
             return true;
         } else {
-            this.clearToken();
+            this.clearAuthData();
             return false;
         }
     }

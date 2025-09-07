@@ -3,6 +3,7 @@ import SignInPage from "./pages/auth/sign-in/Page";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import HomePage from "./pages/user/home/Page";
 import SellerPage from "./pages/seller/SellerPage";
+import ProtectedRoute from "./components/ProtectedRoute";
 
 function App() {
     
@@ -13,9 +14,12 @@ function App() {
           <Route path="/user/home" element={<HomePage />} />
           <Route path="/signin" element={<SignInPage />} />
           <Route path="/signup" element={<SignUpPage />} />
-          <Route path="/api/auth/seller" element={<SellerPage />} />
+          <Route path="/api/auth/seller" element={
+            <ProtectedRoute requiredRole="seller">
+              <SellerPage />
+            </ProtectedRoute>
+          }></Route>
         </Routes>
-      
     </>
     );
 }
