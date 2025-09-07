@@ -12,7 +12,7 @@ export default function Navigation() {
                 <a href="#">Contact Us</a>
             </div>
             <div className="rightSide">
-                <Link to="/seller">search</Link>
+                <Link to="/api/auth/seller">search</Link>
                 <Link to="/signin">profile</Link>
                 <button>cart</button>
             </div>
