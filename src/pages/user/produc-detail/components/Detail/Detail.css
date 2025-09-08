@@ -1,0 +1,129 @@
+hr {
+  background-color: #e6e4e4e1;
+  flex: 1;
+  opacity: 0.6;
+}
+
+.Detail {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  padding: 60px 40px;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.infoSection {
+  font-size: 18px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  word-spacing: 3px;
+}
+
+#attrContent {
+    display: inline;
+    align-items: center;
+    justify-content: center;
+}
+
+.description {
+    font-size: 15px;
+    font-weight: 600;
+    opacity: 0.6;
+}
+
+.price {
+    font-size: 20px;
+    text-shadow: 0.5px 0.5px 0 currentColor;
+    margin-top: 5px;
+}
+
+.imageSection img {
+  width: 100%;
+  height: auto;
+  object-fit: cover;
+  display: block;
+}
+
+.productName {
+    font-size: 30px;
+    font-weight: 600;
+}
+
+.attribute {
+    margin-top: 20px;
+    margin-bottom: 10px;
+    font-size: 15px;
+    font-weight: 600;
+    opacity: 0.6;
+}
+
+.buttonSection {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.buttonTop {
+    justify-content: space-between;
+    display: flex;
+}
+.numberInput {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 50px;
+  width: 180px;
+  background-color: #fafafa;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  overflow: hidden;
+  font-size: 18px;
+}
+
+.numberInput button {
+  flex: 1;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 20px;
+  font-weight: 500;
+  height: 100%;
+  transition: background-color 0.2s ease;
+}
+
+.numberInput button:hover {
+  background-color: #f0f0f0;
+}
+
+.numberInput .value {
+  flex: 2;
+  text-align: center;
+  font-size: 18px;
+}
+
+
+.wishList {
+    height: 50px;
+    width: 350px;
+    background-color: white;
+    border: solid 1px black;
+    border-radius: 10px;
+}
+
+.wishList:hover {
+    cursor: pointer;
+}
+
+.add {
+    height: 50px;
+    background-color: black;
+    border-radius: 10px;
+    color: white;
+}
+
+.add:hover {
+    cursor: pointer;
+    background-color: white;
+    color: black;
+}

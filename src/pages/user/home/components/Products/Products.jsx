@@ -1,51 +1,67 @@
+import { useState, useEffect } from 'react';
 import { Heart } from 'lucide-react';
 import './Products.css';
+import { useNavigate } from 'react-router-dom';
 
 export default function Products() {
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  const navigate =  useNavigate();
+
   const categories = [
     {
       name: "Living Room",
-      image: "./images/product1.jpg",
+      image: "https://res.cloudinary.com/dvwdjkjrb/image/upload/v1757299277/uploads/xzgczevw9m1pdbvgquv2.jpg",
       link: "Shop Now"
     },
     {
       name: "Bedroom", 
-      image: "./images/product3.jpg",
+      image: "https://res.cloudinary.com/dvwdjkjrb/image/upload/v1757299383/uploads/iasupdrlkc9rvxv3ssrg.jpg",
       link: "Shop Now"
     },
     {
       name: "Kitchen",
-      image: "./images/product2.jpg", 
+      image: "https://res.cloudinary.com/dvwdjkjrb/image/upload/v1757299403/uploads/hfuipxhhktb3esw9pqb2.jpg", 
       link: "Shop Now"
     }
   ];
 
-  const newArrivals = [
-    {
-      id: 1,
-      name: "Loveseat Sofa",
-      price: "$199.00",
-      image: "./images/loveseat_sofa.jpg"
-    },
-    {
-      id: 2,
-      name: "Table Lamp", 
-      price: "$24.00",
-      image: "./images/table_lamp.jpg"
-    },
-    {
-      id: 3,
-      name: "Begie Table Lamp",
-      price: "$24.00", 
-      image: "./images/begie_table_lamp.jpg"
-    },
-    {
-      id: 4,
-      name: "Bamboo Basket",
-      price: "$24.00",
-      image: "./images/bamboo_basket.jpg"
+  const getProducts = async () => {
+    try {
+      setLoading(true);
+      const response = await fetch('http://localhost:5000/api/products', {
+        method: "GET",
+        headers: {
+          'Content-Type': 'application/json',
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      
+      if (data.success) {
+        setProducts(data.data);
+        setError(null);
+      } else {
+        setError(data.message || 'Failed to load products');
+      }
+    } catch (err) {
+      console.error('Error fetching products:', err);
+      setError('Failed to load products. Please try again.');
+    } finally {
+      setLoading(false);
     }
-  ];
+  };
+
+  // useEffect để gọi API khi component mount
+  useEffect(() => {
+    getProducts();
+  }, []);
 
   return (
     <main className="page-main">
@@ -100,30 +116,63 @@ export default function Products() {
             </button>
           </div>
 
-          <div className="products-grid">
-            {newArrivals.map((product) => (
-              <div key={product.id} className="product-card">
-                <div className="product-image-container">
-                  <img 
-                    src={product.image}
-                    alt={product.name}
-                    className="product-image"
-                  />
-                  <div className="product-actions">
-                    <button className="wishlist-btn">
-                      <Heart className="heart-icon" />
-                    </button>
+          {/* Loading state */}
+          {loading && (
+            <div className="loading-container">
+              <p>Loading products...</p>
+            </div>
+          )}
+
+          {/* Error state */}
+          {error && !loading && (
+            <div className="error-container">
+              <p className="error-message">{error}</p>
+              <button onClick={getProducts} className="retry-btn">
+                Retry
+              </button>
+            </div>
+          )}
+
+          {/* Products grid */}
+          {!loading && !error && products.length > 0 && (
+            <div className="products-grid">
+              {products.map((product) => (
+                <div key={product.id} className="product-card" onClick={() => navigate(`/product/${product.id}`)}>
+                  <div className="product-image-container">
+                    <img 
+                      src={product.image || product.image_url || "./images/placeholder.jpg"}
+                      alt={product.name}
+                      className="product-image"
+                      onError={(e) => {
+                        e.target.src = "./images/placeholder.jpg";
+                      }}
+                    />
+                    <div className="product-actions">
+                      <button className="wishlist-btn">
+                        <Heart className="heart-icon" />
+                      </button>
+                    </div>
                   </div>
+                  <h3 className="product-name">{product.name}</h3>
+                  <p className="product-price">{product.price}</p>
+                  
+                  {/* Optional: Show seller info */}
+                  {product.seller && (
+                    <p className="product-seller">by {product.seller}</p>
+                  )}
                 </div>
-                <h3 className="product-name">{product.name}</h3>
-                <p className="product-price">{product.price}</p>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
+
+          {/* No products state */}
+          {!loading && !error && products.length === 0 && (
+            <div className="no-products-container">
+              <p>No products available at the moment.</p>
+            </div>
+          )}
         </div>
       </section>
-
     </main>
   );
-};
-
+}

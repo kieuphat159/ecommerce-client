@@ -2,6 +2,7 @@ import SignUpPage from "./pages/auth/sign-up/Page";
 import SignInPage from "./pages/auth/sign-in/Page";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import HomePage from "./pages/user/home/Page";
+import ProductDetailPage from "./pages/user/produc-detail/Page"
 import SellerPage from "./pages/seller/SellerPage";
 import ProtectedRoute from "./components/ProtectedRoute";
 
@@ -19,6 +20,7 @@ function App() {
               <SellerPage />
             </ProtectedRoute>
           }></Route>
+          <Route path="/product/:id" element={<ProductDetailPage/>} />
         </Routes>
     </>
     );

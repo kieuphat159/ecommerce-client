@@ -7,7 +7,7 @@ const Banner = () => {
   
   const heroSlides = [
     {
-      image: "./images/banner.jpg",
+      image: "https://res.cloudinary.com/dvwdjkjrb/image/upload/v1757299042/uploads/n0iknktsxpp7rhaqwnfr.jpg",
       title: "Simply Unique/",
       subtitle: "Simply Better.",
       description: "3legant is a gift & decorations store based in HCMC, Vietnam. Est since 2019."
