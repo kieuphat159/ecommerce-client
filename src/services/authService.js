@@ -99,6 +99,33 @@ class AuthService {
         }
     }
 
+    refreshAccessToken = async () => {
+        try {
+            const response = await fetch(`${this.apiUrl}/refresh`, {
+                method: 'POST',
+                credentials: 'include',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            if (!response.ok) {
+                throw new Error(`Lỗi làm mới token: ${response.status} ${response.statusText}`);
+            }
+
+            const data = await response.json();
+            if (!data.token) {
+                throw new Error('Không nhận được token từ server');
+            }
+
+            this.setToken(data.token);
+            return data.token;
+        } catch (error) {
+            console.error('Lỗi làm mới token:', error);
+            this.logout();
+            throw error;
+        }
+    };
     // seller methods
     async getSellerPage() {
         return this.apiCall('/seller', { method: 'GET' });

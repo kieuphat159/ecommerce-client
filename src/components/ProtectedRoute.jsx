@@ -38,8 +38,7 @@ console.log(requiredRole);
       // Kiểm tra token hết hạn
       if (payload.exp < currentTime) {
         console.log('Token expired, clearing and redirecting');
-        authService.clearToken();
-        setIsAuthorized(false);
+        authService.refreshAccessToken();
         setLoading(false);
         return;
       }

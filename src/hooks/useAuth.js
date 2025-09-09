@@ -24,7 +24,7 @@ const useAuth = () => {
                     setIsAuthenticated(true);
                     setUser(userInfo);
                 } else {
-                    console.log('Outdated toke');
+                    console.log('Outdated token');
                     logout();
                 }
             } else {
