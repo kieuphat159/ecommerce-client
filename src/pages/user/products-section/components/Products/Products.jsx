@@ -2,7 +2,8 @@ import './Products.css';
 import { useState } from 'react';
 
 export default function Products() {
-    const [open, setOpen] = useState(false);
+    const [openCategory, setOpenCategory] = useState(false);
+    const [openPrice, setOpenPrice] = useState(false);
     const products = [
         { name: 'Lowseat Sofas', price: '$199.00', oldPrice: '$400.00', discount: '-50%', isNew: true, rating: 5, image: 'https://res.cloudinary.com/dvwdjkjrb/image/upload/v1757299277/uploads/xzgczevw9m1pdbvgquv2.jpg' },
         { name: 'Luxury Sofas', price: '$299.00', oldPrice: '$600.00', discount: '-50%', isNew: true, rating: 5, image: 'https://res.cloudinary.com/dvwdjkjrb/image/upload/v1757299277/uploads/xzgczevw9m1pdbvgquv2.jpg' },
@@ -25,8 +26,8 @@ export default function Products() {
                     <div>
                         <label>Category</label>
                         <div className='drop-down'>
-                            <button onClick={() => setOpen(!open)}>Living Room</button>
-                            {open && (
+                            <button onClick={() => setOpenCategory(!openCategory)}>Living Room</button>
+                            {openCategory && (
                                 <div className="dropdown-menu">
                                     <a href="#" className="drop-down__option">Mục 1</a>
                                     <a href="#" className="drop-down__option">Mục 2</a>
@@ -38,8 +39,8 @@ export default function Products() {
                     <div>
                         <label>Price</label>
                         <div className='drop-down'>
-                            <button onClick={() => setOpen(!open)}>All Price</button>
-                            {open && (
+                            <button onClick={() => setOpenPrice(!openPrice)}>All Price</button>
+                            {openPrice && (
                                 <div className="dropdown-menu">
                                     <a href="#" className="drop-down__option">Mục 1</a>
                                     <a href="#" className="drop-down__option">Mục 2</a>
