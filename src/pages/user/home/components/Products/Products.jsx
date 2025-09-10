@@ -36,13 +36,14 @@ export default function Products() {
         headers: {
           'Content-Type': 'application/json',
         }
+      
       });
 
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
-
       const data = await response.json();
+      console.log("ok", data);
       
       if (data.success) {
         setProducts(data.data);
@@ -111,7 +112,7 @@ export default function Products() {
         <div className="container">
           <div className="arrivals-header">
             <h2 className="section-title">New Arrivals</h2>
-            <button className="more-products-btn">
+            <button className="more-products-btn" onClick={() => navigate("/products")}>
               More Products →
             </button>
           </div>

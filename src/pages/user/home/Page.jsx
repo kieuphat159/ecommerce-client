@@ -8,7 +8,7 @@ export default function HomePage() {
         <div className="HomePage">
             <Navigation />
             <Banner />
-            {/*<Products /> */}
+            <Products />
             <Footer />
         </div>
     );

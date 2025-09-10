@@ -11,8 +11,9 @@ const UploadProduct = () => {
     sellerId: '2',
   });
 
-  const [selectedFile, setSelectedFile] = useState(null);
-  const [previewImage, setPreviewImage] = useState('');
+  const [files, setFiles] = useState([]);
+  const [previewImages, setPreviewImages] = useState([]);
+  const [uploadResult, setUploadResult] = useState(null);
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -20,116 +21,155 @@ const UploadProduct = () => {
   const handleChange = (e) => {
     const { name, value } = e.target;
     setProduct({ ...product, [name]: value });
-    // Clear previous errors when user starts typing
     if (error) setError('');
   };
 
   const handleFileChange = (e) => {
-    const file = e.target.files[0];
-    setSelectedFile(file);
+    const selectedFiles = e.target.files;
+    setFiles(selectedFiles);
     
-    if (file) {
-      // Create preview URL
-      const previewUrl = URL.createObjectURL(file);
-      setPreviewImage(previewUrl);
+    if (selectedFiles.length > 0) {
+      // Create preview URLs for all selected files
+      const previewUrls = Array.from(selectedFiles).map(file => URL.createObjectURL(file));
+      setPreviewImages(previewUrls);
     } else {
-      setPreviewImage('');
+      setPreviewImages([]);
     }
   };
 
-  const createProduct = async (formData) => {
-    const token = localStorage.getItem('token'); // Lấy token từ localStorage
+  // Upload image function similar to SellerPage
+  const uploadImage = async () => {
+    if (files.length === 0) {
+      return null;
+    }
+
+    const formData = new FormData();
+
+    try {
+      let response;
+      if (files.length === 1) {
+        formData.append("image", files[0]);
+        response = await fetch("http://localhost:5000/api/upload", {
+          method: "POST",
+          body: formData
+        });
+      } else {
+        Array.from(files).forEach((file) => {
+          formData.append("image", file);
+        });
+        response = await fetch("http://localhost:5000/api/uploadd", {
+          method: "POST",
+          body: formData
+        });
+      }
+      
+      const data = await response.json();
+      setUploadResult(data);
+      return data;
+    } catch (err) {
+      console.log("Error uploading image: ", err);
+      throw new Error("Failed to upload image");
+    }
+  };
+
+  const createProduct = async (productData) => {
+    const token = localStorage.getItem('token');
     
-    const response = await fetch("http://localhost:5000/api", {
+    const response = await fetch("http://localhost:5000/api/create", {
       method: "POST",
       headers: {
-        'Authorization': `Bearer ${token}` // Thêm authorization header
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
       },
-      body: formData // Gửi FormData, không set Content-Type header
+      body: JSON.stringify(productData)
     });
     
     return await response.json();
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    setError('');
-    setResult(null);
-    
-    try {
-      // Validation
-      if (!product.name.trim()) {
-        throw new Error('Product name is required');
-      }
-      if (!product.price || parseFloat(product.price) <= 0) {
-        throw new Error('Valid price is required');
-      }
-      if (!product.sellerId) {
-        throw new Error('Seller ID is required');
-      }
-
-      // Tạo FormData để gửi cả file và data
-      const formData = new FormData();
-      
-      // Thêm product data
-      formData.append('name', product.name);
-      formData.append('price', product.price);
-      formData.append('description', product.description);
-      formData.append('category', product.category);
-      formData.append('status', product.status);
-      formData.append('sellerId', product.sellerId);
-      
-      // Thêm file nếu có
-      if (selectedFile) {
-        formData.append('image', selectedFile);
-      }
-
-      // Gọi API tạo sản phẩm
-      const createResult = await createProduct(formData);
-      
-      if (createResult.success) {
-        setResult(createResult);
-        
-        // Reset form sau khi tạo thành công
-        setProduct({
-          name: '',
-          price: '',
-          description: '',
-          category: '',
-          status: '1',
-          sellerId: '2',
-        });
-        setSelectedFile(null);
-        setPreviewImage('');
-        
-        // Reset file input
-        const fileInput = document.querySelector('input[type="file"]');
-        if (fileInput) fileInput.value = '';
-        
-        console.log('Product created successfully:', createResult.data);
-        
-      } else {
-        throw new Error(createResult.message || 'Failed to create product');
-      }
-      
-    } catch (err) {
-      console.error("Error creating product:", err);
-      setError(err.message || 'An error occurred while creating the product');
-      setResult(null);
-    } finally {
-      setLoading(false);
+  e.preventDefault();
+  setLoading(true);
+  setError('');
+  setResult(null);
+  setUploadResult(null);
+  
+  try {
+    // Validation
+    if (!product.name.trim()) {
+      throw new Error('Product name is required');
     }
-  };
+    if (!product.price || parseFloat(product.price) <= 0) {
+      throw new Error('Valid price is required');
+    }
+    if (!product.sellerId) {
+      throw new Error('Seller ID is required');
+    }
 
-  // Clean up preview URL khi component unmount
+    let imageUploadData = null;
+    let imageUrl = null;
+    
+    // Upload images first if any files are selected
+    if (files.length > 0) {
+      imageUploadData = await uploadImage();
+      // Lấy URL đầu tiên từ array URL
+      imageUrl = imageUploadData?.url?.[0] || null;
+    }
+
+    // Prepare product data - SỬA PHẦN NÀY
+    const productData = {
+      name: product.name,
+      price: product.price,
+      description: product.description,
+      category: product.category,
+      status: product.status,
+      sellerId: product.sellerId,
+      // THAY ĐỔI: dùng 'image' thay vì 'imageData'
+      image: imageUrl // Gửi URL string thay vì object
+    };
+
+    // Create product
+    const createResult = await createProduct(productData);
+    
+    if (createResult.success) {
+      setResult(createResult);
+      
+      // Reset form after successful creation
+      setProduct({
+        name: '',
+        price: '',
+        description: '',
+        category: '',
+        status: '1',
+        sellerId: '2',
+      });
+      setFiles([]);
+      setPreviewImages([]);
+      
+      // Reset file input
+      const fileInput = document.querySelector('input[type="file"]');
+      if (fileInput) fileInput.value = '';
+      
+      console.log('Product created successfully:', createResult.data);
+      
+    } else {
+      throw new Error(createResult.message || 'Failed to create product');
+    }
+    
+  } catch (err) {
+    console.error("Error creating product:", err);
+    setError(err.message || 'An error occurred while creating the product');
+    setResult(null);
+  } finally {
+    setLoading(false);
+  }
+};
+  // Clean up preview URLs when component unmounts
   React.useEffect(() => {
     return () => {
-      if (previewImage) {
-        URL.revokeObjectURL(previewImage);
-      }
+      previewImages.forEach(url => URL.revokeObjectURL(url));
     };
-  }, [previewImage]);
+  }, [previewImages]);
 
   return (
     <div className="upload-product-container">
@@ -178,28 +218,37 @@ const UploadProduct = () => {
         </div>
         
         <div className="form-group">
-          <label>Product Image</label>
+          <label>Product Images</label>
           <input
             type="file"
             accept="image/*"
             onChange={handleFileChange}
+            multiple
             disabled={loading}
           />
-          {previewImage && (
-            <div style={{ marginTop: '10px' }}>
-              <img 
-                src={previewImage} 
-                alt="Preview" 
-                style={{ 
-                  maxWidth: '200px', 
-                  maxHeight: '200px',
-                  objectFit: 'cover',
-                  border: '1px solid #ddd',
-                  borderRadius: '4px',
-                  display: 'block'
-                }} 
-              />
+          {previewImages.length > 0 && (
+            <div style={{ marginTop: '10px', display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
+              {previewImages.map((previewUrl, index) => (
+                <img 
+                  key={index}
+                  src={previewUrl} 
+                  alt={`Preview ${index + 1}`} 
+                  style={{ 
+                    maxWidth: '150px', 
+                    maxHeight: '150px',
+                    objectFit: 'cover',
+                    border: '1px solid #ddd',
+                    borderRadius: '4px',
+                    display: 'block'
+                  }} 
+                />
+              ))}
             </div>
+          )}
+          {files.length > 0 && (
+            <p style={{ marginTop: '5px', fontSize: '14px', color: '#666' }}>
+              Selected {files.length} image{files.length !== 1 ? 's' : ''}
+            </p>
           )}
         </div>
         
@@ -247,19 +296,6 @@ const UploadProduct = () => {
           />
         </div>
         
-        <div className="form-group">
-          <label>Status</label>
-          <select 
-            name="status" 
-            value={product.status} 
-            onChange={handleChange}
-            disabled={loading}
-          >
-            <option value="1">Active</option>
-            <option value="0">Inactive</option>
-          </select>
-        </div>
-        
         <button 
           type="submit" 
           disabled={loading}
@@ -278,6 +314,22 @@ const UploadProduct = () => {
         </button>
       </form>
       
+      {/* Display upload result if available */}
+      {uploadResult && (
+        <div className="upload-result-section" style={{ marginTop: '20px' }}>
+          <h4>Image Upload Result:</h4>
+          <pre style={{ 
+            backgroundColor: '#f5f5f5', 
+            padding: '10px', 
+            borderRadius: '4px',
+            overflow: 'auto',
+            fontSize: '12px'
+          }}>
+            {JSON.stringify(uploadResult, null, 2)}
+          </pre>
+        </div>
+      )}
+      
       {result && (
         <div className="result-section" style={{ marginTop: '20px' }}>
           <div className="success-message" style={{
@@ -287,7 +339,7 @@ const UploadProduct = () => {
             borderRadius: '4px',
             border: '1px solid #2d7d2d'
           }}>
-            <h3>✅ Product Created Successfully!</h3>
+            <h3>Product Created Successfully!</h3>
             
             {result.data && (
               <div className="product-details" style={{ marginTop: '10px' }}>

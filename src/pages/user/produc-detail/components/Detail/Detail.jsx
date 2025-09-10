@@ -18,7 +18,7 @@ export default function Detail() {
                 }
                 const json = await response.json();
                 const data = json.data;
-                console.log('Data.image: ', data.image);
+                console.log('Data: ', data);
                 setProduct(data);
                 setImage(data.image);
                 console.log(image);

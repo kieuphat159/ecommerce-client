@@ -6,7 +6,7 @@ export default function Navigation() {
         <nav>
             <div className="leftSide">3legant.</div>
             <div className="center">
-                <a href="#">Home</a>
+                <a href="/">Home</a>
                 <a href="#">Shop</a>
                 <a href="#">Product</a>
                 <a href="#">Contact Us</a>

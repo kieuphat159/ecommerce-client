@@ -1,23 +1,46 @@
 import './Products.css';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 export default function Products() {
     const [openCategory, setOpenCategory] = useState(false);
     const [openPrice, setOpenPrice] = useState(false);
-    const products = [
-        { name: 'Lowseat Sofas', price: '$199.00', oldPrice: '$400.00', discount: '-50%', isNew: true, rating: 5, image: 'https://res.cloudinary.com/dvwdjkjrb/image/upload/v1757299277/uploads/xzgczevw9m1pdbvgquv2.jpg' },
-        { name: 'Luxury Sofas', price: '$299.00', oldPrice: '$600.00', discount: '-50%', isNew: true, rating: 5, image: 'https://res.cloudinary.com/dvwdjkjrb/image/upload/v1757299277/uploads/xzgczevw9m1pdbvgquv2.jpg' },
-        { name: 'Table Lamp', price: '$19.00', oldPrice: '', discount: '', isNew: true, rating: 5, image: 'https://res.cloudinary.com/dvwdjkjrb/image/upload/v1757299277/uploads/xzgczevw9m1pdbvgquv2.jpg' },
-        { name: 'Cozy Sofa', price: '$299.00', oldPrice: '', discount: '-50%', isNew: true, rating: 5, image: 'https://res.cloudinary.com/dvwdjkjrb/image/upload/v1757299277/uploads/xzgczevw9m1pdbvgquv2.jpg' },
-        { name: 'White Drawer unit', price: '$89.00', oldPrice: '', discount: '-10%', isNew: true, rating: 5, image: 'https://res.cloudinary.com/dvwdjkjrb/image/upload/v1757299277/uploads/xzgczevw9m1pdbvgquv2.jpg' },
-        { name: 'Black Tray Table', price: '$19.00', oldPrice: '', discount: '-50%', isNew: true, rating: 5, image: 'https://res.cloudinary.com/dvwdjkjrb/image/upload/v1757299277/uploads/xzgczevw9m1pdbvgquv2.jpg' },
-        { name: 'Table Lamp', price: '$19.00', oldPrice: '', discount: '-50%', isNew: true, rating: 5, image: 'https://res.cloudinary.com/dvwdjkjrb/image/upload/v1757299277/uploads/xzgczevw9m1pdbvgquv2.jpg' },
-        { name: 'Black Brow Side table', price: '$19.00', oldPrice: '', discount: '-50%', isNew: true, rating: 5, image: 'https://res.cloudinary.com/dvwdjkjrb/image/upload/v1757299277/uploads/xzgczevw9m1pdbvgquv2.jpg' },
-        { name: 'Light Beige Pillow', price: '$29.00', oldPrice: '', discount: '-10%', isNew: true, rating: 5, image: 'https://res.cloudinary.com/dvwdjkjrb/image/upload/v1757299277/uploads/xzgczevw9m1pdbvgquv2.jpg' },
-        { name: 'Table Lamp', price: '$39.00', oldPrice: '', discount: '-50%', isNew: true, rating: 5, image: 'https://res.cloudinary.com/dvwdjkjrb/image/upload/v1757299277/uploads/xzgczevw9m1pdbvgquv2.jpg' },
-        { name: 'Bamboo Basket', price: '$29.00', oldPrice: '', discount: '-50%', isNew: true, rating: 5, image: 'https://res.cloudinary.com/dvwdjkjrb/image/upload/v1757299277/uploads/xzgczevw9m1pdbvgquv2.jpg' },
-        { name: 'Off-white Pillow', price: '$29.00', oldPrice: '', discount: '-50%', isNew: true, rating: 5, image: 'https://res.cloudinary.com/dvwdjkjrb/image/upload/v1757299277/uploads/xzgczevw9m1pdbvgquv2.jpg' },
-    ];
+    const [loading, setLoading] = useState(false);
+    const [realProducts, setRealProducts] = useState([]);
+    const [error, setError] = useState('');
+    const getProducts = async () => {
+    try {
+      setLoading(true);
+      const response = await fetch('http://localhost:5000/api/products', {
+        method: "GET",
+        headers: {
+          'Content-Type': 'application/json',
+        }
+      
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      const data = await response.json();
+      console.log("ok", data);
+      
+      if (data.success) {
+        setRealProducts(data.data);
+        setError(null);
+      } else {
+        setError(data.message || 'Failed to load products');
+      }
+    } catch (err) {
+      console.error('Error fetching products:', err);
+      setError('Failed to load products. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+      getProducts();
+    }, []);
 
     return (
         <div className='products-section'>
@@ -55,7 +78,7 @@ export default function Products() {
                 </div>
             </div>
             <div className='product-grid'>
-                {products.map((product, index) => (
+                {realProducts.map((product, index) => (
                     <div className='product-card' key={index}>
                         {product.isNew && <span className='new-tag'>NEW</span>}
                         {product.discount && <span className='discount-tag'>{product.discount}</span>}
