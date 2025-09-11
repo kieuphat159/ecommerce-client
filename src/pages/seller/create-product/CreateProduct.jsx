@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import "./CreateProduct.css";
+import { useNavigate } from 'react-router-dom';
 
 const UploadProduct = () => {
   const [product, setProduct] = useState({
@@ -17,6 +18,7 @@ const UploadProduct = () => {
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -112,11 +114,10 @@ const UploadProduct = () => {
     // Upload images first if any files are selected
     if (files.length > 0) {
       imageUploadData = await uploadImage();
-      // Lấy URL đầu tiên từ array URL
+
       imageUrl = imageUploadData?.url?.[0] || null;
     }
 
-    // Prepare product data - SỬA PHẦN NÀY
     const productData = {
       name: product.name,
       price: product.price,
@@ -124,8 +125,8 @@ const UploadProduct = () => {
       category: product.category,
       status: product.status,
       sellerId: product.sellerId,
-      // THAY ĐỔI: dùng 'image' thay vì 'imageData'
-      image: imageUrl // Gửi URL string thay vì object
+
+      image: imageUrl
     };
 
     // Create product
@@ -370,6 +371,7 @@ const UploadProduct = () => {
           </div>
         </div>
       )}
+      { /* result && navigate('/products') */}
     </div>
   );
 };

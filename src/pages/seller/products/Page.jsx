@@ -1,13 +1,15 @@
-import Navigation from "../home/components/Navigation/Navigation";
-import Products from "./components/Products/Products";
-import Footer from "../home/components/Footer/Footer";
+import { useNavigate } from "react-router-dom";
 
 export default function ProductsPage() {
+    const navigate = useNavigate();
     return (
         <div className="ProductsPage">
-            <Navigation />
-            <Products />
-            <Footer />
+            <button onClick={() => navigate("/api/auth/seller/products")}>
+                Products
+            </button>
+            <button onClick={() => navigate("/api/auth/seller/create")}>
+                Create
+            </button>
         </div>
     );
 }

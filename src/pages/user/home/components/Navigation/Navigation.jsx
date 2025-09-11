@@ -12,9 +12,9 @@ export default function Navigation() {
                 <a href="#">Contact Us</a>
             </div>
             <div className="rightSide">
-                <Link to="/api/auth/seller">upload</Link>
-                <Link to="/signin">profile</Link>
-                <button>cart</button>
+                <Link to="/api/auth/seller"><img src="/assets/dashboard.svg"></img></Link>
+                <Link to="/signin"><img src="/assets/profile.svg"></img></Link>
+                <Link to="/"><img src="/assets/cart.svg"></img></Link>
             </div>
             
         </nav>
