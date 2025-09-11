@@ -17,7 +17,7 @@ function App() {
           <Route path="/signin" element={<SignInPage />} />
           <Route path="/signup" element={<SignUpPage />} />
           <Route path="/products" element={<ProductsPage />} />
-          <Route path="/api/auth/seller" element={
+          <Route path="/api/auth/seller/*" element={
             <ProtectedRoute requiredRole="seller">
               <SellerPage />
             </ProtectedRoute>
