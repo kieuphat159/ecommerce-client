@@ -65,13 +65,16 @@
     padding: 10px;
     text-align: center;
     position: relative;
+    display: flex;
+    flex-direction: column;  
+    justify-content: space-between;
 }
 
-.new-tag {
+.delete {
     position: absolute;
     top: 10px;
     left: 10px;
-    background: #28a745;
+    background: #a72828;
     color: #fff;
     padding: 5px 10px;
     border-radius: 3px;

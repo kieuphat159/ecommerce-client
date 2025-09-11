@@ -8,6 +8,16 @@ export default function Detail() {
     const { id } = useParams();
     const [numberOfProduct, setNumberOfProduct] = useState(1);
     const [image, setImage] = useState('');
+    const specialVal = [
+        'id',
+        'name',
+        'image',
+        'seller'
+    ]
+    const specialAttr = [
+        'price',
+        'description'
+    ]
 
     useEffect(() => {
         const fetchProduct = async () => {
@@ -32,19 +42,21 @@ export default function Detail() {
     }, [id])
 
     const renderAttribute = (key, value) => {
-        return (
-            <div key={key} id="attrContent" className={key.toLowerCase()}>
-                {key !== 'Price' && key !== 'Description' && (
-                    <div className="attribute">{key}</div>
-                )}
-                <span>{value}</span>
-                {key !== 'Price' && key !== 'Description' && (
-                    <hr />
-                )}
-                                
-            </div>
-        );
-    }
+  return (
+    <div key={key} id="attrContent" className={key.toLowerCase()}>
+      {!specialVal.includes(key) && (
+        <>
+          {!specialAttr.includes(key) && (
+            <div className="attribute">{key}</div>
+          )}
+          <span>{value}</span>
+          {!specialAttr.includes(key) && <hr />}
+        </>
+      )}
+    </div>
+  );
+};
+
 
     const increase = () => {
         setNumberOfProduct(numberOfProduct + 1);

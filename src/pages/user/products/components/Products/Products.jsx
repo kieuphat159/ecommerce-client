@@ -1,5 +1,5 @@
-import './Products.css';
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 export default function Products() {
     const [openCategory, setOpenCategory] = useState(false);
@@ -7,6 +7,7 @@ export default function Products() {
     const [loading, setLoading] = useState(false);
     const [realProducts, setRealProducts] = useState([]);
     const [error, setError] = useState('');
+    const navigate = useNavigate()
     const getProducts = async () => {
     try {
       setLoading(true);
@@ -79,17 +80,19 @@ export default function Products() {
             </div>
             <div className='product-grid'>
                 {realProducts.map((product, index) => (
-                    <div className='product-card' key={index}>
+                    <div className='product-card' key={index} onClick={() => navigate(`/product/${product.id}`)}>
                         {product.isNew && <span className='new-tag'>NEW</span>}
                         {product.discount && <span className='discount-tag'>{product.discount}</span>}
                         <img src={product.image} alt={product.name} className='product-image' />
-                        <div className='rating'>★★★★★</div>
-                        <div className='product-name'>{product.name}</div>
-                        <div className='product-price'>
-                            {product.oldPrice && <span className='old-price'>{product.oldPrice}</span>}
-                            <span className='current-price'>{product.price}</span>
+                        <div className='product-info'>
+                            <div className='rating'>★★★★★</div>
+                            <div className='product-name'>{product.name}</div>
+                            <div className='product-price'>
+                                {product.oldPrice && <span className='old-price'>{product.oldPrice}</span>}
+                                <span className='current-price'>{product.price}</span>
+                            </div>
+                            <button className='add-to-cart'>Add to cart</button>
                         </div>
-                        <button className='add-to-cart'>Add to cart</button>
                     </div>
                 ))}
             </div>

@@ -66,6 +66,7 @@ class AuthService {
                     this.setUserInfo(data.userInfo);
                 }
             }
+            localStorage.setItem("userId", data.userId);
             return data;
         } catch (error) {
             console.error('Signin error:', error);

@@ -8,7 +8,7 @@ export default function Navigation() {
             <div className="center">
                 <a href="/">Home</a>
                 <a href="#">Shop</a>
-                <a href="#">Product</a>
+                <a href="/products">Product</a>
                 <a href="#">Contact Us</a>
             </div>
             <div className="rightSide">
