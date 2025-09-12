@@ -67,7 +67,7 @@ export default function Detail() {
     return (
         <div className="Detail">
             <div className="imageSection">
-                <img src={image} alt="Product image"></img>
+                <img src={image || "https://placehold.co/600x400"} alt="Product image"></img>
             </div>
             <div className="infoSection">
 

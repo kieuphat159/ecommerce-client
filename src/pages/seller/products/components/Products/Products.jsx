@@ -143,7 +143,7 @@ export default function Products({sellerId}) {
             ) : (
                 <div className='product-grid'>
                     {realProducts.map((product, index) => (
-                        <div className='product-card' key={index} onClick={() => navigate(`/product/${product.id}`)}>
+                        <div className='product-card' key={index}>
                             {product.discount && <span className='discount-tag'>{product.discount}</span>}
                             <img src={product.image} alt={product.name} className='product-image' />
                             <div className='product-info'>
@@ -153,6 +153,11 @@ export default function Products({sellerId}) {
                                     {product.oldPrice && <span className='old-price'>{product.oldPrice}</span>}
                                     <span className='current-price'>{product.price}</span>
                                 </div>
+                                <button 
+                                    className='update' 
+                                    onClick={() => navigate(`${product.id}`)}>
+                                    Update
+                                </button>
                                 <button 
                                     className='delete' 
                                     onClick={(e) => confirmDeleteItem(product, e)}>

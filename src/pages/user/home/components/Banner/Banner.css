@@ -46,7 +46,7 @@
 }
 
 .banner-arrow:active {
-  transform: translateY(-50%) scale(0.95);
+  transform: translateY(-98%) scale(0.98);
 }
 
 .banner-arrow-left {

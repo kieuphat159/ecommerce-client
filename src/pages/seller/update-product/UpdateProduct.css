@@ -1,0 +1,63 @@
+.header {
+    background-color: aliceblue;
+    margin: 0 auto;
+    text-align: center;
+}
+
+.header h2 {
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 25px;
+    font-weight: 600;
+}
+
+.header button {
+    margin: 10px 20px;
+    border: none;
+    border-radius: 10px;
+    padding: 10px;
+    background-color: black;
+    color: #FFF;
+}
+
+.header button:hover {
+    color: black;
+    background-color: #FFF;
+    cursor: pointer;
+}
+
+.delete-btn {
+    background-color: rgb(252, 96, 96) !important;
+}
+
+.product {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    align-items: center;
+}
+
+.product-image {
+    width: 100%;
+    height: auto;
+}
+
+.product-image img {
+    width: 95%;
+}
+
+.product-info {
+    font-family: Arial, Helvetica, sans-serif;
+    align-items: center;
+}
+
+.product-info div {
+    padding: 8px;
+}
+
+.product-info label {
+    font-weight: 600;
+}
+
+.product-info input {
+    border: none;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.141);
+}
