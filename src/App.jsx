@@ -7,6 +7,8 @@ import SellerPage from "./pages/seller/Page";
 import ProtectedRoute from "./components/ProtectedRoute";
 import ProductsPage from "./pages/user/products/Page";
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 function App() {
     
   return (

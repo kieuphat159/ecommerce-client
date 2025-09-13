@@ -51,7 +51,7 @@ const UploadProduct = () => {
       let response;
       if (files.length === 1) {
         formData.append("image", files[0]);
-        response = await fetch("http://localhost:5000/api/upload", {
+        response = await fetch(`${import.meta.env.VITE_API_URL}/api/upload`, {
           method: "POST",
           body: formData
         });
@@ -59,7 +59,7 @@ const UploadProduct = () => {
         Array.from(files).forEach((file) => {
           formData.append("image", file);
         });
-        response = await fetch("http://localhost:5000/api/uploadd", {
+        response = await fetch(`${import.meta.env.VITE_API_URL}/api/upload`, {
           method: "POST",
           body: formData
         });
@@ -77,7 +77,7 @@ const UploadProduct = () => {
   const createProduct = async (productData) => {
     const token = localStorage.getItem('token');
     
-    const response = await fetch("http://localhost:5000/api/create", {
+    const response = await fetch(`${import.meta.env.VITE_API_URL}/api/create`, {
       method: "POST",
       headers: {
         'Content-Type': 'application/json',

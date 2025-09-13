@@ -17,7 +17,7 @@ export default function Products({sellerId}) {
     const getProducts = async () => {
         try {
             setLoading(true);
-            const response = await fetch(`http://localhost:5000/api/seller/products/${sellerId}`, {
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/api/seller/products/${sellerId}`, {
                 method: "GET",
                 headers: {
                     'Content-Type': 'application/json',
@@ -56,7 +56,7 @@ export default function Products({sellerId}) {
             setDeleteLoading(true);
             // console.log('id: ', productToDelete.id);
             
-            const response = await fetch(`http://localhost:5000/api/seller/product/${productToDelete.id}`, {
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/api/seller/product/${productToDelete.id}`, {
                 method: 'DELETE',
                 headers: {
                     'Content-Type': 'application/json',

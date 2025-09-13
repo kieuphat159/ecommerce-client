@@ -28,7 +28,7 @@ const UpdateProduct = ({sellerId}) => {
     const fetchProduct = async () => {
       try {
         const token = localStorage.getItem('token');
-        const response = await fetch(`http://localhost:5000/api/seller/product/${id}`, {
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/api/seller/product/${id}`, {
           headers: {
             'Authorization': `Bearer ${token}`
           }
@@ -99,7 +99,7 @@ const UpdateProduct = ({sellerId}) => {
       let response;
       if (files.length === 1) {
         formData.append("image", files[0]);
-        response = await fetch("http://localhost:5000/api/upload", {
+        response = await fetch(`${import.meta.env.VITE_API_URL}/api/upload`, {
           method: "POST",
           body: formData
         });
@@ -107,7 +107,7 @@ const UpdateProduct = ({sellerId}) => {
         Array.from(files).forEach((file) => {
           formData.append("image", file);
         });
-        response = await fetch("http://localhost:5000/api/upload", {
+        response = await fetch(`${import.meta.env.VITE_API_URL}/api/upload`, {
           method: "POST",
           body: formData
         });
@@ -124,7 +124,7 @@ const UpdateProduct = ({sellerId}) => {
 
   const updateProduct = async (productData) => {
     const token = localStorage.getItem('token');
-    const response = await fetch(`http://localhost:5000/api/seller/product/${id}`, {
+    const response = await fetch(`${import.meta.env.VITE_API_URL}/api/seller/product/${id}`, {
       method: "PUT",
       headers: {
         'Content-Type': 'application/json',
@@ -207,7 +207,7 @@ const UpdateProduct = ({sellerId}) => {
 
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:5000/api/product/${id}`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/product/${id}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`

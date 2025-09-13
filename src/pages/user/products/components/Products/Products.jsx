@@ -11,7 +11,7 @@ export default function Products() {
     const getProducts = async () => {
     try {
       setLoading(true);
-      const response = await fetch('http://localhost:5000/api/products', {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/products`, {
         method: "GET",
         headers: {
           'Content-Type': 'application/json',

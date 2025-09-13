@@ -1,6 +1,6 @@
 class AuthService {
     constructor() {
-        this.apiUrl = 'http://localhost:5000/api/auth';
+        this.apiUrl = `${import.meta.env.VITE_API_URL}/api/auth`;
         this.token = localStorage.getItem('authToken') || null;
         this.userInfo = localStorage.getItem('userInfo') || null;
     }
