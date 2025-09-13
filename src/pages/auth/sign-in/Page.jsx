@@ -3,13 +3,13 @@ import "./Page.css";
 
 function SignInPage() {
   return (
-    <div className="SignInPage">
-        <div className="body">
-            <div className="ImageSection">
-                <div className="Logo">3legant.</div>
+    <div className="sign-in-page">
+        <div className="sign-in-page__body">
+            <div className="sign-in-page__image-section">
+                <div className="sign-in-page__logo">3legant.</div>
                 <img src="./images/signup.jpg" alt="Sign In" />
             </div>
-            <div className="FormContent">
+            <div className="sign-in-page__form-content">
                 <SignInForm />
             </div>
         </div>

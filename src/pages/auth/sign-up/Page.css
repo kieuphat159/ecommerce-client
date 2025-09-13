@@ -1,54 +1,55 @@
-.SignUpPage {
-  width: 100vw;
-  height: 100vh;
+.sign-up-page {
   padding: 0;
   box-sizing: border-box;
-  background-color: #f5f5f5;
-  display: flex;
+  background-color: white;
   align-items: center;
   justify-content: center;
+  border-left: 1px solid #e0e0e0;
+  height: 100%;
 }
 
-.body {
-  display: flex;
+.sign-up-page div {
+  padding: 8px;
+}
+
+.sign-up-page__body {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
   align-items: center;
-  width: 100vw;
-  height: 100vh;
+  background-color: rgb(235, 233, 233);
 }
 
-.FormContent {
-  flex: 1 1 50%;
-  min-width: 320px;
+.sign-up-page__form-content {
   font-family: Arial, Helvetica, sans-serif;
   color: black;
   display: flex;
   align-items: center;
   justify-content: center;
-  height: 100%;
+  background-color: rgb(235, 233, 233);
 }
 
-.FormContent form {
-  display: flex;
-  flex-direction: column;
+.sign-up-page__form {
+  position: relative;
   gap: 16px;
-  background-color: white;
+  background-color: rgb(235, 233, 233);
   padding: 24px;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 1px 0px rgba(0, 0, 0, 0.1);
 }
 
-.FormContent input {
-  padding: 8px;
+.sign-up-page input {
+  padding: 14px;
   border: none;
   border-bottom: 2px solid #ccc;
   font-size: 16px;
+  background-color: rgb(235, 233, 233);
 }
 
-.FormContent input:focus {
+.sign-up-page__input:focus {
   outline: none;
   border-bottom-color: #000000;
 }
 
-.submitButton {
+.sign-up-page__submit-button {
   background-color: #000000;
   color: white;
   border: none;
@@ -59,21 +60,22 @@
   font-size: 16px;
 }
 
-.ImageSection {
-  flex: 1 1 50%;
-  display: flex;
-  flex-direction: column;
+.sign-up-page__image-section {
   align-items: center;
-  justify-content: flex-start;
-  background-color: #f5f7fa;
-  height: 100%;
+  background-color: rgba(254, 254, 254, 255);
   padding-top: 32px;
+  height: 100%;
 }
 
-.Logo {
+.sign-up-page__image-section img {
+  height: 70%;
+}
+
+.sign-up-page__logo {
   font-size: 28px;
   font-weight: bold;
   margin-bottom: 32px;
   text-align: center;
   letter-spacing: 1px;
+  font-family: Arial, Helvetica, sans-serif;
 }
