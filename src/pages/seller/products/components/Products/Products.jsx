@@ -98,39 +98,6 @@ export default function Products({sellerId}) {
 
     return (
         <div className='products-section'>
-            <div className='product-section__header'>
-                <div className='product-section__header--left'>
-                    <div>
-                        <label>Category</label>
-                        <div className='drop-down'>
-                            <button onClick={() => setOpenCategory(!openCategory)}>Living Room</button>
-                            {openCategory && (
-                                <div className="dropdown-menu">
-                                    <a href="#" className="drop-down__option">Mục 1</a>
-                                    <a href="#" className="drop-down__option">Mục 2</a>
-                                    <a href="#" className="drop-down__option">Mục 3</a>
-                                </div>
-                            )}
-                        </div>
-                    </div>
-                    <div>
-                        <label>Price</label>
-                        <div className='drop-down'>
-                            <button onClick={() => setOpenPrice(!openPrice)}>All Price</button>
-                            {openPrice && (
-                                <div className="dropdown-menu">
-                                    <a href="#" className="drop-down__option">Mục 1</a>
-                                    <a href="#" className="drop-down__option">Mục 2</a>
-                                    <a href="#" className="drop-down__option">Mục 3</a>
-                                </div>
-                            )}
-                        </div>
-                    </div>
-                </div>
-                <div className='product-section__header--right'>
-                    Sort by
-                </div>
-            </div>
 
             {error && (
                 <div className="error-message">
@@ -156,12 +123,7 @@ export default function Products({sellerId}) {
                                 <button 
                                     className='update' 
                                     onClick={() => navigate(`${product.id}`)}>
-                                    Update
-                                </button>
-                                <button 
-                                    className='delete' 
-                                    onClick={(e) => confirmDeleteItem(product, e)}>
-                                    Delete
+                                    Edit
                                 </button>
                             </div>
                         </div>

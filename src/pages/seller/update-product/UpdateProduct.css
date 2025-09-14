@@ -1,7 +1,10 @@
 .header {
+    width: 100%;
     background-color: aliceblue;
     margin: 0 auto;
     text-align: center;
+    z-index: 1000;
+    position: fixed;
 }
 
 .header h2 {
@@ -30,18 +33,21 @@
 }
 
 .product {
+    padding-top: 100px;
     display: grid;
     grid-template-columns: 1fr 1fr;
     align-items: center;
 }
 
 .product-image {
-    width: 100%;
-    height: auto;
+    max-height: 500px;
+    align-items: center;
+    text-align: center;
 }
 
 .product-image img {
-    width: 95%;
+    max-height: 500px;
+    width: auto;
 }
 
 .product-info {

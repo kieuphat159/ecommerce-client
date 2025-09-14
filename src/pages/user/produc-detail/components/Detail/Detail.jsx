@@ -12,7 +12,9 @@ export default function Detail() {
         'id',
         'name',
         'image',
-        'seller'
+        'seller',
+        'seller_id',
+        'seller_name'
     ]
     const specialAttr = [
         'price',

@@ -2,14 +2,16 @@ import React, { useState } from 'react';
 import "./CreateProduct.css";
 import { useNavigate } from 'react-router-dom';
 
-const UploadProduct = () => {
+const UploadProduct = ({sellerId}) => {
   const [product, setProduct] = useState({
     name: '',
     price: '',
     description: '',
     category: '',
     status: '1',
-    sellerId: '2',
+    sellerId: sellerId,
+    size: '',
+    color: ''
   });
 
   const [files, setFiles] = useState([]);
@@ -125,9 +127,11 @@ const UploadProduct = () => {
       category: product.category,
       status: product.status,
       sellerId: product.sellerId,
-
-      image: imageUrl
+      image: imageUrl,
+      size: product.category === "Clothes" ? product.size : undefined,
+      color: product.category === "Clothes" ? product.color : undefined
     };
+
 
     // Create product
     const createResult = await createProduct(productData);
@@ -142,7 +146,7 @@ const UploadProduct = () => {
         description: '',
         category: '',
         status: '1',
-        sellerId: '2',
+        sellerId: {sellerId},
       });
       setFiles([]);
       setPreviewImages([]);
@@ -280,22 +284,42 @@ const UploadProduct = () => {
             <option value="Bathroom">Bathroom</option>
             <option value="Office">Office</option>
             <option value="Outdoor">Outdoor</option>
+            <option value="Clothes">Clothes</option>
           </select>
         </div>
-        
-        <div className="form-group">
-          <label>Seller ID *</label>
-          <input
-            type="number"
-            name="sellerId"
-            value={product.sellerId}
-            onChange={handleChange}
-            required
-            min="1"
-            disabled={loading}
-            placeholder="Enter seller ID"
-          />
-        </div>
+        {product.category === "Clothes" && (
+          <>
+            <div className="form-group">
+              <label>Size *</label>
+              <select 
+                name="size" 
+                value={product.size} 
+                onChange={handleChange}
+                disabled={loading}
+                required
+              >
+                <option value="">Select Size</option>
+                <option value="S">S</option>
+                <option value="M">M</option>
+                <option value="L">L</option>
+                <option value="XL">XL</option>
+              </select>
+            </div>
+
+            <div className="form-group">
+              <label>Color *</label>
+              <input
+                type="text"
+                name="color"
+                value={product.color}
+                onChange={handleChange}
+                required
+                disabled={loading}
+                placeholder="Enter color (e.g. Red, Blue)"
+              />
+            </div>
+          </>
+        )}
         
         <button 
           type="submit" 
