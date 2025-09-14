@@ -24,7 +24,7 @@ export default function Detail() {
     useEffect(() => {
         const fetchProduct = async () => {
             try {
-                const response = await fetch(`${import.meta.env.VITE_API_URL}/api/${id}`);
+                const response = await fetch(`${import.meta.env.VITE_API_URL}/api/product/${id}`);
                 if (!response.ok) {
                     throw new Error('Fail to fetch product');
                 }
