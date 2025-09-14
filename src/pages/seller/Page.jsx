@@ -13,7 +13,7 @@ export default function SellerPage() {
       <Routes>
         <Route path="/" element={<ProductsPage />} />
         <Route path="/products" element={<Products sellerId={userId}/>} />
-        <Route path="/create" element={<CreateProduct />} />
+        <Route path="/create" element={<CreateProduct sellerId={userId}/>} />
         <Route path="/products/:id" element={<UpdateProduct sellerId={userId}/>} />
       </Routes>
     </div>

@@ -3,13 +3,13 @@ import "./Page.css";
 
 export default function SignUpPage() {
   return (
-    <div className="SignUpPage">
-      <div className="body">
-        <div className="ImageSection">
-          <div className="Logo">3legant.</div>
+    <div className="sign-up-page">
+      <div className="sign-up-page__body">
+        <div className="sign-up-page__image-section">
+          <div className="sign-up-page__logo">3legant.</div>
           <img src="./images/signup.jpg" alt="Sign Up" />
         </div>
-        <div className="FormContent">
+        <div className="sign-up-page__form-content">
           <SignUpForm />
         </div>
       </div>
