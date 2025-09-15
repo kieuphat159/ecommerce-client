@@ -137,7 +137,7 @@ export default function Products() {
           {/* Products grid */}
           {!loading && !error && products.length > 0 && (
             <div className="products-grid">
-              {products.map((product) => (
+              {products.slice(0, 4).map((product) => (
                 <div key={product.id} className="product-card" onClick={() => navigate(`/product/${product.id}`)}>
                   <div className="product-image-container">
                     <img 
