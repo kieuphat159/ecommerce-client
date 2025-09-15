@@ -8,7 +8,7 @@ export default function Products() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const navigate =  useNavigate();
+  const navigate = useNavigate();
 
   const categories = [
     {
@@ -59,45 +59,44 @@ export default function Products() {
     }
   };
 
-  // useEffect để gọi API khi component mount
   useEffect(() => {
     getProducts();
   }, []);
 
   return (
     <main className="page-main">
-      <section className="categories-section">
-        <div className="container">
-          <div className="categories-grid">
-            <div className="category-large">
-              <div className="category-card">
+      <section className="categories">
+        <div className="categories__container">
+          <div className="categories__grid">
+            <div className="categories__card--large">
+              <div className="categories__card">
                 <img 
                   src={categories[0].image}
                   alt={categories[0].name}
-                  className="category-image"
+                  className="categories__image"
                 />
-                <div className="category-overlay"></div>
-                <div className="category-content">
-                  <h3 className="category-title">{categories[0].name}</h3>
-                  <button className="category-link">
+                <div className="categories__overlay"></div>
+                <div className="categories__content">
+                  <h3 className="categories__title">{categories[0].name}</h3>
+                  <button className="categories__link">
                     {categories[0].link} →
                   </button>
                 </div>
               </div>
             </div>
 
-            <div className="categories-small">
+            <div className="categories__small">
               {categories.slice(1).map((category, index) => (
-                <div key={index} className="category-card">
+                <div key={index} className="categories__card">
                   <img 
                     src={category.image}
                     alt={category.name}
-                    className="category-image"
+                    className="categories__image"
                   />
-                  <div className="category-overlay"></div>
-                  <div className="category-content">
-                    <h3 className="category-title">{category.name}</h3>
-                    <button className="category-link">
+                  <div className="categories__overlay"></div>
+                  <div className="categories__content">
+                    <h3 className="categories__title">{category.name}</h3>
+                    <button className="categories__link">
                       {category.link} →
                     </button>
                   </div>
@@ -108,67 +107,62 @@ export default function Products() {
         </div>
       </section>
 
-      <section className="arrivals-section">
-        <div className="container">
-          <div className="arrivals-header">
-            <h2 className="section-title">New Arrivals</h2>
-            <button className="more-products-btn" onClick={() => navigate("/products")}>
+      <section className="arrivals">
+        <div className="arrivals__container">
+          <div className="arrivals__header">
+            <h2 className="arrivals__title">New Arrivals</h2>
+            <button className="arrivals__more-btn" onClick={() => navigate("/products")}>
               More Products →
             </button>
           </div>
 
-          {/* Loading state */}
           {loading && (
-            <div className="loading-container">
+            <div className="arrivals__loading">
               <p>Loading products...</p>
             </div>
           )}
 
-          {/* Error state */}
           {error && !loading && (
-            <div className="error-container">
-              <p className="error-message">{error}</p>
-              <button onClick={getProducts} className="retry-btn">
+            <div className="arrivals__error">
+              <p className="arrivals__error-message">{error}</p>
+              <button onClick={getProducts} className="arrivals__retry-btn">
                 Retry
               </button>
             </div>
           )}
 
-          {/* Products grid */}
           {!loading && !error && products.length > 0 && (
-            <div className="products-grid">
+            <div className="products__grid">
               {products.slice(0, 4).map((product) => (
                 <div key={product.id} className="product-card" onClick={() => navigate(`/product/${product.id}`)}>
-                  <div className="product-image-container">
+                  <div className="product-card__image-container">
                     <img 
                       src={product.image || product.image_url || "./images/placeholder.jpg"}
                       alt={product.name}
-                      className="product-image"
+                      className="product-card__image"
                       onError={(e) => {
                         e.target.src = "./images/placeholder.jpg";
                       }}
                     />
-                    <div className="product-actions">
-                      <button className="wishlist-btn">
-                        <Heart className="heart-icon" />
+                    <div className="product-card__actions">
+                      <button className="product-card__wishlist-btn">
+                        <Heart className="product-card__heart-icon" />
                       </button>
                     </div>
                   </div>
-                  <h3 className="product-name">{product.name}</h3>
-                  <p className="product-price">{product.price}</p>
+                  <h3 className="product-card__name">{product.name}</h3>
+                  <p className="product-card__price">{product.price}</p>
                   
-                  {/* Optional: Show seller info */}
                   {product.seller && (
-                    <p className="product-seller">by {product.seller}</p>
+                    <p className="product-card__seller">by {product.seller}</p>
                   )}
                 </div>
               ))}
             </div>
           )}
 
-          {/* No products state */}
           {!loading && !error && products.length === 0 && (
-            <div className="no-products-container">
+            <div className="products__empty">
               <p>No products available at the moment.</p>
             </div>
           )}

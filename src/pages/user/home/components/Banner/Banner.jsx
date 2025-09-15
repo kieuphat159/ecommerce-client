@@ -15,24 +15,23 @@ const Banner = () => {
 
   return (
     <section className="banner">
-      <div className="banner-container">
-        <div className="banner-slider">
-          <button className="banner-arrow banner-arrow-left">
+      <div className="banner__container">
+        <div className="banner__slider">
+          <button className="banner__arrow banner__arrow--left">
             <ChevronLeft size={24} />
           </button>
-
-          <button className="banner-arrow banner-arrow-right">
+          <button className="banner__arrow banner__arrow--right">
             <ChevronRight size={24} />
           </button>
         </div>
-        <div className='banner-content'>
-          <div className='slogan'>
+        <div className="banner__content">
+          <div className="banner__slogan">
             <div>Simply Unique<b>/</b></div>
             <div>Simply Better</div>
           </div>
-          <div className='description'>
+          <div className="banner__description">
             <div>
-              <strong>3legant</strong> is a gift & decorations store based in HCMC, Vietnam. Est since 2019. 
+              <strong>3legant</strong> is a gift & decorations store based in HCMC, Vietnam. Est since 2019.
             </div>
           </div>
         </div>
