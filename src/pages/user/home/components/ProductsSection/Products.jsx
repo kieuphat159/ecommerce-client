@@ -13,17 +13,17 @@ export default function Products() {
   const categories = [
     {
       name: "Living Room",
-      image: "https://res.cloudinary.com/dvwdjkjrb/image/upload/v1757299277/uploads/xzgczevw9m1pdbvgquv2.jpg",
+      image: "https://res.cloudinary.com/dvwdjkjrb/image/upload/v1757902233/product1_klhamr.jpg",
       link: "Shop Now"
     },
     {
       name: "Bedroom", 
-      image: "https://res.cloudinary.com/dvwdjkjrb/image/upload/v1757299383/uploads/iasupdrlkc9rvxv3ssrg.jpg",
+      image: "https://res.cloudinary.com/dvwdjkjrb/image/upload/v1757902222/product3_nlvfst.jpg",
       link: "Shop Now"
     },
     {
       name: "Kitchen",
-      image: "https://res.cloudinary.com/dvwdjkjrb/image/upload/v1757299403/uploads/hfuipxhhktb3esw9pqb2.jpg", 
+      image: "https://res.cloudinary.com/dvwdjkjrb/image/upload/v1757902222/product2_zmrd0e.jpg", 
       link: "Shop Now"
     }
   ];
