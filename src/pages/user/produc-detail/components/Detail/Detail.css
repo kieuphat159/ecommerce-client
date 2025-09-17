@@ -148,7 +148,7 @@ hr {
   height: 44px;
   width: 100%;
   max-width: 180px;
-  background-color: #f4f471;
+  background-color: #fff700;
   border: 1px solid #eaeaea;
   border-radius: 8px;
   font-size: 15px;
@@ -159,6 +159,7 @@ hr {
   justify-content: center;
   gap: 6px;
   transition: all 0.2s ease;
+  box-shadow: #66666641 2px 2px;
 }
 
 .detail__wishlist:hover {

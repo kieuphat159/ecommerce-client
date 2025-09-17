@@ -64,6 +64,8 @@ strong {
 .banner__content {
   height: 152px;
   padding-top: 24px;
+  padding-left: 120px;
+  padding-right: 120px;
   display: grid;
   grid-template-columns: 1fr 1fr;
 }
@@ -91,6 +93,24 @@ strong {
   letter-spacing: 0px;
 }
 
+@media (max-width: 1044px) {
+  .banner__content {
+    height: auto;
+    grid-template-columns: 1fr;
+    gap: 16px;
+    padding-top: 16px;
+    display: inline;
+    padding-left: 0;
+    padding-right: 0;
+    text-align: center;
+  }
+
+  .banner__description {
+    display: inline;
+    text-align: center
+  }
+}
+
 /* Mobile responsive styles */
 @media (max-width: 768px) {
   .banner__container {
@@ -113,6 +133,7 @@ strong {
     grid-template-columns: 1fr;
     gap: 16px;
     padding-top: 16px;
+    display: inline;
   }
 
   .banner__slogan {

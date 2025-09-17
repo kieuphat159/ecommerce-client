@@ -192,16 +192,3 @@
     border-color: #888;
 }
 
-.product-info button {
-  border: 1px solid red;
-  background-color: red;
-  border-radius: 5px;
-  color: white;
-  width: 100%;
-  padding: 10px;
-}
-
-.product-info button:hover {
-  cursor: pointer;
-  background-color: rgba(255, 0, 0, 0.536);
-}

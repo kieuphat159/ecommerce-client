@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import './UpdateProduct.css'
+import './UpdateProduct.css';
 
-const UpdateProduct = ({sellerId}) => {
+const UpdateProduct = ({ sellerId }) => {
   const { id } = useParams();
   const [product, setProduct] = useState({
     name: '',
@@ -13,6 +13,7 @@ const UpdateProduct = ({sellerId}) => {
     sellerId: sellerId,
     sku: ''
   });
+
   const [originalProduct, setOriginalProduct] = useState(null);
   const [files, setFiles] = useState([]);
   const [previewImages, setPreviewImages] = useState([]);
@@ -22,7 +23,158 @@ const UpdateProduct = ({sellerId}) => {
   const [loading, setLoading] = useState(false);
   const [loadingProduct, setLoadingProduct] = useState(true);
   const [error, setError] = useState('');
+  const [openStock, setOpenStock] = useState(false);
+  const [loadedStock, setLoadedStock] = useState(false);
+  const [openVariant, setOpenVariant] = useState(false);
+  const [loadedVariant, setLoadedVariant] = useState(false);
+  const [newOptionName, setNewOptionName] = useState(''); // State for new option input
+  const [newOptionValue, setNewOptionValue] = useState({}); // State for new option value inputs
   const navigate = useNavigate();
+  
+  const [options, setOptions] = useState([]);
+  const [optionValues, setOptionValues] = useState({});
+
+  // Fetch product options
+  const fetchOptions = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/product-options/${id}`, {
+        method: "GET",
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      if (response.ok) {
+        const data = await response.json();
+        if (data.success && data.data) {
+          const optionsData = data.data;
+          console.log('Options: ', optionsData);
+          setOptions(optionsData);
+          optionsData.forEach(option => fetchOptionValues(option.id));
+        }
+      } else {
+        console.log('Failed to fetch options');
+      }
+    } catch (err) {
+      console.log('Error fetching options: ', err);
+    }
+  };
+
+  // Fetch option values for a specific option_id
+  const fetchOptionValues = async (option_id) => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/product-option-values/${option_id}`, {
+        method: "GET",
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      if (response.ok) {
+        const data = await response.json();
+        if (data.success && data.data) {
+          console.log(`Option values for ${option_id}: `, data.data);
+          setOptionValues(prev => ({
+            ...prev,
+            [option_id]: data.data
+          }));
+        }
+      } else {
+        console.log(`Failed to fetch option values for option ${option_id}`);
+      }
+    } catch (err) {
+      console.log(`Error fetching option values for option ${option_id}: `, err);
+    }
+  };
+
+  // Add new option
+  const addOption = async () => {
+    if (!newOptionName.trim()) {
+      setError('Option name is required');
+      return;
+    }
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/product-options`, {
+        method: "POST",
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ product_id: id, name: newOptionName })
+      });
+      const data = await response.json();
+      if (data.success && data.data) {
+        setOptions(prev => [...prev, data.data]);
+        setNewOptionName('');
+        setError('');
+      } else {
+        throw new Error(data.message || 'Failed to add option');
+      }
+    } catch (err) {
+      console.error('Error adding option:', err);
+      setError(err.message || 'Failed to add option');
+    }
+  };
+
+  // Add new option value
+  const addOptionValue = async (option_id) => {
+    const value = newOptionValue[option_id]?.trim();
+    if (!value) {
+      setError('Option value is required');
+      return;
+    }
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/product-option-values`, {
+        method: "POST",
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ option_id, value })
+      });
+      const data = await response.json();
+      if (data.success && data.data) {
+        setOptionValues(prev => ({
+          ...prev,
+          [option_id]: [...(prev[option_id] || []), data.data]
+        }));
+        setNewOptionValue(prev => ({ ...prev, [option_id]: '' }));
+        setError('');
+      } else {
+        throw new Error(data.message || 'Failed to add option value');
+      }
+    } catch (err) {
+      console.error('Error adding option value:', err);
+      setError(err.message || 'Failed to add option value');
+    }
+  };
+
+  const [stocks, setStocks] = useState([]);
+  const fetchStock = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/seller/stocks`, {
+        method: "GET",
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      if (response.ok) {
+        const data = await response.json();
+        if (data.success && data.data) {
+          const stocksData = data.data;
+          console.log('Stock: ', stocksData);
+          setStocks(stocksData);
+        }
+      } else {
+        console.log('Failed to fetch stock');
+      }
+    } catch (err) {
+      console.log('Error fetching stock: ', err);
+    }
+  };
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -68,7 +220,7 @@ const UpdateProduct = ({sellerId}) => {
     if (id) {
       fetchProduct();
     }
-  }, [id]);
+  }, [id, sellerId]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -262,12 +414,12 @@ const UpdateProduct = ({sellerId}) => {
       {originalProduct && (
         <div className='product'>
           <div className='product-image'>
-              <img 
-                src={`${currentImage}` || 'https://placehold.co/600x400'} 
-                alt="Current product" 
-                width="200"
-              />
-            </div>
+            <img 
+              src={`${currentImage}` || 'https://placehold.co/600x400'} 
+              alt="Current product" 
+              width="200"
+            />
+          </div>
           <div className='product-info'>
             <form onSubmit={handleSubmit}>
               <div>
@@ -365,6 +517,105 @@ const UpdateProduct = ({sellerId}) => {
               </div>
 
               <div>
+                <button type='button' onClick={() => {
+                  setOpenStock(!openStock);
+                  if (!loadedStock) {
+                    fetchStock();
+                    setLoadedStock(true);
+                  }
+                }}>Add to stock?</button>
+              </div>
+              {openStock && (
+                <div>
+                  <label>Stock</label>
+                  <select 
+                    name="stock" 
+                    onChange={handleChange}
+                    disabled={loading}
+                  >
+                    <option value="">Select Stock</option>
+                    {stocks.map(stock => (
+                      <option key={stock.id} value={stock.id}>{stock.name}</option>
+                    ))}
+                  </select>
+                  <div>
+                    <label>Add New Option</label>
+                    <input
+                      type="text"
+                      value={newOptionName}
+                      onChange={(e) => setNewOptionName(e.target.value)}
+                      placeholder="Enter option name (e.g., Color)"
+                      disabled={loading}
+                    />
+                    <button type="button" onClick={addOption} disabled={loading}>
+                      {loading ? 'Adding...' : 'Add Option'}
+                    </button>
+                  </div>
+                  <div>
+                    <button type='button' onClick={() => {
+                      setOpenVariant(!openVariant);
+                      if (!loadedVariant) {
+                        fetchOptions();
+                        setLoadedVariant(true);
+                      }
+                    }}>Variant?</button>
+                  </div>
+                  {openVariant && (
+                    <>
+                      {options.map(option => (
+                        <div key={option.id}>
+                          <label>{option.name}</label>
+                          <select 
+                            name={`option_${option.id}`} 
+                            onChange={handleChange}
+                            disabled={loading}
+                          >
+                            <option value="">None</option>
+                            {optionValues[option.id]?.map(value => (
+                              <option key={value.id} value={value.id}>
+                                {value.value}
+                              </option>
+                            ))}
+                          </select>
+                          <div>
+                            <input
+                              type="text"
+                              value={newOptionValue[option.id] || ''}
+                              onChange={(e) => setNewOptionValue(prev => ({
+                                ...prev,
+                                [option.id]: e.target.value
+                              }))}
+                              placeholder={`Enter value for ${option.name} (e.g., Red)`}
+                              disabled={loading}
+                            />
+                            <button 
+                              type="button" 
+                              onClick={() => addOptionValue(option.id)} 
+                              disabled={loading}
+                            >
+                              {loading ? 'Adding...' : 'Add Value'}
+                            </button>
+                          </div>
+                        </div>
+                      ))}
+                    </>
+                  )}
+                  <div>
+                    <label>Quantity *</label>
+                    <input
+                      type="number"
+                      name="quantity"
+                      value={product.quantity || '0'}
+                      onChange={handleChange}
+                      required
+                      disabled={loading}
+                      placeholder="0"
+                    />
+                  </div>
+                </div>
+              )}
+              
+              <div>
                 <label>Status</label>
                 <select 
                   name="status" 
@@ -406,8 +657,6 @@ const UpdateProduct = ({sellerId}) => {
         </div>
       )}
 
-      
-      
       {uploadResult && (
         <div>
           <h4>Image Upload Result:</h4>
