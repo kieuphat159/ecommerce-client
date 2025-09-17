@@ -33,6 +33,7 @@ const UpdateProduct = ({ sellerId }) => {
   
   const [options, setOptions] = useState([]);
   const [optionValues, setOptionValues] = useState({});
+  const [currentQuantity, setCurrentQuantity] = useState(0);
 
   // Fetch product options
   const fetchOptions = async () => {
@@ -417,6 +418,57 @@ const UpdateProduct = ({ sellerId }) => {
     }
   };
 
+  const fetchCurrentQuantity = async () => {
+    if (!openStock || !product.stock || options.length === 0) {
+      setCurrentQuantity(0);
+      return;
+    }
+
+    const selectedOptions = {};
+    options.forEach(opt => {
+      const val = product[`option_${opt.id}`];
+      if (val) selectedOptions[opt.id] = val;
+    });
+
+    if (Object.keys(selectedOptions).length === 0) {
+      setCurrentQuantity(0);
+      return;
+    }
+
+    try {
+      const token = localStorage.getItem('token');
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/product-variant-id`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ product_id: id, options: selectedOptions })
+      });
+      const data = await res.json();
+      if (data.success && data.variantId) {
+        const stockRes = await fetch(`${import.meta.env.VITE_API_URL}/api/stock/${data.variantId}?stockId=${product.stock}`, {
+          
+        });
+        const stockData = await stockRes.json();
+        if (stockData.success) {
+          setCurrentQuantity(stockData.data.quantity || 0);
+        } else {
+          setCurrentQuantity(0);
+        }
+      } else {
+        setCurrentQuantity(0);
+      }
+    } catch (err) {
+      console.error('Error fetching current quantity:', err);
+      setCurrentQuantity(0);
+    }
+  };
+
+  useEffect(() => {
+    fetchCurrentQuantity();
+  }, [product, options, openStock]);
+
   useEffect(() => {
     return () => {
       previewImages.forEach(url => URL.revokeObjectURL(url));
@@ -699,6 +751,7 @@ const UpdateProduct = ({ sellerId }) => {
                           placeholder="0"
                           className="product__info__input"
                         />
+                        <p>Current quantity in selected stock: {currentQuantity}</p>
                       </div>
                     </div>
                   )}
