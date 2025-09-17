@@ -27,8 +27,8 @@ const UpdateProduct = ({ sellerId }) => {
   const [loadedStock, setLoadedStock] = useState(false);
   const [openVariant, setOpenVariant] = useState(false);
   const [loadedVariant, setLoadedVariant] = useState(false);
-  const [newOptionName, setNewOptionName] = useState(''); // State for new option input
-  const [newOptionValue, setNewOptionValue] = useState({}); // State for new option value inputs
+  const [newOptionName, setNewOptionName] = useState('');
+  const [newOptionValue, setNewOptionValue] = useState({});
   const navigate = useNavigate();
   
   const [options, setOptions] = useState([]);
@@ -326,20 +326,55 @@ const UpdateProduct = ({ sellerId }) => {
       };
 
       const updateResult = await updateProduct(productData);
-      
-      if (updateResult.success) {
-        setResult(updateResult);
-        setCurrentImage(imageUrl);
-        setFiles([]);
-        setPreviewImages([]);
-        
-        const fileInput = document.querySelector('input[type="file"]');
-        if (fileInput) fileInput.value = '';
-                
-      } else {
+
+      if (!updateResult.success) {
         throw new Error(updateResult.message || 'Failed to update product');
       }
-      
+
+      if (openStock && product.stock && product.quantity) {
+        console.log(">>> [FE] Submitting stock add with:", {
+          entityId: id,
+          stockId: product.stock,
+          quantity: product.quantity,
+          options: Object.keys(optionValues).reduce((acc, optionId) => {
+            acc[optionId] = product[`option_${optionId}`] || null;
+            return acc;
+          }, {})
+        });
+
+        const token = localStorage.getItem('token');
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/api/stock/add`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${token}`
+          },
+          body: JSON.stringify({
+            entityId: id,
+            stockId: product.stock,
+            quantity: parseInt(product.quantity, 10),
+            options: Object.keys(optionValues).reduce((acc, optionId) => {
+              acc[optionId] = product[`option_${optionId}`] || null;
+              return acc;
+            }, {})
+          })
+        });
+
+        const stockResult = await response.json();
+        console.log(">>> [FE] Stock API response:", stockResult);
+
+        if (!stockResult.success) {
+          throw new Error(stockResult.message || 'Failed to update stock');
+        }
+      }
+
+      setResult(updateResult);
+      setCurrentImage(imageUrl);
+      setFiles([]);
+      setPreviewImages([]);
+      const fileInput = document.querySelector('input[type="file"]');
+      if (fileInput) fileInput.value = '';
+
     } catch (err) {
       console.error("Error updating product:", err);
       setError(err.message || 'An error occurred while updating the product');
@@ -388,302 +423,357 @@ const UpdateProduct = ({ sellerId }) => {
     };
   }, [previewImages]);
 
-  if (loadingProduct) {
-    return <div>Loading product...</div>;
-  }
-
-  if (error && !originalProduct) {
-    return (
-      <div>
-        <p>Error: {error}</p>
-        <button onClick={() => navigate('/products')}>Back to Products</button>
-      </div>
-    );
-  }
-
   return (
     <div>
-      <div className='header'>
-        <h2>Update Product</h2>
-        <button onClick={() => navigate(`/products`)}>Back to Products</button>
-        <button className="delete-btn" onClick={handleDelete} disabled={loading}>
-          {loading ? 'Processing...' : 'Delete Product'}
-        </button>
-      </div>
-
-      {originalProduct && (
-        <div className='product'>
-          <div className='product-image'>
-            <img 
-              src={`${currentImage}` || 'https://placehold.co/600x400'} 
-              alt="Current product" 
-              width="200"
-            />
+      {loadingProduct ? (
+        <div className="loading">Loading product...</div>
+      ) : error && !originalProduct ? (
+        <div className="error">
+          <p>Error: {error}</p>
+          <button className="header__button" onClick={() => navigate('/products')}>
+            Back to Products
+          </button>
+        </div>
+      ) : (
+        <>
+          <div className="header">
+            <h2 className="header__title">Update Product</h2>
+            <div>
+              <button
+                className="header__button"
+                onClick={() => navigate('/products')}
+                disabled={loading}
+              >
+                Back to Products
+              </button>
+              <button
+                className="header__button header__button--delete"
+                onClick={handleDelete}
+                disabled={loading}
+              >
+                {loading ? 'Processing...' : 'Delete Product'}
+              </button>
+            </div>
           </div>
-          <div className='product-info'>
-            <form onSubmit={handleSubmit}>
-              <div>
-                <label>SKU</label>
-                <input
-                  type="text"
-                  name="sku"
-                  value={product.sku}
-                  onChange={handleChange}
-                  disabled={loading}
-                  placeholder="Product SKU"
-                />
-              </div>
 
-              <div>
-                <label>Product Name *</label>
-                <input
-                  type="text"
-                  name="name"
-                  value={product.name}
-                  onChange={handleChange}
-                  required
-                  disabled={loading}
-                  placeholder="Enter product name"
+          {originalProduct && (
+            <div className="product">
+              <div className="product__image">
+                <img
+                  src={currentImage || 'https://placehold.co/600x400'}
+                  alt="Current product"
                 />
-              </div>
-              
-              <div>
-                <label>Price ($) *</label>
-                <input
-                  type="number"
-                  name="price"
-                  value={product.price}
-                  onChange={handleChange}
-                  step="0.01"
-                  min="0.01"
-                  required
-                  disabled={loading}
-                  placeholder="0.00"
-                />
-              </div>
-              
-              <div>
-                <label>Update Product Images</label>
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={handleFileChange}
-                  multiple
-                  disabled={loading}
-                />
-                {previewImages.length > 0 && (
-                  <div>
-                    {previewImages.map((previewUrl, index) => (
-                      <div key={index}>
-                        <img src={previewUrl} alt={`Preview ${index + 1}`} width="150" />
-                        <p>New image {index + 1}</p>
-                      </div>
-                    ))}
-                  </div>
-                )}
                 {files.length > 0 && (
-                  <p>Selected {files.length} new image{files.length !== 1 ? 's' : ''} (will replace current image)</p>
+                  <p>
+                    Selected {files.length} new image{files.length !== 1 ? 's' : ''} (will replace current image)
+                  </p>
                 )}
               </div>
-              
-              <div>
-                <label>Description</label>
-                <textarea
-                  name="description"
-                  value={product.description}
-                  onChange={handleChange}
-                  rows="4"
-                  disabled={loading}
-                  placeholder="Enter product description (optional)"
-                />
-              </div>
-              
-              <div>
-                <label>Category</label>
-                <select 
-                  name="category" 
-                  value={product.category} 
-                  onChange={handleChange}
-                  disabled={loading}
-                >
-                  <option value="">Select Category (Optional)</option>
-                  <option value="Living Room">Living Room</option>
-                  <option value="Bedroom">Bedroom</option>
-                  <option value="Kitchen">Kitchen</option>
-                  <option value="Bathroom">Bathroom</option>
-                  <option value="Office">Office</option>
-                  <option value="Outdoor">Outdoor</option>
-                </select>
-              </div>
-
-              <div>
-                <button type='button' onClick={() => {
-                  setOpenStock(!openStock);
-                  if (!loadedStock) {
-                    fetchStock();
-                    setLoadedStock(true);
-                  }
-                }}>Add to stock?</button>
-              </div>
-              {openStock && (
-                <div>
-                  <label>Stock</label>
-                  <select 
-                    name="stock" 
-                    onChange={handleChange}
-                    disabled={loading}
-                  >
-                    <option value="">Select Stock</option>
-                    {stocks.map(stock => (
-                      <option key={stock.id} value={stock.id}>{stock.name}</option>
-                    ))}
-                  </select>
-                  <div>
-                    <label>Add New Option</label>
+              <div className="product__info">
+                <form onSubmit={handleSubmit}>
+                  <div className="product__info__field">
+                    <label className="product__info__label">SKU</label>
                     <input
                       type="text"
-                      value={newOptionName}
-                      onChange={(e) => setNewOptionName(e.target.value)}
-                      placeholder="Enter option name (e.g., Color)"
+                      name="sku"
+                      value={product.sku}
+                      onChange={handleChange}
                       disabled={loading}
+                      placeholder="Product SKU"
+                      className="product__info__input"
                     />
-                    <button type="button" onClick={addOption} disabled={loading}>
-                      {loading ? 'Adding...' : 'Add Option'}
-                    </button>
                   </div>
-                  <div>
-                    <button type='button' onClick={() => {
-                      setOpenVariant(!openVariant);
-                      if (!loadedVariant) {
-                        fetchOptions();
-                        setLoadedVariant(true);
-                      }
-                    }}>Variant?</button>
-                  </div>
-                  {openVariant && (
-                    <>
-                      {options.map(option => (
-                        <div key={option.id}>
-                          <label>{option.name}</label>
-                          <select 
-                            name={`option_${option.id}`} 
-                            onChange={handleChange}
-                            disabled={loading}
-                          >
-                            <option value="">None</option>
-                            {optionValues[option.id]?.map(value => (
-                              <option key={value.id} value={value.id}>
-                                {value.value}
-                              </option>
-                            ))}
-                          </select>
-                          <div>
-                            <input
-                              type="text"
-                              value={newOptionValue[option.id] || ''}
-                              onChange={(e) => setNewOptionValue(prev => ({
-                                ...prev,
-                                [option.id]: e.target.value
-                              }))}
-                              placeholder={`Enter value for ${option.name} (e.g., Red)`}
-                              disabled={loading}
-                            />
-                            <button 
-                              type="button" 
-                              onClick={() => addOptionValue(option.id)} 
-                              disabled={loading}
-                            >
-                              {loading ? 'Adding...' : 'Add Value'}
-                            </button>
-                          </div>
-                        </div>
-                      ))}
-                    </>
-                  )}
-                  <div>
-                    <label>Quantity *</label>
+
+                  <div className="product__info__field">
+                    <label className="product__info__label">Product Name *</label>
                     <input
-                      type="number"
-                      name="quantity"
-                      value={product.quantity || '0'}
+                      type="text"
+                      name="name"
+                      value={product.name}
                       onChange={handleChange}
                       required
                       disabled={loading}
-                      placeholder="0"
+                      placeholder="Enter product name"
+                      className="product__info__input"
                     />
                   </div>
-                </div>
-              )}
-              
-              <div>
-                <label>Status</label>
-                <select 
-                  name="status" 
-                  value={product.status} 
-                  onChange={handleChange}
-                  disabled={loading}
-                >
-                  <option value="1">Active</option>
-                  <option value="0">Inactive</option>
-                </select>
-              </div>
-              
-              <div>
-                <label>Seller ID *</label>
-                <input
-                  type="number"
-                  name="sellerId"
-                  value={sellerId}
-                  onChange={handleChange}
-                  required
-                  min="1"
-                  disabled={loading}
-                  placeholder="Enter seller ID"
-                  readOnly
-                />
-              </div>
-              
-              <button type="submit" disabled={loading}>
-                {loading ? 'Updating Product...' : 'Update Product'}
-              </button>
-            </form>
-          </div>
-        </div>
-      )}
-      
-      {error && (
-        <div>
-          <strong>Error:</strong> {error}
-        </div>
-      )}
 
-      {uploadResult && (
-        <div>
-          <h4>Image Upload Result:</h4>
-          <pre>{JSON.stringify(uploadResult, null, 2)}</pre>
-        </div>
-      )}
-      
-      {result && (
-        <div>
-          <h3>Product Updated Successfully!</h3>
-          
-          {result.data && (
-            <div>
-              <p>Product ID: {result.data.id || id}</p>
-              <p>SKU: {result.data.sku}</p>
-              <p>Name: {result.data.name}</p>
-              <p>Price: {result.data.price}</p>
-              {result.data.category && <p>Category: {result.data.category}</p>}
-              <p>Status: {result.data.status === 1 ? 'Active' : 'Inactive'}</p>
+                  <div className="product__info__field">
+                    <label className="product__info__label">Price ($) *</label>
+                    <input
+                      type="number"
+                      name="price"
+                      value={product.price}
+                      onChange={handleChange}
+                      step="0.01"
+                      min="0.01"
+                      required
+                      disabled={loading}
+                      placeholder="0.00"
+                      className="product__info__input"
+                    />
+                  </div>
+
+                  <div className="product__info__field">
+                    <label className="product__info__label">Update Product Images</label>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleFileChange}
+                      multiple
+                      disabled={loading}
+                      className="product__info__input"
+                    />
+                    {previewImages.length > 0 && (
+                      <div className="product__info__preview">
+                        {previewImages.map((previewUrl, index) => (
+                          <div key={index}>
+                            <img src={previewUrl} alt={`Preview ${index + 1}`} />
+                            <p>New image {index + 1}</p>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="product__info__field">
+                    <label className="product__info__label">Description</label>
+                    <textarea
+                      name="description"
+                      value={product.description}
+                      onChange={handleChange}
+                      rows="4"
+                      disabled={loading}
+                      placeholder="Enter product description (optional)"
+                      className="product__info__textarea"
+                    />
+                  </div>
+
+                  <div className="product__info__field">
+                    <label className="product__info__label">Category</label>
+                    <select
+                      name="category"
+                      value={product.category}
+                      onChange={handleChange}
+                      disabled={loading}
+                      className="product__info__select"
+                    >
+                      <option value="">Select Category (Optional)</option>
+                      <option value="Living Room">Living Room</option>
+                      <option value="Bedroom">Bedroom</option>
+                      <option value="Kitchen">Kitchen</option>
+                      <option value="Bathroom">Bathroom</option>
+                      <option value="Office">Office</option>
+                      <option value="Outdoor">Outdoor</option>
+                    </select>
+                  </div>
+
+                  <div className="product__info__field">
+                    <button
+                      type="button"
+                      className="header__button"
+                      onClick={() => {
+                        setOpenStock(!openStock);
+                        if (!loadedStock) {
+                          fetchStock();
+                          setLoadedStock(true);
+                        }
+                      }}
+                      disabled={loading}
+                    >
+                      {openStock ? 'Hide Stock Options' : 'Add to Stock'}
+                    </button>
+                  </div>
+
+                  {openStock && (
+                    <div className="product__info__field">
+                      <label className="product__info__label">Stock</label>
+                      <select
+                        name="stock"
+                        onChange={handleChange}
+                        disabled={loading}
+                        className="product__info__select"
+                      >
+                        <option value="">Select Stock</option>
+                        {stocks.map(stock => (
+                          <option key={stock.id} value={stock.id}>
+                            {stock.name}
+                          </option>
+                        ))}
+                      </select>
+
+                      <div className="product__info__field">
+                        <label className="product__info__label">Add New Option</label>
+                        <div style={{ display: 'flex', gap: '8px' }}>
+                          <input
+                            type="text"
+                            value={newOptionName}
+                            onChange={(e) => setNewOptionName(e.target.value)}
+                            placeholder="Enter option name (e.g., Color)"
+                            disabled={loading}
+                            className="product__info__input"
+                          />
+                          <button
+                            type="button"
+                            className="header__button"
+                            onClick={addOption}
+                            disabled={loading}
+                          >
+                            {loading ? 'Adding...' : 'Add Option'}
+                          </button>
+                        </div>
+                      </div>
+
+                      <div className="product__info__field">
+                        <button
+                          type="button"
+                          className="header__button"
+                          onClick={() => {
+                            setOpenVariant(!openVariant);
+                            if (!loadedVariant) {
+                              fetchOptions();
+                              setLoadedVariant(true);
+                            }
+                          }}
+                          disabled={loading}
+                        >
+                          {openVariant ? 'Hide Variants' : 'Add Variants'}
+                        </button>
+                      </div>
+
+                      {openVariant && (
+                        <>
+                          {options.map(option => (
+                            <div key={option.id} className="product__info__field">
+                              <label className="product__info__label">{option.name}</label>
+                              <select
+                                name={`option_${option.id}`}
+                                onChange={handleChange}
+                                disabled={loading}
+                                className="product__info__select"
+                              >
+                                <option value="">None</option>
+                                {optionValues[option.id]?.map(value => (
+                                  <option key={value.id} value={value.id}>
+                                    {value.value}
+                                  </option>
+                                ))}
+                              </select>
+                              <div className="product__info__field" style={{ display: 'flex', gap: '8px' }}>
+                                <input
+                                  type="text"
+                                  value={newOptionValue[option.id] || ''}
+                                  onChange={(e) =>
+                                    setNewOptionValue(prev => ({
+                                      ...prev,
+                                      [option.id]: e.target.value
+                                    }))
+                                  }
+                                  placeholder={`Enter value for ${option.name} (e.g., Red)`}
+                                  disabled={loading}
+                                  className="product__info__input"
+                                />
+                                <button
+                                  type="button"
+                                  className="header__button"
+                                  onClick={() => addOptionValue(option.id)}
+                                  disabled={loading}
+                                >
+                                  {loading ? 'Adding...' : 'Add Value'}
+                                </button>
+                              </div>
+                            </div>
+                          ))}
+                        </>
+                      )}
+
+                      <div className="product__info__field">
+                        <label className="product__info__label">Quantity *</label>
+                        <input
+                          type="number"
+                          name="quantity"
+                          value={product.quantity || '0'}
+                          onChange={handleChange}
+                          required
+                          disabled={loading}
+                          placeholder="0"
+                          className="product__info__input"
+                        />
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="product__info__field">
+                    <label className="product__info__label">Status</label>
+                    <select
+                      name="status"
+                      value={product.status}
+                      onChange={handleChange}
+                      disabled={loading}
+                      className="product__info__select"
+                    >
+                      <option value="1">Active</option>
+                      <option value="0">Inactive</option>
+                    </select>
+                  </div>
+
+                  <div className="product__info__field">
+                    <label className="product__info__label">Seller ID *</label>
+                    <input
+                      type="number"
+                      name="sellerId"
+                      value={sellerId}
+                      onChange={handleChange}
+                      required
+                      min="1"
+                      disabled={loading}
+                      placeholder="Enter seller ID"
+                      readOnly
+                      className="product__info__input"
+                    />
+                  </div>
+
+                  <button type="submit" className="header__button" disabled={loading}>
+                    {loading ? 'Updating Product...' : 'Update Product'}
+                  </button>
+                </form>
+              </div>
             </div>
           )}
-          
-          <details>
-            <summary>View Raw Response</summary>
-            <pre>{JSON.stringify(result, null, 2)}</pre>
-          </details>
-        </div>
+
+          {error && (
+            <div className="error">
+              <strong>Error:</strong> {error}
+            </div>
+          )}
+
+          {uploadResult && (
+            <div className="result">
+              <h4>Image Upload Result:</h4>
+              <pre>{JSON.stringify(uploadResult, null, 2)}</pre>
+            </div>
+          )}
+
+          {result && (
+            <div className="result">
+              <h3>Product Updated Successfully!</h3>
+              {result.data && (
+                <div>
+                  <p>Product ID: {result.data.id || id}</p>
+                  <p>SKU: {result.data.sku}</p>
+                  <p>Name: {result.data.name}</p>
+                  <p>Price: {result.data.price}</p>
+                  {result.data.category && <p>Category: {result.data.category}</p>}
+                  <p>Status: {result.data.status === 1 ? 'Active' : 'Inactive'}</p>
+                </div>
+              )}
+              <details>
+                <summary>View Raw Response</summary>
+                <pre>{JSON.stringify(result, null, 2)}</pre>
+              </details>
+            </div>
+          )}
+        </>
       )}
     </div>
   );
