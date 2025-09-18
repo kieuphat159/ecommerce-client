@@ -1,16 +1,16 @@
-.page-footer {
+.footer {
   background-color: #1a1a1a;
   color: white;
   padding: 3rem 0 3rem 0;
 }
 
-.container {
+.footer__container {
   max-width: 1200px;
   margin: 0 auto;
   padding: 0 2rem;
 }
 
-.footer-content {
+.footer__content {
   display: flex;
   align-items: center;
   padding-bottom: 2rem;
@@ -18,13 +18,13 @@
   justify-content: space-between;
 }
 
-.footer-brand {
+.footer__brand {
   display: flex;
   align-items: center;
   gap: 1rem;
 }
 
-.footer-title {
+.footer__title {
   font-size: 1.5rem;
   font-weight: bold;
   font-family: Arial, Helvetica, sans-serif;
@@ -32,34 +32,34 @@
   color: white;
 }
 
-.footer-tagline {
+.footer__tagline {
   font-size: 0.9rem;
   color: #9ca3af;
   margin: 0;
 }
 
-.footer-nav {
+.footer__nav {
   display: flex;
   gap: 2rem;
 }
 
-.footer-nav-link {
+.footer__nav-link {
   color: #9ca3af;
   text-decoration: none;
   font-size: 0.95rem;
   transition: color 0.2s ease;
 }
 
-.footer-nav-link:hover {
+.footer__nav-link--hover:hover {
   color: white;
 }
 
-.footer-social {
+.footer__social {
   display: flex;
   gap: 1rem;
 }
 
-.social-icon {
+.footer__social-icon {
   color: #9ca3af;
   transition: color 0.2s ease;
   display: inline-flex;
@@ -67,34 +67,65 @@
   justify-content: center;
 }
 
-.social-icon:hover {
+.footer__social-icon--hover:hover {
   color: white;
 }
 
-.footer-bottom {
+.footer__bottom {
   padding-top: 1.5rem;
   justify-content: space-between;
-display: flex;
+  display: flex;
 }
 
-.footer-legal {
+.footer__legal {
   display: flex;
   align-items: center;
   gap: 2rem;
   font-size: 0.9rem;
 }
 
-.copyright {
+.footer__copyright {
   color: #9ca3af;
   margin: 0;
 }
 
-.legal-link {
+.footer__legal-link {
   color: #9ca3af;
   text-decoration: none;
   transition: color 0.2s ease;
 }
 
-.legal-link:hover {
+.footer__legal-link--hover:hover {
   color: white;
+}
+
+/* Mobile responsive styles */
+@media (max-width: 768px) {
+  .footer__content {
+    flex-direction: column;
+    text-align: center;
+    padding-bottom: 1.5rem;
+  }
+
+  .footer__nav {
+    flex-direction: column;
+    gap: 1rem;
+    padding-top: 1rem;
+  }
+
+  .footer__bottom {
+    flex-direction: column;
+    text-align: center;
+    gap: 1rem;
+    padding-top: 1rem;
+  }
+
+  .footer__social {
+    justify-content: center;
+  }
+
+  .footer__legal {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
 }
