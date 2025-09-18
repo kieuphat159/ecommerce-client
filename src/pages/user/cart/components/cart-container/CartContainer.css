@@ -1,0 +1,91 @@
+.circle {
+  width: 35px;           
+  height: 35px;          
+  background-color: black;
+  color: white;         
+  border-radius: 50%;    
+  display: flex;       
+  align-items: center;   
+  justify-content: center;
+  font-weight: bold;
+}
+
+
+.cart-container {
+  padding: 80px 20px;
+}
+
+.cart-container__header{
+  padding-bottom: 40px;
+  font-weight: 600;
+}
+
+.cart-container__header__title {
+  text-align: center;
+  font-size: 24px;
+}
+
+.cart-container__header__navigation {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  white-space: nowrap;
+  padding-left: 10px;
+}
+
+.cart-container__header__navigation button {
+  flex-shrink: 0;
+  transition: all 0.3s ease; 
+  padding: 10px;
+  border: none; 
+  background: none;
+  cursor: pointer;
+  text-align: left;
+  display: flex;
+  align-items: center;
+  gap: 5px
+}
+
+.cart-container__header__navigation button:not(.active) {
+  flex-basis: 15%; 
+  overflow: hidden;
+  text-overflow: ellipsis;
+  opacity: 0.5;
+}
+
+.cart-container__header__navigation button.active {
+  flex-basis: 50%; 
+  border-bottom: 2px solid black;
+  margin-left: 20px;
+  margin-right: 60px;
+}
+
+.cart-container__header__navigation button:nth-child(1)::after {
+  font-weight: 600;
+  content: "Shopping cart";
+}
+
+.cart-container__header__navigation button:nth-child(1):not(.active)::after {
+  content: ""; 
+  display: block;
+}
+
+.cart-container__header__navigation button:nth-child(2)::after {
+  content: "Checkout details";
+  font-weight: 600;
+}
+
+.cart-container__header__navigation button:nth-child(2):not(.active)::after {
+  content: ""; 
+  display: block;
+}
+
+.cart-container__header__navigation button:nth-child(3)::after {
+  content: "Order complete";
+  font-weight: 600;
+}
+
+.cart-container__header__navigation button:nth-child(3):not(.active)::after {
+  content: ""; 
+  display: block;
+}
