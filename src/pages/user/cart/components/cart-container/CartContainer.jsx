@@ -2,6 +2,7 @@ import { useState } from "react";
 import "./CartContainer.css";
 import ContentProduct from "../content-product/ContentProduct";
 import ContentDetail from "../content-detail/ContentDetail";
+import OrderComplete from "../order-complete/OrderComplete";
 
 export default function CartContainer() {
   const mockProducts = [
@@ -72,6 +73,9 @@ export default function CartContainer() {
         )}
         {active === 2 && (
           <ContentDetail mockProducts={mockProducts}/>
+        )}
+        {active === 3 && (
+          <OrderComplete mockProducts={mockProducts}/>
         )}
       </div>
     </div>
