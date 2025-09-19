@@ -1,6 +1,7 @@
 import "./Navigation.css";
 import { Link } from "react-router-dom";
 import { useState } from "react";
+import authService from "../../../../../services/authService";
 
 export default function Navigation() {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -8,6 +9,10 @@ export default function Navigation() {
     const toggleMenu = () => {
         setIsMenuOpen(!isMenuOpen);
     };
+
+    const signOut = () => {
+        authService.logout();
+    }
 
     return (
         <nav className="navigation">
@@ -30,9 +35,10 @@ export default function Navigation() {
                 <Link to="/signin" className="navigation__action">
                     <img src="/assets/profile.svg" className="navigation__icon" alt="Profile" />
                 </Link>
-                <Link to="/" className="navigation__action">
+                <Link to="/api/auth/user/cart" className="navigation__action">
                     <img src="/assets/cart.svg" className="navigation__icon" alt="Cart" />
                 </Link>
+                <button onClick={signOut}>sign out</button>
             </div>
         </nav>
     );

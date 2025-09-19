@@ -24,6 +24,10 @@ function App() {
 
           <Route path="/cart" element={<CartPage />} />
 
+          <Route path="/api/auth/user/*" element={<CartPage />}>
+
+          </Route>
+
           <Route path="/api/auth/seller/*" element={
             <ProtectedRoute requiredRole="seller">
               <SellerPage />

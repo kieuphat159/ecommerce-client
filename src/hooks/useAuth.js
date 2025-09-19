@@ -66,6 +66,7 @@ const useAuth = () => {
   };
 
   const logout = () => {
+    console.log('clear');
     console.log('Logging out user...');
     
     AuthService.logout();

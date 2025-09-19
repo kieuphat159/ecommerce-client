@@ -19,20 +19,25 @@ class AuthService {
 
     setUserInfo(userInfo) {
         this.userInfo = userInfo;
-        console.log('User info saved:', userInfo); // Debug
+        localStorage.setItem('userInfo', JSON.stringify(userInfo));
+        console.log('User info saved:', userInfo);
     }
 
-
     getUserInfo() {
+        if (!this.userInfo) {
+            const saved = localStorage.getItem('userInfo');
+            this.userInfo = saved ? JSON.parse(saved) : null;
+        }
         return this.userInfo;
     }
 
     clearAuthData() {
+        
         this.token = null;
         this.userInfo = null;
-        localStorage.removeItem('authToken');
-        localStorage.removeItem('userInfo');
+        localStorage.clear();
     }
+
 
     // authentication methods
     async signup(name, username, email, password, role) {
@@ -134,6 +139,7 @@ class AuthService {
 
     // logout
     logout() {
+        
         this.clearAuthData();
     }
 
