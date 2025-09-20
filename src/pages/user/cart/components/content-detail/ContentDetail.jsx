@@ -1,13 +1,86 @@
 import './ContentDetail.css'
+import { useEffect, useState } from "react";
 
-export default function ContentDetail({mockProducts}) {
-    const increase = () => {
-        setNumberOfProduct(Math.min(numberOfProduct + 1, currentQuantity));
+export default function ContentDetail({
+    mockProducts, 
+    userId, 
+    onRemove, 
+    shippingMethod,
+    quantities,
+    setQuantities
+    }) {
+
+    const updateCart = async (index, num) => {
+        const product = mockProducts[index];
+        const unitPrice = parseFloat(product.price.replace('$', ''));
+        const totalPrice = unitPrice * num;
+
+        try {
+            const res = await fetch(
+            `${import.meta.env.VITE_API_URL}/api/user/add-to-cart/${userId}`,
+            {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                variantId: product.variant_id,
+                quantity: num,         
+                unit_price: unitPrice,
+                total_price: totalPrice 
+                })
+            }
+            );
+            const data = await res.json();
+            if (!data.success) {
+            console.error("Update cart failed:", data.message || data.error);
+            }
+        } catch (err) {
+            console.error("Error updating cart:", err);
+        }
     };
 
-    const decrease = () => {
-        setNumberOfProduct(Math.max(1, numberOfProduct - 1));
+
+    const increase = (index, stock) => {
+        setQuantities(prev => {
+            const updated = [...prev];
+            if (updated[index] < stock) {
+                updated[index] += 1;
+                updateCart(index, 1); 
+            }
+            return updated;
+        });
     };
+
+        const decrease = (index) => {
+        setQuantities(prev => {
+            const updated = [...prev];
+            if (updated[index] > 1) {
+                updated[index] -= 1;
+                updateCart(index, -1);
+            }
+            return updated;
+        });
+    };
+
+
+    // Tính toán subtotal và total
+    const calculateSubtotal = () => {
+        return mockProducts.reduce((total, product, index) => {
+            const price = parseFloat(product.price.replace('$', ''));
+            return total + (price * quantities[index]);
+        }, 0);
+    };
+
+    const getShippingCost = () => {
+        switch(shippingMethod) {
+            case 'Express': return 15.00;
+            case 'Pick-up': return 21.00;
+            default: return 0.00;
+        }
+    };
+
+    const subtotal = calculateSubtotal();
+    const shippingCost = getShippingCost();
+    const total = subtotal + shippingCost;
     return (
         <div className='content-detail'>
             <div className="content-detail__contact Content">
@@ -76,8 +149,6 @@ export default function ContentDetail({mockProducts}) {
                             name="payment" 
                             id="free" 
                             value="free"
-                            //checked={true}
-                            //onChange={() => setpaymentMethod("free")}
                         />
                         <span className='option__info'>Pay by Card Credit</span>
                     </label>
@@ -88,7 +159,6 @@ export default function ContentDetail({mockProducts}) {
                             name="payment" 
                             id="express" 
                             value="express"
-                            //onChange={() => setpaymentMethod("express")}
                         />
                         <span className='option__info'>Paypal</span>
                     </label>
@@ -114,7 +184,9 @@ export default function ContentDetail({mockProducts}) {
                 <h2 className='order-title title'>Order summary</h2>
                 {mockProducts && mockProducts.map((product, index) => (
                     <div className="products-section__product" key={index}>
-                        <img src={product.img} alt={`Image of ${product.name}`} />
+                        <div className="products-section__product__img">
+                            <img src={product.img} alt={`Image of ${product.name}`} />
+                        </div>
                         <div className="products-section__product--detail">
                             <div className="detail__name">{product.name}</div>
                             {product.options.map((option, optIndex) => (
@@ -125,17 +197,33 @@ export default function ContentDetail({mockProducts}) {
                                 </div>
                             ))}
                             <div className="number-input">
-                                <button className="number-input__button number-input__button--decrease" onClick={decrease}>-</button>
-                                <span className="number-input__value">{product.quantity}</span>
-                                <button className="number-input__button number-input__button--increase" onClick={increase}>+</button>
+                                <button 
+                                    className="number-input__button number-input__button--decrease" 
+                                    onClick={() => decrease(index)}
+                                    disabled={quantities[index] <= 1}
+                                >
+                                    -
+                                </button>
+                                <span className="number-input__value">{quantities[index]}</span>
+                                <button 
+                                    className="number-input__button number-input__button--increase" 
+                                    onClick={() => increase(index, product.stock_quantity)}
+                                    disabled={quantities[index] >= product.stock_quantity}
+                                >
+                                    +
+                                </button>
                             </div>
                         </div>
                         <div className="products-section__product--option">
-                            <div className="option__price">{product.price}</div>
-                            <div className="option__remove"><img src="./assets/Shape.png"/></div>
+                            <div className="option__price">
+                                ${(parseFloat(product.price.replace('$', '')) * quantities[index]).toFixed(2)}
+                            </div>
+                            <div className="option__remove"
+                            onClick={() => onRemove(product.cart_item_id)}
+                            ><img src="/assets/Shape.png"/></div>
                         </div>
                     </div>
-                ))}
+                    ))}
                 <div className='content-detail__order__coupon'>
                     <input type="text" placeholder='Input'/>
                     <button>Apply</button>
@@ -143,19 +231,19 @@ export default function ContentDetail({mockProducts}) {
                 <hr />
                 <div className='content-detail__order__inshort'>
                     <span>Shipping</span>
-                    <span>Free</span>
+                    <span>{shippingMethod}</span>
                 </div>
                 <hr />
 
                 <div className='content-detail__order__inshort'>
                     <span>Subtotal</span>
-                    <span>$99.00</span>
+                    <span>${subtotal.toFixed(2)}</span>
                 </div>
                 <hr />
 
                 <div className='content-detail__order__inshort'>
                     <h2>Total</h2>
-                    <h2>$234.00</h2>
+                    <h2>${total.toFixed(2)}</h2>
                 </div>
             </div>
 

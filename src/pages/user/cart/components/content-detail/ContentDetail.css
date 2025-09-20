@@ -148,7 +148,7 @@ label {
 }
 
 .content-detail__order__coupon button {
-    color: #ddd;
+    color: #ffffff;
     background-color: black;
     min-width: 35%;
     border: none;
@@ -190,7 +190,7 @@ label {
     margin-top: 20px;
     height: 52px;
     font-size: 17px;
-    color: #ddd;
+    color: #ffffff;
     background-color: black;
     border: none;
     border-radius: 8px;
