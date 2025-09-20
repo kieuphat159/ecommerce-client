@@ -75,6 +75,16 @@
     transition: all 0.3s ease;
 }
 
+.navigation__button {
+    background: none;
+    border: none;
+}
+
+.navigation__button:hover {
+    cursor: pointer;
+    opacity: 0.7;
+}
+
 @media screen and (max-width: 768px) {
     .navigation__menu {
         display: none;

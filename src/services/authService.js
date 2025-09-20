@@ -71,6 +71,7 @@ class AuthService {
                     this.setUserInfo(data.userInfo);
                 }
             }
+            localStorage.setItem('role', data.role);
             localStorage.setItem("userId", data.userId);
             return data;
         } catch (error) {
@@ -132,12 +133,10 @@ class AuthService {
             throw error;
         }
     };
-    // seller methods
     async getSellerPage() {
         return this.apiCall('/seller', { method: 'GET' });
     }
 
-    // logout
     logout() {
         
         this.clearAuthData();

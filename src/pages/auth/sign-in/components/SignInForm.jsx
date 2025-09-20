@@ -26,7 +26,7 @@ export default function SignInForm() {
     try {
       const response = await login(form);
       if (response.role === 'seller') {
-        Navigate('/seller');
+        Navigate('/');
       } else {
         Navigate('/user/home');
       }

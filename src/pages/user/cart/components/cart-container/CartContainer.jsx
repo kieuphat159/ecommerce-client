@@ -1,43 +1,42 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom"; // nếu bạn dùng react-router
 import "./CartContainer.css";
 import ContentProduct from "../content-product/ContentProduct";
 import ContentDetail from "../content-detail/ContentDetail";
 import OrderComplete from "../order-complete/OrderComplete";
 
-export default function CartContainer() {
-  const mockProducts = [
-        {
-            name: "Tray Table",
-            price: "$19.19",
-            quantity: 2,
-            img: "https://res.cloudinary.com/dvwdjkjrb/image/upload/v1758166539/a40cc85f069a0857fe7da4976ba73bf5db64a055_1_xktm2a.jpg",
-            options: [{
-                "Color": "Black"
-            }]
-        },
-        {
-            name: "Tray Table",
-            price: "$19.19",
-            quantity: 1,
-            img: "https://res.cloudinary.com/dvwdjkjrb/image/upload/v1758166539/a40cc85f069a0857fe7da4976ba73bf5db64a055_1_xktm2a.jpg",
-            options: [{
-                "Color": "Red"
-            }]
-        },
-        {
-            name: "Table Lamp",
-            price: "$39.00",
-            quantity: 2,
-            img: "https://res.cloudinary.com/dvwdjkjrb/image/upload/v1757638297/uploads/cxpa1kmwq0nwswoidzai.jpg",
-            options: [{
-                "Color": "Gold"
-            }]
-        }
-    ]
-
-
+export default function CartContainer({userId}) {
   const [active, setActive] = useState(1);
-  const [headerTitle, setHeaderTile] = useState('Cart')
+  const [headerTitle, setHeaderTile] = useState("Cart");
+  const [realProducts, setRealProducts] = useState([]);
+
+  useEffect(() => {
+    const fetchCart = async () => {
+      try {
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/api/user/cart/${userId}`);
+        const data = await res.json();
+        if (data.success) {
+          const mapped = data.data.map(item => ({
+            name: item.name,
+            price: `$${item.unit_price}`,
+            quantity: item.quantity,
+            img: item.image_path,
+            options: item.variant_attributes
+              ? item.variant_attributes.split(", ").map(opt => {
+                  const [k, v] = opt.split(": ");
+                  return { [k]: v };
+                })
+              : []
+          }));
+          setRealProducts(mapped);
+        }
+      } catch (err) {
+        console.error("Error fetching cart:", err);
+      }
+    };
+
+    fetchCart();
+  }, [userId]);
 
   return (
     <div className="cart-container">
@@ -46,21 +45,30 @@ export default function CartContainer() {
         <nav className="cart-container__header__navigation">
           <button
             className={active === 1 ? "active" : ""}
-            onClick={() => {setHeaderTile('Cart'); setActive(1);}}
+            onClick={() => {
+              setHeaderTile("Cart");
+              setActive(1);
+            }}
           >
             <div className="circle">1</div>
           </button>
 
           <button
             className={active === 2 ? "active" : ""}
-            onClick={() => {setHeaderTile('Check Out'); setActive(2);}}
+            onClick={() => {
+              setHeaderTile("Check Out");
+              setActive(2);
+            }}
           >
             <div className="circle">2</div>
           </button>
 
           <button
             className={active === 3 ? "active" : ""}
-            onClick={() => {setHeaderTile('Complete!'); setActive(3);}}
+            onClick={() => {
+              setHeaderTile("Complete!");
+              setActive(3);
+            }}
           >
             <div className="circle">3</div>
           </button>
@@ -68,17 +76,10 @@ export default function CartContainer() {
       </div>
 
       <div className="content">
-        {active === 1 && (
-          <ContentProduct mockProducts={mockProducts}/>
-        )}
-        {active === 2 && (
-          <ContentDetail mockProducts={mockProducts}/>
-        )}
-        {active === 3 && (
-          <OrderComplete mockProducts={mockProducts}/>
-        )}
+        {active === 1 && <ContentProduct mockProducts={realProducts} />}
+        {active === 2 && <ContentDetail mockProducts={realProducts} />}
+        {active === 3 && <OrderComplete mockProducts={realProducts} />}
       </div>
     </div>
   );
 }
-
