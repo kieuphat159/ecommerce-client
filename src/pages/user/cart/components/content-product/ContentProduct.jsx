@@ -1,6 +1,5 @@
 import { useState } from "react";
 import './ContentProduct.css'
-import { useEffect } from "react";
 
 export default function ContentProduct({ 
     mockProducts, 
@@ -9,81 +8,38 @@ export default function ContentProduct({
     shippingMethod, 
     setShippingMethod, 
     quantities, 
-    setQuantities 
+    setQuantities,
+    updateQuantity,
+    setActive, 
+    setHeaderTile
     }) {
 
-    useEffect(() => {
-        if (mockProducts && mockProducts.length > 0) {
-            setQuantities(mockProducts.map(p => p.quantity));
-        } else {
-            setQuantities([]);
-        }
-    }, [mockProducts]);
-
-    const updateCart = async (index, num) => {
-        const product = mockProducts[index];
-        const unitPrice = parseFloat(product.price.replace('$', ''));
-        const totalPrice = unitPrice * num;
-
-        try {
-            const res = await fetch(
-            `${import.meta.env.VITE_API_URL}/api/user/add-to-cart/${userId}`,
-            {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                variantId: product.variant_id,
-                quantity: num,         
-                unit_price: unitPrice,
-                total_price: totalPrice 
-                })
-            }
-            );
-            const data = await res.json();
-            if (!data.success) {
-            console.error("Update cart failed:", data.message || data.error);
-            }
-        } catch (err) {
-            console.error("Error updating cart:", err);
-        }
-    };
-
-
     const increase = (index, stock) => {
-        setQuantities(prev => {
-            const updated = [...prev];
-            if (updated[index] < stock) {
-                updated[index] += 1;
-                updateCart(index, 1); 
-            }
-            return updated;
-        });
+        const currentQty = quantities[index];
+        if (currentQty < stock) {
+            updateQuantity(index, 1); 
+        }
     };
 
-        const decrease = (index) => {
-        setQuantities(prev => {
-            const updated = [...prev];
-            if (updated[index] > 1) {
-                updated[index] -= 1;
-                updateCart(index, -1);
-            }
-            return updated;
-        });
+    const decrease = (index) => {
+        const currentQty = quantities[index];
+        if (currentQty > 1) {
+            updateQuantity(index, -1); 
+        }
     };
-
 
     // Tính toán subtotal và total
     const calculateSubtotal = () => {
         return mockProducts.reduce((total, product, index) => {
             const price = parseFloat(product.price.replace('$', ''));
-            return total + (price * quantities[index]);
+            return total + (price * (quantities[index] || 0));
         }, 0);
     };
 
     const getShippingCost = () => {
         switch(shippingMethod) {
-            case 'Express': return 15.00;
-            case 'Pick-up': return 21.00;
+            case 'express': return 15.00;
+            case 'pick-up': return 21.00;
             default: return 0.00;
         }
     };
@@ -117,15 +73,15 @@ export default function ContentProduct({
                                 <button 
                                     className="number-input__button number-input__button--decrease" 
                                     onClick={() => decrease(index)}
-                                    disabled={quantities[index] <= 1}
+                                    disabled={!quantities[index] || quantities[index] <= 1}
                                 >
                                     -
                                 </button>
-                                <span className="number-input__value">{quantities[index]}</span>
+                                <span className="number-input__value">{quantities[index] || 0}</span>
                                 <button 
                                     className="number-input__button number-input__button--increase" 
                                     onClick={() => increase(index, product.stock_quantity)}
-                                    disabled={quantities[index] >= product.stock_quantity}
+                                    disabled={!quantities[index] || quantities[index] >= product.stock_quantity}
                                 >
                                     +
                                 </button>
@@ -133,7 +89,7 @@ export default function ContentProduct({
                         </div>
                         <div className="products-section__product--option">
                             <div className="option__price">
-                                ${(parseFloat(product.price.replace('$', '')) * quantities[index]).toFixed(2)}
+                                ${(parseFloat(product.price.replace('$', '')) * (quantities[index] || 0)).toFixed(2)}
                             </div>
                             <div className="option__remove"
                             onClick={() => onRemove(product.cart_item_id)}
@@ -163,8 +119,8 @@ export default function ContentProduct({
                             name="shipping" 
                             id="free" 
                             value="free"
-                            checked={shippingMethod === "Free"}
-                            onChange={() => setShippingMethod("Free")}
+                            checked={shippingMethod === "free"}
+                            onChange={() => setShippingMethod("free")}
                         />
                         <span>Free shipping</span>
                         <span>$0.00</span>
@@ -176,8 +132,8 @@ export default function ContentProduct({
                             name="shipping" 
                             id="express" 
                             value="express"
-                            checked={shippingMethod === "Express"}
-                            onChange={() => setShippingMethod("Express")}
+                            checked={shippingMethod === "express"}
+                            onChange={() => setShippingMethod("express")}
                         />
                         <span>Express shipping</span>
                         <span>+$15.00</span>
@@ -189,8 +145,8 @@ export default function ContentProduct({
                             name="shipping" 
                             id="pick-up" 
                             value="pick-up"
-                            checked={shippingMethod === "Pick-up"}
-                            onChange={() => setShippingMethod("Pick-up")}
+                            checked={shippingMethod === "pick-up"}
+                            onChange={() => setShippingMethod("pick-up")}
                         />
                         <span>Pick Up</span>
                         <span>$21.00</span>
@@ -206,7 +162,12 @@ export default function ContentProduct({
                     <label>Total</label>
                     <label>${total.toFixed(2)}</label>
                 </div>
-                <button className="cart-summary__button">
+                <button 
+                    className="cart-summary__button"
+                    onClick={() => {
+                        setHeaderTile("Check Out");
+                        setActive(2);
+                }}>
                     Checkout
                 </button>
             </div>

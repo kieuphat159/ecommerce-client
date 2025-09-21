@@ -24,12 +24,30 @@ class AuthService {
     }
 
     getUserInfo() {
-        if (!this.userInfo) {
-            const saved = localStorage.getItem('userInfo');
-            this.userInfo = saved ? JSON.parse(saved) : null;
+        try {
+            if (this.userInfo) return this.userInfo;
+
+            const token = this.getToken();
+            if (!token) return null;
+
+            const payload = JSON.parse(atob(token.split('.')[1]));
+
+            const role = localStorage.getItem('role') || payload.role;
+            const userId = localStorage.getItem('userId') || payload.userId;
+
+            this.userInfo = {
+                ...payload,
+                role,
+                userId
+            };
+
+            return this.userInfo;
+        } catch (error) {
+            console.error("Error getting user info:", error);
+            return null;
         }
-        return this.userInfo;
     }
+
 
     clearAuthData() {
         
@@ -133,6 +151,7 @@ class AuthService {
             throw error;
         }
     };
+    
     async getSellerPage() {
         return this.apiCall('/seller', { method: 'GET' });
     }

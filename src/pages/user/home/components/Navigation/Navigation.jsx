@@ -1,36 +1,27 @@
 import "./Navigation.css";
 import { Link, useNavigate } from "react-router-dom";
-import { useState, useEffect } from "react";
-import authService from "../../../../../services/authService";
+import { useState } from "react";
+import useAuth from "../../../../../hooks/useAuth";
 
 export default function Navigation() {
     const navigate = useNavigate();
+    const { isAuthenticated, user, logout } = useAuth();
     const [isMenuOpen, setIsMenuOpen] = useState(false);
-    const [user, setUser] = useState(null);
     const [isShopOpen, setIsShopOpen] = useState(false);
     const [isProductOpen, setIsProductOpen] = useState(false);
     const [searchQuery, setSearchQuery] = useState("");
-
-    useEffect(() => {
-        const userId = localStorage.getItem("userId");
-        const role = localStorage.getItem("role");
-        if (userId) {
-            setUser({ id: userId, role });
-        }
-    }, []);
 
     const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
     const toggleShop = () => setIsShopOpen(!isShopOpen);
     const toggleProduct = () => setIsProductOpen(!isProductOpen);
 
     const signOut = () => {
-        authService.logout();
-        setUser(null);
+        logout();
         navigate("/signin");
     };
 
     const handleCartClick = () => {
-        if (!user) {
+        if (!isAuthenticated) {
             navigate("/signin");
         } else {
             navigate("/api/auth/user/cart");
@@ -39,7 +30,6 @@ export default function Navigation() {
 
     const handleSearch = (e) => {
         e.preventDefault();
-        // Handle search logic here
         console.log("Searching for:", searchQuery);
     };
 
@@ -67,13 +57,13 @@ export default function Navigation() {
                     </Link>
                 )}
 
-                {!user && (
+                {!isAuthenticated && (
                     <Link to="/signin" className="navigation__action">
                         <img src="/assets/profile.png" className="navigation__icon" alt="Sign in" />
                     </Link>
                 )}
 
-                {user && (
+                {isAuthenticated && (
                     <>
                         <Link to="/profile" className="navigation__action">
                             <img src="/assets/profile.png" className="navigation__icon" alt="Profile" />
@@ -181,7 +171,7 @@ export default function Navigation() {
                         </Link>
                     </div>
 
-                    {!user ? (
+                    {!isAuthenticated ? (
                         <Link to="/signin" className="navigation__signin-button" onClick={toggleMenu}>
                             Sign In
                         </Link>

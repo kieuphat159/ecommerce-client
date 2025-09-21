@@ -212,7 +212,7 @@ export default function Detail() {
         };
 
         try {
-            const res = await fetch(`${import.meta.env.VITE_API_URL}/api/user/add-to-cart/${userId}`, {
+            const res = await fetch(`${import.meta.env.VITE_API_URL}/api/auth/user/add-to-cart/${userId}`, {
                 method: "POST",
                 headers: {
                     'Content-Type': 'application/json',

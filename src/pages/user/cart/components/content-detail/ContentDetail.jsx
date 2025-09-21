@@ -1,5 +1,6 @@
 import './ContentDetail.css'
-import { useEffect, useState } from "react";
+import AuthService from "/src/services/authService";
+import { use, useState } from 'react';
 
 export default function ContentDetail({
     mockProducts, 
@@ -7,66 +8,52 @@ export default function ContentDetail({
     onRemove, 
     shippingMethod,
     quantities,
-    setQuantities
+    setQuantities,
+    updateQuantity,
+    cartId,
+    setActive, 
+    setHeaderTile,
+    setOrderId
     }) {
+    const [ paymentMethod, setPaymentMethod ] = useState("credit_card");
 
-    const updateCart = async (index, num) => {
-        const product = mockProducts[index];
-        const unitPrice = parseFloat(product.price.replace('$', ''));
-        const totalPrice = unitPrice * num;
-
-        try {
-            const res = await fetch(
-            `${import.meta.env.VITE_API_URL}/api/user/add-to-cart/${userId}`,
-            {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                variantId: product.variant_id,
-                quantity: num,         
-                unit_price: unitPrice,
-                total_price: totalPrice 
-                })
-            }
-            );
-            const data = await res.json();
-            if (!data.success) {
-            console.error("Update cart failed:", data.message || data.error);
-            }
-        } catch (err) {
-            console.error("Error updating cart:", err);
+    const placeOrder = async () => {
+    try {
+        const res = await AuthService.apiCall(`/user/place-order/${cartId}`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ paymentMethod })
+        });
+        if (res.success) {
+            console.log("ok: ", res.orderId);
+            setHeaderTile("Complete!");
+            setActive(3);
+            setOrderId(res.orderId);
         }
+    } catch (err) {
+        console.log('Order error: ', err);
+    }
     };
 
 
     const increase = (index, stock) => {
-        setQuantities(prev => {
-            const updated = [...prev];
-            if (updated[index] < stock) {
-                updated[index] += 1;
-                updateCart(index, 1); 
-            }
-            return updated;
-        });
+        const currentQty = quantities[index];
+        if (currentQty < stock) {
+            updateQuantity(index, 1);
+        }
     };
 
-        const decrease = (index) => {
-        setQuantities(prev => {
-            const updated = [...prev];
-            if (updated[index] > 1) {
-                updated[index] -= 1;
-                updateCart(index, -1);
-            }
-            return updated;
-        });
+    const decrease = (index) => {
+        const currentQty = quantities[index];
+        if (currentQty > 1) {
+            updateQuantity(index, -1);
+        }
     };
 
-
-    // Tính toán subtotal và total
     const calculateSubtotal = () => {
         return mockProducts.reduce((total, product, index) => {
             const price = parseFloat(product.price.replace('$', ''));
-            return total + (price * quantities[index]);
+            return total + (price * (quantities[index] || 0));
         }, 0);
     };
 
@@ -81,6 +68,7 @@ export default function ContentDetail({
     const subtotal = calculateSubtotal();
     const shippingCost = getShippingCost();
     const total = subtotal + shippingCost;
+    
     return (
         <div className='content-detail'>
             <div className="content-detail__contact Content">
@@ -147,8 +135,10 @@ export default function ContentDetail({
                         <input 
                             type="radio" 
                             name="payment" 
-                            id="free" 
-                            value="free"
+                            id="credit_card" 
+                            value="credit_card"
+                            checked={paymentMethod === "credit_card"}
+                            onChange={() => setPaymentMethod("credit_card")}
                         />
                         <span className='option__info'>Pay by Card Credit</span>
                     </label>
@@ -157,10 +147,12 @@ export default function ContentDetail({
                         <input 
                             type="radio" 
                             name="payment" 
-                            id="express" 
-                            value="express"
+                            id="paypal" 
+                            value="paypal"
+                            checked={paymentMethod === "paypal"}
+                            onChange={() => setPaymentMethod("paypal")}
                         />
-                        <span className='option__info'>Paypal</span>
+                        <span className='option__info' onClick = {() => setPaymentMethod("paypal")}>Paypal</span>
                     </label>
                     <hr />
                 </div>
@@ -200,15 +192,15 @@ export default function ContentDetail({
                                 <button 
                                     className="number-input__button number-input__button--decrease" 
                                     onClick={() => decrease(index)}
-                                    disabled={quantities[index] <= 1}
+                                    disabled={!quantities[index] || quantities[index] <= 1}
                                 >
                                     -
                                 </button>
-                                <span className="number-input__value">{quantities[index]}</span>
+                                <span className="number-input__value">{quantities[index] || 0}</span>
                                 <button 
                                     className="number-input__button number-input__button--increase" 
                                     onClick={() => increase(index, product.stock_quantity)}
-                                    disabled={quantities[index] >= product.stock_quantity}
+                                    disabled={!quantities[index] || quantities[index] >= product.stock_quantity}
                                 >
                                     +
                                 </button>
@@ -216,7 +208,7 @@ export default function ContentDetail({
                         </div>
                         <div className="products-section__product--option">
                             <div className="option__price">
-                                ${(parseFloat(product.price.replace('$', '')) * quantities[index]).toFixed(2)}
+                                ${(parseFloat(product.price.replace('$', '')) * (quantities[index] || 0)).toFixed(2)}
                             </div>
                             <div className="option__remove"
                             onClick={() => onRemove(product.cart_item_id)}
@@ -247,7 +239,7 @@ export default function ContentDetail({
                 </div>
             </div>
 
-            <button className='content-detail__place-order'>Place Order</button>
+            <button className='content-detail__place-order' onClick={placeOrder}>Place Order</button>
         </div>
     );
 }
