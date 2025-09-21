@@ -22,7 +22,12 @@ function App() {
           <Route path="/products" element={<ProductsPage />} />
           <Route path="/product/:id" element={<ProductDetailPage/>} />
 
-          <Route path="/cart" element={<CartPage />} />
+          <Route path="/api/auth/user/*" element={
+            <ProtectedRoute requiredRole='customer'>
+              <CartPage />
+            </ProtectedRoute>
+          }>
+          </Route>
 
           <Route path="/api/auth/seller/*" element={
             <ProtectedRoute requiredRole="seller">

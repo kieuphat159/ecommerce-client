@@ -23,9 +23,17 @@
   border-bottom: 1px solid rgba(0, 0, 0, 0.276);
 }
 
+.products-section__product__img {
+  padding: 15px;
+  margin-right: 15px;
+  margin-left: -15px;
+  width: 130px;
+  height: 130px;
+}
+
 .products-section__product img {
-  max-height: 150px;
-  max-width: 150px;
+  width: 100%;
+  height: 100%;
   object-fit: contain;
 }
 

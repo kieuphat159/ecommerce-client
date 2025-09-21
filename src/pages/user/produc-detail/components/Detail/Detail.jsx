@@ -3,8 +3,6 @@ import { useState, useEffect } from 'react'
 import { useParams } from "react-router-dom";
 
 export default function Detail() {
-    const [openVariant, setOpenVariant] = useState(false);
-    const [loadedVariant, setLoadedVariant] = useState(false);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
     const [options, setOptions] = useState([]);
@@ -16,12 +14,15 @@ export default function Detail() {
     const [numberOfProduct, setNumberOfProduct] = useState(1);
     const [image, setImage] = useState('');
     const [wishlistBtn, setWishlistBtn] = useState('detail__wishlist');
+    const [pricePerUnit, setPricePerUnit] = useState(0);
+    const [totalPrice, setTotalPrice] = useState(0);
+    const [variantId, setVariantId] = useState(0);
 
     const specialVal = ['id', 'name', 'image', 'seller', 'seller_id', 'seller_name'];
-    const specialAttr = ['price', 'description'];
+    const specialAttr = ['price', 'description', 'categories'];
 
     const fetchCurrentQuantity = async () => {
-        if (!openVariant || options.length === 0) {
+        if (options.length === 0) {
             setCurrentQuantity(0);
             return;
         }
@@ -45,6 +46,7 @@ export default function Detail() {
             const data = await res.json();
             
             if (data.success && data.variantId) {
+                setVariantId(data.variantId);
                 const stockRes = await fetch(`${import.meta.env.VITE_API_URL}/api/stock/${data.variantId}`, {
                     headers: {
                         'Authorization': token ? `Bearer ${token}` : undefined
@@ -126,8 +128,12 @@ export default function Detail() {
     };
 
     useEffect(() => {
+        setTotalPrice((pricePerUnit * numberOfProduct).toFixed(2));
+    }, [pricePerUnit, numberOfProduct]);
+
+    useEffect(() => {
         fetchCurrentQuantity();
-    }, [selectedVariants, options, openVariant]);
+    }, [selectedVariants, options]);
 
     useEffect(() => {
         const fetchProduct = async () => {
@@ -140,6 +146,8 @@ export default function Detail() {
                 const data = json.data;
                 setProduct(data);
                 setImage(data.image);
+                const numericPrice = parseFloat(data.price.replace(/[^0-9.-]+/g, ""));
+                setPricePerUnit(numericPrice);
             } catch (err) {
                 console.log('Error: ', err);
                 setError('Failed to load product');
@@ -147,6 +155,7 @@ export default function Detail() {
         };
         if (id) {
             fetchProduct();
+            fetchOptions();
         }
     }, [id]);
 
@@ -167,15 +176,58 @@ export default function Detail() {
     };
 
     const increase = () => {
-        setNumberOfProduct(Math.min(numberOfProduct + 1, currentQuantity));
+        setNumberOfProduct(prev => Math.min(prev + 1, currentQuantity));
     };
 
     const decrease = () => {
-        setNumberOfProduct(Math.max(1, numberOfProduct - 1));
+        setNumberOfProduct(prev => Math.max(1, prev - 1));
     };
 
     const addToWishlist = () => {
         setWishlistBtn(wishlistBtn === 'detail__wishlist' ? 'detail__wishlist--clicked' : 'detail__wishlist');
+    };
+
+    const addToCart = async () => {
+        if (!variantId) {
+            alert('Please select all product variants before adding to cart!');
+            return;
+        }
+
+        const token = localStorage.getItem('authToken');
+        const userId = localStorage.getItem('userId');
+
+        if (!token || !userId) {
+            alert('Please login to Add to cart!');
+            return;
+        }
+
+        const data = {
+            variantId: variantId,
+            quantity: numberOfProduct,
+            unit_price: pricePerUnit,
+            total_price: totalPrice
+        };
+
+        try {
+            const res = await fetch(`${import.meta.env.VITE_API_URL}/api/auth/user/add-to-cart/${userId}`, {
+                method: "POST",
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify(data)
+            });
+
+            const result = await res.json();
+            if (res.ok && result.success) {
+                alert('Added to cart successfully!');
+            } else {
+                alert(result.message || 'Failed to add to cart');
+            }
+        } catch (err) {
+            console.log('Err: ', err);
+            alert('Something went wrong while adding to cart!');
+        }
     };
 
     return (
@@ -190,24 +242,11 @@ export default function Detail() {
                 {Object.entries(product).map(([key, value]) =>
                     renderAttribute(key, value)
                 )}
-
-                <div className="product__info__field">
-                    <button
-                        type="button"
-                        className="header__button"
-                        onClick={() => {
-                            setOpenVariant(!openVariant);
-                            if (!loadedVariant) {
-                                fetchOptions();
-                                setLoadedVariant(true);
-                            }
-                        }}
-                        disabled={loading}
-                    >
-                        {openVariant ? 'Hide Variants' : 'Select Variants'}
-                    </button>
-                    {openVariant && (
+                    
+                {options.length > 0 && (
+                    <div className="product__info__field">
                         <>
+                            <h3 className="product__variants-title">Product Options</h3>
                             {options.map(option => (
                                 <div key={option.id} className="product__info__field">
                                     <label className="product__info__label">{option.name}</label>
@@ -227,13 +266,14 @@ export default function Detail() {
                                     </select>
                                 </div>
                             ))}
-                            <p className="product__quantity">
-                                Available Quantity: {loading ? 'Loading...' : currentQuantity}
-                            </p>
+                            
                         </>
-                    )}
-                </div>
-
+                    </div>
+                )}
+                <p className="product__quantity">
+                    Available Quantity: {loading ? 'Loading...' : currentQuantity}
+                </p>
+                <div className="product__price">Total price: ${totalPrice}</div>
                 <div className="detail__button-section">
                     <div className="detail__button-top">
                         <div className="number-input">
@@ -243,13 +283,13 @@ export default function Detail() {
                         </div>
                         <button onClick={addToWishlist} className={wishlistBtn}>♡ Wishlist</button>
                     </div>
-                    <button className="detail__add" disabled={loading || currentQuantity === 0}>
+                    <button onClick={addToCart} className="detail__add" disabled={loading || currentQuantity === 0}>
                         Add to Cart
                     </button>
                 </div>
                 {error && (
                     <div className="error">
-                        <strong>Error:</strong> {error}
+                        <strong>Error: {error}</strong>
                     </div>
                 )}
             </div>

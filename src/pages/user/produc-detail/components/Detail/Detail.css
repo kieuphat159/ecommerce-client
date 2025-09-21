@@ -187,6 +187,22 @@ hr {
   cursor: pointer;
 }
 
+.product__price {
+  padding-top: 30px;
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.product__info__field {
+  padding: 20px;
+  background-color: #e2e2e2;
+  border-radius: 8px;
+}
+
+.product__variants-title {
+  font-weight: 600;
+}
+
 @media (max-width: 768px) {
   .detail {
     grid-template-columns: 1fr;

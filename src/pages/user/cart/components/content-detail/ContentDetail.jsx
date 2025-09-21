@@ -1,13 +1,74 @@
 import './ContentDetail.css'
+import AuthService from "/src/services/authService";
+import { use, useState } from 'react';
 
-export default function ContentDetail({mockProducts}) {
-    const increase = () => {
-        setNumberOfProduct(Math.min(numberOfProduct + 1, currentQuantity));
+export default function ContentDetail({
+    mockProducts, 
+    userId, 
+    onRemove, 
+    shippingMethod,
+    quantities,
+    setQuantities,
+    updateQuantity,
+    cartId,
+    setActive, 
+    setHeaderTile,
+    setOrderId
+    }) {
+    const [ paymentMethod, setPaymentMethod ] = useState("credit_card");
+
+    const placeOrder = async () => {
+    try {
+        const res = await AuthService.apiCall(`/user/place-order/${cartId}`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ paymentMethod })
+        });
+        if (res.success) {
+            console.log("ok: ", res.orderId);
+            setHeaderTile("Complete!");
+            setActive(3);
+            setOrderId(res.orderId);
+        }
+    } catch (err) {
+        console.log('Order error: ', err);
+    }
     };
 
-    const decrease = () => {
-        setNumberOfProduct(Math.max(1, numberOfProduct - 1));
+
+    const increase = (index, stock) => {
+        const currentQty = quantities[index];
+        if (currentQty < stock) {
+            updateQuantity(index, 1);
+        }
     };
+
+    const decrease = (index) => {
+        const currentQty = quantities[index];
+        if (currentQty > 1) {
+            updateQuantity(index, -1);
+        }
+    };
+
+    const calculateSubtotal = () => {
+        return mockProducts.reduce((total, product, index) => {
+            const price = parseFloat(product.price.replace('$', ''));
+            return total + (price * (quantities[index] || 0));
+        }, 0);
+    };
+
+    const getShippingCost = () => {
+        switch(shippingMethod) {
+            case 'Express': return 15.00;
+            case 'Pick-up': return 21.00;
+            default: return 0.00;
+        }
+    };
+
+    const subtotal = calculateSubtotal();
+    const shippingCost = getShippingCost();
+    const total = subtotal + shippingCost;
+    
     return (
         <div className='content-detail'>
             <div className="content-detail__contact Content">
@@ -74,10 +135,10 @@ export default function ContentDetail({mockProducts}) {
                         <input 
                             type="radio" 
                             name="payment" 
-                            id="free" 
-                            value="free"
-                            //checked={true}
-                            //onChange={() => setpaymentMethod("free")}
+                            id="credit_card" 
+                            value="credit_card"
+                            checked={paymentMethod === "credit_card"}
+                            onChange={() => setPaymentMethod("credit_card")}
                         />
                         <span className='option__info'>Pay by Card Credit</span>
                     </label>
@@ -86,11 +147,12 @@ export default function ContentDetail({mockProducts}) {
                         <input 
                             type="radio" 
                             name="payment" 
-                            id="express" 
-                            value="express"
-                            //onChange={() => setpaymentMethod("express")}
+                            id="paypal" 
+                            value="paypal"
+                            checked={paymentMethod === "paypal"}
+                            onChange={() => setPaymentMethod("paypal")}
                         />
-                        <span className='option__info'>Paypal</span>
+                        <span className='option__info' onClick = {() => setPaymentMethod("paypal")}>Paypal</span>
                     </label>
                     <hr />
                 </div>
@@ -114,7 +176,9 @@ export default function ContentDetail({mockProducts}) {
                 <h2 className='order-title title'>Order summary</h2>
                 {mockProducts && mockProducts.map((product, index) => (
                     <div className="products-section__product" key={index}>
-                        <img src={product.img} alt={`Image of ${product.name}`} />
+                        <div className="products-section__product__img">
+                            <img src={product.img} alt={`Image of ${product.name}`} />
+                        </div>
                         <div className="products-section__product--detail">
                             <div className="detail__name">{product.name}</div>
                             {product.options.map((option, optIndex) => (
@@ -125,17 +189,33 @@ export default function ContentDetail({mockProducts}) {
                                 </div>
                             ))}
                             <div className="number-input">
-                                <button className="number-input__button number-input__button--decrease" onClick={decrease}>-</button>
-                                <span className="number-input__value">{product.quantity}</span>
-                                <button className="number-input__button number-input__button--increase" onClick={increase}>+</button>
+                                <button 
+                                    className="number-input__button number-input__button--decrease" 
+                                    onClick={() => decrease(index)}
+                                    disabled={!quantities[index] || quantities[index] <= 1}
+                                >
+                                    -
+                                </button>
+                                <span className="number-input__value">{quantities[index] || 0}</span>
+                                <button 
+                                    className="number-input__button number-input__button--increase" 
+                                    onClick={() => increase(index, product.stock_quantity)}
+                                    disabled={!quantities[index] || quantities[index] >= product.stock_quantity}
+                                >
+                                    +
+                                </button>
                             </div>
                         </div>
                         <div className="products-section__product--option">
-                            <div className="option__price">{product.price}</div>
-                            <div className="option__remove"><img src="./assets/Shape.png"/></div>
+                            <div className="option__price">
+                                ${(parseFloat(product.price.replace('$', '')) * (quantities[index] || 0)).toFixed(2)}
+                            </div>
+                            <div className="option__remove"
+                            onClick={() => onRemove(product.cart_item_id)}
+                            ><img src="/assets/Shape.png"/></div>
                         </div>
                     </div>
-                ))}
+                    ))}
                 <div className='content-detail__order__coupon'>
                     <input type="text" placeholder='Input'/>
                     <button>Apply</button>
@@ -143,23 +223,23 @@ export default function ContentDetail({mockProducts}) {
                 <hr />
                 <div className='content-detail__order__inshort'>
                     <span>Shipping</span>
-                    <span>Free</span>
+                    <span>{shippingMethod}</span>
                 </div>
                 <hr />
 
                 <div className='content-detail__order__inshort'>
                     <span>Subtotal</span>
-                    <span>$99.00</span>
+                    <span>${subtotal.toFixed(2)}</span>
                 </div>
                 <hr />
 
                 <div className='content-detail__order__inshort'>
                     <h2>Total</h2>
-                    <h2>$234.00</h2>
+                    <h2>${total.toFixed(2)}</h2>
                 </div>
             </div>
 
-            <button className='content-detail__place-order'>Place Order</button>
+            <button className='content-detail__place-order' onClick={placeOrder}>Place Order</button>
         </div>
     );
 }

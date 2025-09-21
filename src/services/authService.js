@@ -19,20 +19,43 @@ class AuthService {
 
     setUserInfo(userInfo) {
         this.userInfo = userInfo;
-        console.log('User info saved:', userInfo); // Debug
+        localStorage.setItem('userInfo', JSON.stringify(userInfo));
+        console.log('User info saved:', userInfo);
     }
-
 
     getUserInfo() {
-        return this.userInfo;
+        try {
+            if (this.userInfo) return this.userInfo;
+
+            const token = this.getToken();
+            if (!token) return null;
+
+            const payload = JSON.parse(atob(token.split('.')[1]));
+
+            const role = localStorage.getItem('role') || payload.role;
+            const userId = localStorage.getItem('userId') || payload.userId;
+
+            this.userInfo = {
+                ...payload,
+                role,
+                userId
+            };
+
+            return this.userInfo;
+        } catch (error) {
+            console.error("Error getting user info:", error);
+            return null;
+        }
     }
 
+
     clearAuthData() {
+        
         this.token = null;
         this.userInfo = null;
-        localStorage.removeItem('authToken');
-        localStorage.removeItem('userInfo');
+        localStorage.clear();
     }
+
 
     // authentication methods
     async signup(name, username, email, password, role) {
@@ -66,6 +89,7 @@ class AuthService {
                     this.setUserInfo(data.userInfo);
                 }
             }
+            localStorage.setItem('role', data.role);
             localStorage.setItem("userId", data.userId);
             return data;
         } catch (error) {
@@ -127,13 +151,13 @@ class AuthService {
             throw error;
         }
     };
-    // seller methods
+    
     async getSellerPage() {
         return this.apiCall('/seller', { method: 'GET' });
     }
 
-    // logout
     logout() {
+        
         this.clearAuthData();
     }
 

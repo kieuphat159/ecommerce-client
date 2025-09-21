@@ -1,16 +1,53 @@
 import { useState } from "react";
 import './ContentProduct.css'
 
-export default function ContentProduct({mockProducts}) {
-    const [shippingMethod, setShippingMethod] = useState("free");
-    const [numberOfProduct, setNumberOfProduct] = useState(1);
-    const increase = () => {
-        setNumberOfProduct(Math.min(numberOfProduct + 1, currentQuantity));
+export default function ContentProduct({ 
+    mockProducts, 
+    userId, 
+    onRemove, 
+    shippingMethod, 
+    setShippingMethod, 
+    quantities, 
+    setQuantities,
+    updateQuantity,
+    setActive, 
+    setHeaderTile
+    }) {
+
+    const increase = (index, stock) => {
+        const currentQty = quantities[index];
+        if (currentQty < stock) {
+            updateQuantity(index, 1); 
+        }
     };
 
-    const decrease = () => {
-        setNumberOfProduct(Math.max(1, numberOfProduct - 1));
+    const decrease = (index) => {
+        const currentQty = quantities[index];
+        if (currentQty > 1) {
+            updateQuantity(index, -1); 
+        }
     };
+
+    // Tính toán subtotal và total
+    const calculateSubtotal = () => {
+        return mockProducts.reduce((total, product, index) => {
+            const price = parseFloat(product.price.replace('$', ''));
+            return total + (price * (quantities[index] || 0));
+        }, 0);
+    };
+
+    const getShippingCost = () => {
+        switch(shippingMethod) {
+            case 'express': return 15.00;
+            case 'pick-up': return 21.00;
+            default: return 0.00;
+        }
+    };
+
+    const subtotal = calculateSubtotal();
+    const shippingCost = getShippingCost();
+    const total = subtotal + shippingCost;
+
     
     return (
         <>
@@ -20,7 +57,9 @@ export default function ContentProduct({mockProducts}) {
                 <div className="content__products__products-section">
                     {mockProducts && mockProducts.map((product, index) => (
                     <div className="products-section__product" key={index}>
-                        <img src={product.img} alt={`Image of ${product.name}`} />
+                        <div className="products-section__product__img">
+                            <img src={product.img} alt={`Image of ${product.name}`} />
+                        </div>
                         <div className="products-section__product--detail">
                             <div className="detail__name">{product.name}</div>
                             {product.options.map((option, optIndex) => (
@@ -31,14 +70,30 @@ export default function ContentProduct({mockProducts}) {
                                 </div>
                             ))}
                             <div className="number-input">
-                                <button className="number-input__button number-input__button--decrease" onClick={decrease}>-</button>
-                                <span className="number-input__value">{product.quantity}</span>
-                                <button className="number-input__button number-input__button--increase" onClick={increase}>+</button>
+                                <button 
+                                    className="number-input__button number-input__button--decrease" 
+                                    onClick={() => decrease(index)}
+                                    disabled={!quantities[index] || quantities[index] <= 1}
+                                >
+                                    -
+                                </button>
+                                <span className="number-input__value">{quantities[index] || 0}</span>
+                                <button 
+                                    className="number-input__button number-input__button--increase" 
+                                    onClick={() => increase(index, product.stock_quantity)}
+                                    disabled={!quantities[index] || quantities[index] >= product.stock_quantity}
+                                >
+                                    +
+                                </button>
                             </div>
                         </div>
                         <div className="products-section__product--option">
-                            <div className="option__price">{product.price}</div>
-                            <div className="option__remove"><img src="./assets/Shape.png"/></div>
+                            <div className="option__price">
+                                ${(parseFloat(product.price.replace('$', '')) * (quantities[index] || 0)).toFixed(2)}
+                            </div>
+                            <div className="option__remove"
+                            onClick={() => onRemove(product.cart_item_id)}
+                            ><img src="/assets/Shape.png"/></div>
                         </div>
                     </div>
                     ))}
@@ -100,14 +155,19 @@ export default function ContentProduct({mockProducts}) {
 
                 <div className="cart-summary__subtotal">
                     <label>Subtotal</label>
-                    <label>$1234.00</label>
+                    <label>${subtotal.toFixed(2)}</label>
                 </div>
                 <hr />
                 <div className="cart-summary__total">
                     <label>Total</label>
-                    <label>$1345.00</label>
+                    <label>${total.toFixed(2)}</label>
                 </div>
-                <button className="cart-summary__button">
+                <button 
+                    className="cart-summary__button"
+                    onClick={() => {
+                        setHeaderTile("Check Out");
+                        setActive(2);
+                }}>
                     Checkout
                 </button>
             </div>
