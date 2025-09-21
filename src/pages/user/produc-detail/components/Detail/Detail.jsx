@@ -3,8 +3,6 @@ import { useState, useEffect } from 'react'
 import { useParams } from "react-router-dom";
 
 export default function Detail() {
-    const [openVariant, setOpenVariant] = useState(false);
-    const [loadedVariant, setLoadedVariant] = useState(false);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
     const [options, setOptions] = useState([]);
@@ -21,10 +19,10 @@ export default function Detail() {
     const [variantId, setVariantId] = useState(0);
 
     const specialVal = ['id', 'name', 'image', 'seller', 'seller_id', 'seller_name'];
-    const specialAttr = ['price', 'description'];
+    const specialAttr = ['price', 'description', 'categories'];
 
     const fetchCurrentQuantity = async () => {
-        if (!openVariant || options.length === 0) {
+        if (options.length === 0) {
             setCurrentQuantity(0);
             return;
         }
@@ -46,7 +44,6 @@ export default function Detail() {
                 body: JSON.stringify({ product_id: id, options: selectedVariants })
             });
             const data = await res.json();
-            //console.log('Datatatata: ', data);
             
             if (data.success && data.variantId) {
                 setVariantId(data.variantId);
@@ -134,10 +131,9 @@ export default function Detail() {
         setTotalPrice((pricePerUnit * numberOfProduct).toFixed(2));
     }, [pricePerUnit, numberOfProduct]);
 
-
     useEffect(() => {
         fetchCurrentQuantity();
-    }, [selectedVariants, options, openVariant]);
+    }, [selectedVariants, options]);
 
     useEffect(() => {
         const fetchProduct = async () => {
@@ -159,6 +155,7 @@ export default function Detail() {
         };
         if (id) {
             fetchProduct();
+            fetchOptions();
         }
     }, [id]);
 
@@ -192,7 +189,7 @@ export default function Detail() {
 
     const addToCart = async () => {
         if (!variantId) {
-            alert('Please select variant before adding to cart!');
+            alert('Please select all product variants before adding to cart!');
             return;
         }
 
@@ -245,24 +242,11 @@ export default function Detail() {
                 {Object.entries(product).map(([key, value]) =>
                     renderAttribute(key, value)
                 )}
-
-                <div className="product__info__field">
-                    <button
-                        type="button"
-                        className="header__button"
-                        onClick={() => {
-                            setOpenVariant(!openVariant);
-                            if (!loadedVariant) {
-                                fetchOptions();
-                                setLoadedVariant(true);
-                            }
-                        }}
-                        disabled={loading}
-                    >
-                        {openVariant ? 'Hide Variants' : 'Select Variants'}
-                    </button>
-                    {openVariant && (
+                    
+                {options.length > 0 && (
+                    <div className="product__info__field">
                         <>
+                            <h3 className="product__variants-title">Product Options</h3>
                             {options.map(option => (
                                 <div key={option.id} className="product__info__field">
                                     <label className="product__info__label">{option.name}</label>
@@ -282,15 +266,14 @@ export default function Detail() {
                                     </select>
                                 </div>
                             ))}
-                            <p className="product__quantity">
-                                Available Quantity: {loading ? 'Loading...' : currentQuantity}
-                            </p>
                             
                         </>
-                    )}
-                    <div className="product__price">Total price: ${totalPrice}</div>
-                </div>
-
+                    </div>
+                )}
+                <p className="product__quantity">
+                    Available Quantity: {loading ? 'Loading...' : currentQuantity}
+                </p>
+                <div className="product__price">Total price: ${totalPrice}</div>
                 <div className="detail__button-section">
                     <div className="detail__button-top">
                         <div className="number-input">
@@ -306,7 +289,7 @@ export default function Detail() {
                 </div>
                 {error && (
                     <div className="error">
-                        <strong>Error:</strong> {error}
+                        <strong>Error: {error}</strong>
                     </div>
                 )}
             </div>

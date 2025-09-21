@@ -26,13 +26,13 @@ export default function Footer() {
                     </div>
                     <div className="footer__social">
                         <a href="#" className="footer__social-icon" aria-label="Instagram">
-                            Instagram
+                            <img src="/assets/instagram.png" alt="" />
                         </a>
                         <a href="#" className="footer__social-icon" aria-label="Facebook">
-                            Facebook
+                            <img src="/assets/facebook.png" alt="" />
                         </a>
                         <a href="#" className="footer__social-icon" aria-label="YouTube">
-                            YouTube
+                            <img src="/assets/youtube.png" alt="" />
                         </a>
                     </div>
                 </div>

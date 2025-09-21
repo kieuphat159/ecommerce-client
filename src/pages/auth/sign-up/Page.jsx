@@ -7,7 +7,7 @@ export default function SignUpPage() {
       <div className="sign-up-page__body">
         <div className="sign-up-page__image-section">
           <div className="sign-up-page__logo">3legant.</div>
-          <img src="./images/signup.jpg" alt="Sign Up" />
+          <img src="./images/signup.jpg" alt="Elegant Furniture" />
         </div>
         <div className="sign-up-page__form-content">
           <SignUpForm />

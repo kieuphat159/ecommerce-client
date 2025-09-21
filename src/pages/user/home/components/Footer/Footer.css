@@ -99,6 +99,10 @@
   color: white;
 }
 
+.footer__bottom img {
+  filter: invert(100%);
+}
+
 /* Mobile responsive styles */
 @media (max-width: 768px) {
   .footer__content {
