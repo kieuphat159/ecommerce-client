@@ -10,6 +10,8 @@ export default function Products() {
     const [category, setCategory] = useState('All');
     const [error, setError] = useState('');
     const [visibleCount, setVisibleCount] = useState(8);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(1);
     const navigate = useNavigate();
 
     const getCategories = async () => {
@@ -36,10 +38,10 @@ export default function Products() {
         }
     };
 
-    const getProducts = async () => {
+    const getProducts = async (page = 1, limit = 4) => {
         try {
             setLoading(true);
-            const response = await fetch(`${import.meta.env.VITE_API_URL}/api/products`, {
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/api/products?limit=${limit}&page=${page}`, {
                 method: "GET",
                 headers: {
                     'Content-Type': 'application/json',
@@ -55,6 +57,8 @@ export default function Products() {
             if (data.success) {
                 setRealProducts(data.data);
                 setError(null);
+                setTotalPages(data.pagination.totalPages);
+                setCurrentPage(data.pagination.page);
             } else {
                 setError(data.message || 'Failed to load products');
             }
@@ -100,7 +104,7 @@ export default function Products() {
 
     useEffect(() => {
         getCategories();
-        getProducts();
+        getProducts(1, 4);
     }, []);
 
     return (
@@ -178,6 +182,17 @@ export default function Products() {
                     Show more
                 </button>
             )}
+            <div className="pagination">
+                {Array.from({ length: totalPages }, (_, i) => (
+                    <button
+                        key={i + 1}
+                        onClick={() => getProducts(i + 1, 4)}
+                        className={`pagination__button ${currentPage === i + 1 ? 'active' : ''}`}
+                    >
+                        {i + 1}
+                    </button>
+                ))}
+            </div>
         </div>
     );
 }
