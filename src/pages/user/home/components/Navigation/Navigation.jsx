@@ -52,7 +52,7 @@ export default function Navigation({userId}) {
 
             <div className="navigation__actions">
                 {user?.role === "seller" && (
-                    <Link to="/api/auth/seller" className="navigation__action">
+                    <Link to="/seller" className="navigation__action">
                         <img src="/assets/dashboard.svg" className="navigation__icon" alt="Dashboard" />
                     </Link>
                 )}

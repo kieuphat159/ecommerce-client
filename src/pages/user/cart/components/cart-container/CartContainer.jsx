@@ -1,9 +1,10 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import "./CartContainer.css";
 import ContentProduct from "../content-product/ContentProduct";
 import ContentDetail from "../content-detail/ContentDetail";
 import OrderComplete from "../order-complete/OrderComplete";
 import AuthService from "/src/services/authService";
+import { throttle } from '/src/components/Throttle'
 
 export default function CartContainer({ userId }) {
   const [active, setActive] = useState(1);
@@ -74,7 +75,7 @@ export default function CartContainer({ userId }) {
     }
   };
 
-  const updateQuantity = async (productIndex, delta) => {
+  const updateQuantityAPI = async (productIndex, delta) => {
     const product = realProducts[productIndex];
     const unitPrice = parseFloat(product.price.replace('$', ''));
     const totalPrice = unitPrice * delta;
@@ -113,6 +114,12 @@ export default function CartContainer({ userId }) {
       console.error("Error updating quantity:", err);
     }
   };
+
+  const updateQuantity = useCallback(
+    throttle(updateQuantityAPI, 500),
+    [realProducts, userId]
+  );
+  
 
   return (
     <div className="cart-container">

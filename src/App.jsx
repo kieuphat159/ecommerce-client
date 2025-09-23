@@ -31,9 +31,15 @@ function App() {
           }>
           </Route>
 
-          <Route path="/api/auth/seller/*" element={
+          <Route path="/seller/*" element={
             <ProtectedRoute requiredRole="seller">
               <SellerPage />
+            </ProtectedRoute>
+          }></Route>
+          
+          <Route path="/api/auth/seller/*" element={
+            <ProtectedRoute requiredRole="seller">
+              
             </ProtectedRoute>
           }></Route>
           

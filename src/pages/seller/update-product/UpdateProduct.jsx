@@ -406,7 +406,7 @@ const UpdateProduct = ({ sellerId }) => {
       
       if (data.success) {
         alert('Product deleted successfully');
-        navigate('/products');
+        navigate('/seller');
       } else {
         throw new Error(data.message || 'Failed to delete product');
       }
@@ -482,8 +482,8 @@ const UpdateProduct = ({ sellerId }) => {
       ) : error && !originalProduct ? (
         <div className="error">
           <p>Error: {error}</p>
-          <button className="header__button" onClick={() => navigate('/products')}>
-            Back to Products
+          <button className="header__button" onClick={() => navigate('/seller')}>
+            Back
           </button>
         </div>
       ) : (
@@ -493,10 +493,10 @@ const UpdateProduct = ({ sellerId }) => {
             <div>
               <button
                 className="header__button"
-                onClick={() => navigate('/products')}
+                onClick={() => navigate('/seller')}
                 disabled={loading}
               >
-                Back to Products
+                Back
               </button>
               <button
                 className="header__button header__button--delete"
@@ -768,22 +768,6 @@ const UpdateProduct = ({ sellerId }) => {
                       <option value="1">Active</option>
                       <option value="0">Inactive</option>
                     </select>
-                  </div>
-
-                  <div className="product__info__field">
-                    <label className="product__info__label">Seller ID *</label>
-                    <input
-                      type="number"
-                      name="sellerId"
-                      value={sellerId}
-                      onChange={handleChange}
-                      required
-                      min="1"
-                      disabled={loading}
-                      placeholder="Enter seller ID"
-                      readOnly
-                      className="product__info__input"
-                    />
                   </div>
 
                   <button type="submit" className="header__button" disabled={loading}>

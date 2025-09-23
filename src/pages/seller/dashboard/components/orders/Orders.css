@@ -1,0 +1,146 @@
+/* Latest Orders Section */
+.latest-orders {
+    background-color: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    margin: 24px;
+    padding: 24px;
+}
+
+.latest-orders__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+}
+
+.latest-orders__header h2 {
+    font-size: 20px;
+    font-weight: 600;
+}
+
+.latest-orders__header a {
+    text-decoration: none;
+    color: #FF8901;
+    font-weight: 600;
+    transition: color 0.3s;
+}
+
+.latest-orders__header a:hover {
+    color: #e07b00;
+}
+
+.order-table-container {
+    overflow-x: auto;
+}
+
+.order-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+}
+
+.order-table th,
+.order-table td {
+    padding: 16px;
+    text-align: left;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.order-table th {
+    background-color: #fafafa;
+    color: #888;
+    font-weight: 500;
+    text-transform: uppercase;
+}
+
+.order-table tbody tr:hover {
+    background-color: #f9f9f9;
+}
+
+.product-cell {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.product-images {
+    display: flex;
+    align-items: center;
+}
+
+.order-table__product-image {
+    width: 32px;
+    height: 32px;
+    border-radius: 4px;
+    object-fit: cover;
+    margin-right: -10px;
+    border: 1px solid #ffffff;
+}
+
+.product-image:first-child {
+    z-index: 2;
+}
+
+.product-image:nth-child(2) {
+    z-index: 1;
+}
+
+.status-badge {
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.status--pending {
+    background-color: #fffbe6;
+    color: #ffc107;
+}
+
+.status--shipping {
+    background-color: #e6f7ff;
+    color: #1890ff;
+}
+
+.status--refund {
+    background-color: #fff2e8;
+    color: #fa8c16;
+}
+
+.status--completed {
+    background-color: #f6ffed;
+    color: #52c41a;
+}
+
+.actions-cell {
+    text-align: right;
+}
+
+.actions {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    margin: 0 20px 0 0;
+    gap: 8px;
+}
+
+.icon-btn {
+    background: none;
+    border: none;
+    color: #888;
+    cursor: pointer;
+    font-size: 16px;
+    transition: color 0.3s;
+}
+
+.icon-btn:hover {
+    color: #1a1a1a;
+}
+
+@media (max-width: 768px) {
+    .order-table {
+        font-size: 12px;
+    }
+}
