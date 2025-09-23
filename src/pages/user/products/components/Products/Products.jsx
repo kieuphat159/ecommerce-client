@@ -10,7 +10,7 @@ export default function Products() {
     const [category, setCategory] = useState('All');
     const [error, setError] = useState('');
     const [visibleCount, setVisibleCount] = useState(8);
-    const [currentPage, setCurrentPage] = useState(1);
+    const [currentPage, setCurrentPage] = useState(1);  
     const [totalPages, setTotalPages] = useState(1);
     const navigate = useNavigate();
 

@@ -51,7 +51,7 @@ const useAuth = () => {
         
         setIsAuthenticated(true);
         setUser({ 
-          userInfo: response.userInfo, 
+          userId: response.userId, 
           role: response.role 
         });
         

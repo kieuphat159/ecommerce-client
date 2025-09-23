@@ -1,0 +1,51 @@
+.orders__container {
+    display: flex;
+    flex-direction: column;
+    min-height: 100%;
+}
+
+.orders__title {
+    font-size: 26px;
+    font-weight: 600;
+    margin-bottom: 25px;
+}
+
+.orders__table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.orders__table th,
+.orders__table td {
+    padding: 26px 16px;
+    text-align: left;
+    border-bottom: 1px solid #e0e0e0;
+    height: 70px;
+}
+
+.orders__table th {
+    color: #a1a1a1;
+    font-weight: 600;
+}
+
+.orders__table tr:hover {
+    background-color: #f9f9f9;
+}
+
+.orders__pagination {
+    margin-top: auto;
+    display: flex;
+    gap: 5px;
+    justify-content: center;
+}
+
+.orders__pagination button {
+    padding: 5px 10px;
+    border: none;
+    cursor: pointer;
+    background: none;
+}
+
+.orders__pagination button.active {
+    color: rgb(0, 0, 0);
+}

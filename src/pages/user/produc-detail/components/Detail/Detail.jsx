@@ -6,7 +6,6 @@ export default function Detail() {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
     const [options, setOptions] = useState([]);
-    const [optionValues, setOptionValues] = useState({});
     const [currentQuantity, setCurrentQuantity] = useState(0);
     const [product, setProduct] = useState({});
     const [selectedVariants, setSelectedVariants] = useState({});
@@ -21,19 +20,75 @@ export default function Detail() {
     const specialVal = ['id', 'name', 'image', 'seller', 'seller_id', 'seller_name'];
     const specialAttr = ['price', 'description', 'categories'];
 
-    const fetchCurrentQuantity = async () => {
+    const calculateCurrentQuantity = () => {
         if (options.length === 0) {
             setCurrentQuantity(0);
             return;
         }
 
-        if (Object.keys(selectedVariants).length === 0) {
+        const selectedOptionIds = Object.keys(selectedVariants);
+        if (selectedOptionIds.length !== options.length) {
             setCurrentQuantity(0);
             return;
         }
 
+        let minQuantity = Infinity;
+        
+        for (const optionKey in selectedVariants) {
+            const optionId = optionKey.replace('option_', '');
+            const valueId = selectedVariants[optionKey];
+            
+            const option = options.find(opt => opt.id.toString() === optionId);
+            if (option) {
+                const value = option.values.find(val => val.id.toString() === valueId);
+                if (value && value.quantity < minQuantity) {
+                    minQuantity = value.quantity;
+                }
+            }
+        }
+
+        setCurrentQuantity(minQuantity === Infinity ? 0 : minQuantity);
+    };
+
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+        setSelectedVariants(prev => ({ ...prev, [name]: value }));
+        if (error) setError('');
+    };
+
+    const fetchOptions = async () => {
         try {
             setLoading(true);
+            const token = localStorage.getItem('token');
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/api/product-options/${id}`, {
+                method: "GET",
+                headers: {
+                    'Authorization': token ? `Bearer ${token}` : undefined
+                }
+            });
+            if (response.ok) {
+                const data = await response.json();
+                if (data.success && data.data) {
+                    setOptions(data.data);
+                }
+            } else {
+                console.log('Failed to fetch options');
+                setError('Failed to fetch product options');
+            }
+        } catch (err) {
+            console.log('Error fetching options: ', err);
+            setError('Failed to fetch product options');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const fetchVariantId = async () => {
+        if (Object.keys(selectedVariants).length !== options.length) {
+            return null;
+        }
+
+        try {
             const token = localStorage.getItem('token');
             const res = await fetch(`${import.meta.env.VITE_API_URL}/api/product-variant-id`, {
                 method: 'POST',
@@ -46,85 +101,12 @@ export default function Detail() {
             const data = await res.json();
             
             if (data.success && data.variantId) {
-                setVariantId(data.variantId);
-                const stockRes = await fetch(`${import.meta.env.VITE_API_URL}/api/stock/${data.variantId}`, {
-                    headers: {
-                        'Authorization': token ? `Bearer ${token}` : undefined
-                    }
-                });
-                const stockData = await stockRes.json();
-                if (stockData.success && stockData.data.length > 0) {
-                    const totalQuantity = stockData.data.reduce((sum, stock) => sum + (stock.quantity || 0), 0);
-                    setCurrentQuantity(totalQuantity);
-                } else {
-                    setCurrentQuantity(0);
-                }
-            } else {
-                setCurrentQuantity(0);
+                return data.variantId;
             }
         } catch (err) {
-            console.error('Error fetching current quantity:', err);
-            setCurrentQuantity(0);
-            setError('Failed to fetch stock quantity');
-        } finally {
-            setLoading(false);
+            console.error('Error fetching variant ID:', err);
         }
-    };
-
-    const handleChange = (e) => {
-        const { name, value } = e.target;
-        setSelectedVariants(prev => ({ ...prev, [name]: value }));
-        if (error) setError('');
-    };
-
-    const fetchOptions = async () => {
-        try {
-            const token = localStorage.getItem('token');
-            const response = await fetch(`${import.meta.env.VITE_API_URL}/api/product-options/${id}`, {
-                method: "GET",
-                headers: {
-                    'Authorization': token ? `Bearer ${token}` : undefined
-                }
-            });
-            if (response.ok) {
-                const data = await response.json();
-                if (data.success && data.data) {
-                    setOptions(data.data);
-                    data.data.forEach(option => fetchOptionValues(option.id));
-                }
-            } else {
-                console.log('Failed to fetch options');
-            }
-        } catch (err) {
-            console.log('Error fetching options: ', err);
-            setError('Failed to fetch product options');
-        }
-    };
-
-    const fetchOptionValues = async (option_id) => {
-        try {
-            const token = localStorage.getItem('token');
-            const response = await fetch(`${import.meta.env.VITE_API_URL}/api/product-option-values/${option_id}`, {
-                method: "GET",
-                headers: {
-                    'Authorization': token ? `Bearer ${token}` : undefined
-                }
-            });
-            if (response.ok) {
-                const data = await response.json();
-                if (data.success && data.data) {
-                    setOptionValues(prev => ({
-                        ...prev,
-                        [option_id]: data.data
-                    }));
-                }
-            } else {
-                console.log(`Failed to fetch option values for option ${option_id}`);
-            }
-        } catch (err) {
-            console.log(`Error fetching option values for option ${option_id}: `, err);
-            setError('Failed to fetch option values');
-        }
+        return null;
     };
 
     useEffect(() => {
@@ -132,7 +114,7 @@ export default function Detail() {
     }, [pricePerUnit, numberOfProduct]);
 
     useEffect(() => {
-        fetchCurrentQuantity();
+        calculateCurrentQuantity();
     }, [selectedVariants, options]);
 
     useEffect(() => {
@@ -188,7 +170,7 @@ export default function Detail() {
     };
 
     const addToCart = async () => {
-        if (!variantId) {
+        if (Object.keys(selectedVariants).length !== options.length) {
             alert('Please select all product variants before adding to cart!');
             return;
         }
@@ -201,14 +183,22 @@ export default function Detail() {
             return;
         }
 
-        const data = {
-            variantId: variantId,
-            quantity: numberOfProduct,
-            unit_price: pricePerUnit,
-            total_price: totalPrice
-        };
-
         try {
+            setLoading(true);
+            const fetchedVariantId = await fetchVariantId();
+            
+            if (!fetchedVariantId) {
+                alert('Invalid product variant selection!');
+                return;
+            }
+
+            const data = {
+                variantId: fetchedVariantId,
+                quantity: numberOfProduct,
+                unit_price: pricePerUnit,
+                total_price: totalPrice
+            };
+
             const res = await fetch(`${import.meta.env.VITE_API_URL}/api/auth/user/add-to-cart/${userId}`, {
                 method: "POST",
                 headers: {
@@ -227,6 +217,8 @@ export default function Detail() {
         } catch (err) {
             console.log('Err: ', err);
             alert('Something went wrong while adding to cart!');
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -254,13 +246,12 @@ export default function Detail() {
                                         name={`option_${option.id}`}
                                         onChange={handleChange}
                                         value={selectedVariants[`option_${option.id}`] || ''}
-                                        disabled={loading}
                                         className="product__info__select"
                                     >
                                         <option value="">Select {option.name}</option>
-                                        {optionValues[option.id]?.map(value => (
+                                        {option.values?.map(value => (
                                             <option key={value.id} value={value.id}>
-                                                {value.value}
+                                                {value.value} {value.quantity > 0 ? `(${value.quantity} available)` : '(Out of stock)'}
                                             </option>
                                         ))}
                                     </select>
@@ -271,7 +262,7 @@ export default function Detail() {
                     </div>
                 )}
                 <p className="product__quantity">
-                    Available Quantity: {loading ? 'Loading...' : currentQuantity}
+                    Available Quantity: {currentQuantity}
                 </p>
                 <div className="product__price">Total price: ${totalPrice}</div>
                 <div className="detail__button-section">
@@ -284,7 +275,7 @@ export default function Detail() {
                         <button onClick={addToWishlist} className={wishlistBtn}>♡ Wishlist</button>
                     </div>
                     <button onClick={addToCart} className="detail__add" disabled={loading || currentQuantity === 0}>
-                        Add to Cart
+                        {loading ? 'Adding...' : 'Add to Cart'}
                     </button>
                 </div>
                 {error && (

@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import useAuth from "../../../../../hooks/useAuth";
 
-export default function Navigation() {
+export default function Navigation({userId}) {
     const navigate = useNavigate();
     const { isAuthenticated, user, logout } = useAuth();
     const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -65,7 +65,7 @@ export default function Navigation() {
 
                 {isAuthenticated && (
                     <>
-                        <Link to="/profile" className="navigation__action">
+                        <Link to={`/profile/${user.userId}`} className="navigation__action">
                             <img src="/assets/profile.png" className="navigation__icon" alt="Profile" />
                         </Link>
                         <button className="navigation__button" onClick={signOut}>Sign out</button>
