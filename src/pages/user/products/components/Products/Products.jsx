@@ -15,6 +15,10 @@ export default function Products() {
     const navigate = useNavigate();
 
     const getCategories = async () => {
+        const now = new Date();
+        const seconds = now.getSeconds().toString().padStart(2, "0");
+        const ms = now.getMilliseconds().toString().padStart(3, "0");
+        console.log(`Call category: ${seconds}.${ms}`);
         try {
             setLoading(true);
             const response = await fetch(`${import.meta.env.VITE_API_URL}/api/categories`, {
@@ -39,6 +43,10 @@ export default function Products() {
     };
 
     const getProducts = async (page = 1, limit = 4) => {
+        const now = new Date();
+        const seconds = now.getSeconds().toString().padStart(2, "0");
+        const ms = now.getMilliseconds().toString().padStart(3, "0");
+        console.log(`Call Product: ${seconds}.${ms}`);
         try {
             setLoading(true);
             const response = await fetch(`${import.meta.env.VITE_API_URL}/api/products?limit=${limit}&page=${page}`, {
