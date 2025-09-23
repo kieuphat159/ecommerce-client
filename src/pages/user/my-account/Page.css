@@ -1,0 +1,25 @@
+.account__header {
+    padding-top: 60px;
+    height: 218px;
+    width: 100%;
+    display: flex;
+}
+
+.account__header h1 {
+    margin: auto;
+    font-size: 54px;
+}
+
+.account__body {
+    height: 498px;
+    margin-left: 120px;
+    margin-right: 120px;
+    gap: 50px;
+    display: grid;
+    grid-template-columns: 1fr 3fr;
+}
+
+
+.account__content {
+    height: 498px;
+}

@@ -7,6 +7,7 @@ import SellerPage from "./pages/seller/Page";
 import ProtectedRoute from "./components/ProtectedRoute";
 import ProductsPage from "./pages/user/products/Page";
 import CartPage from "./pages/user/cart/Page";
+import MyAccountPage from "./pages/user/my-account/Page";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -16,6 +17,7 @@ function App() {
     <>
         <Routes>
           <Route path="/" element={<HomePage />} />
+          <Route path="/profile/:userId" element={<MyAccountPage/>} />
           <Route path="/user/home" element={<HomePage />} />
           <Route path="/signin" element={<SignInPage />} />
           <Route path="/signup" element={<SignUpPage />} />
