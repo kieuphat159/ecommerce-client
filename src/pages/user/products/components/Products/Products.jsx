@@ -158,14 +158,11 @@ export default function Products() {
             <div className='products__grid'>
                 {realProducts.slice(0, visibleCount).map((product, index) => (
                     <div className='product-card' key={index} onClick={() => navigate(`/product/${product.id}`)}>
-                        {product.isNew && <span className='product-card__new-tag'>NEW</span>}
-                        {product.discount && <span className='product-card__discount-tag'>{product.discount}</span>}
                         <img src={product.image} alt={product.name} className='product-card__image' />
                         <div className='product-card__info'>
                             <div className='product-card__rating'>★★★★★</div>
                             <div className='product-card__name'>{product.name}</div>
                             <div className='product-card__price'>
-                                {product.oldPrice && <span className='product-card__old-price'>{product.oldPrice}</span>}
                                 <span className='product-card__current-price'>{product.price}</span>
                             </div>
                             <button className='product-card__add-to-cart'>Add to cart</button>
