@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import './Dashboard.css';
-import DashboardNav from './components/navigation/DashBoardNav';
+import DashboardNav from './components/navigation/DashboardNav';
 import Products from '../products/components/Products/Products';
 import Orders from './components/orders/Orders';
 
