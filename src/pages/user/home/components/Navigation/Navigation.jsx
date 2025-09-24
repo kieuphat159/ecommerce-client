@@ -63,18 +63,26 @@ export default function Navigation({userId}) {
                     </Link>
                 )}
 
-                {isAuthenticated && (
+                {isAuthenticated && user.role === 'customer' && (
                     <>
                         <Link to={`/profile/${user.userId}`} className="navigation__action">
                             <img src="/assets/profile.png" className="navigation__icon" alt="Profile" />
                         </Link>
                         <button className="navigation__button" onClick={signOut}>Sign out</button>
+                        <button onClick={handleCartClick} className="navigation__action navigation__button">
+                            <img src="/assets/cart.png" className="navigation__icon" alt="Cart" />
+                        </button>
                     </>
                 )}
 
-                <button onClick={handleCartClick} className="navigation__action navigation__button">
-                    <img src="/assets/cart.png" className="navigation__icon" alt="Cart" />
-                </button>
+                {isAuthenticated && user.role === 'seller' &&(
+                    <>
+
+                        <button className="navigation__button" onClick={signOut}>Sign out</button>
+                    </>
+                )}
+
+
             </div>
 
             {isMenuOpen && <div className="navigation__overlay" onClick={toggleMenu}></div>}

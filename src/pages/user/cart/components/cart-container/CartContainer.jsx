@@ -170,7 +170,7 @@ export default function CartContainer({ userId }) {
             setOrderId={setOrderId}
           />
         )}
-        {active === 3 && <OrderComplete mockProducts={realProducts} orderId={orderId}/>}
+        {active === 3 && <OrderComplete mockProducts={realProducts} orderId={orderId} userId={userId}/>}
       </div>
     </div>
   );

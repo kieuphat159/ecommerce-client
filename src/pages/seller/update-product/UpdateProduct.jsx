@@ -39,7 +39,7 @@ const UpdateProduct = ({ sellerId }) => {
   const fetchOptions = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/product-options/${id}`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/seller/product-options/${id}`, {
         method: "GET",
         headers: {
           'Authorization': `Bearer ${token}`
@@ -445,7 +445,9 @@ const UpdateProduct = ({ sellerId }) => {
         },
         body: JSON.stringify({ product_id: id, options: selectedOptions })
       });
+      console.log(id, selectedOptions)
       const data = await res.json();
+      console.log('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa ', data.variantId)
       if (data.success && data.variantId) {
         const stockRes = await fetch(`${import.meta.env.VITE_API_URL}/api/stock/${data.variantId}?stockId=${product.stock}`, {
           

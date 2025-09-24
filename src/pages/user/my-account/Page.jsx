@@ -1,33 +1,43 @@
-import './Page.css'
-import Navigation from '/src/pages/user/home/components/Navigation/Navigation'
+import './Page.css';
+import Navigation from '/src/pages/user/home/components/Navigation/Navigation';
 import AccountNavigation from './components/Navigation/Navigation';
 import Orders from './components/Orders/Orders';
-import { useParams } from "react-router-dom";
-import AuthService from "/src/services/authService";
+import { useParams, useLocation } from 'react-router-dom'; 
+import AuthService from '/src/services/authService';
 import { useEffect, useState } from 'react';
 
 export default function MyAccountPage() {
     const { userId } = useParams();
+    const location = useLocation(); 
     const [orders, setOrders] = useState([]);
     const [page, setPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
+    const [activeTab, setActiveTab] = useState('Account'); 
     const limit = 5;
+
+    useEffect(() => {
+        const queryParams = new URLSearchParams(location.search);
+        const tab = queryParams.get('tab');
+        if (tab && ['Account', 'Address', 'Orders', 'Wishlist'].includes(tab)) {
+            setActiveTab(tab); 
+        }
+    }, [location.search]);
 
     const fetchOrders = async (pageNum) => {
         try {
             const data = await AuthService.apiCall(
                 `/user/my-orders/${userId}?page=${pageNum}&limit=${limit}`,
-                { method: "GET" }
+                { method: 'GET' }
             );
 
-            console.log("API response:", data);
+            console.log('API response:', data);
 
             if (data.success && data.data?.orders) {
-                const mapped = data.data.orders.map(item => ({
+                const mapped = data.data.orders.map((item) => ({
                     id: item.order_id,
                     date: item.created_at,
                     status: item.status,
-                    price: item.total_amount
+                    price: item.total_amount,
                 }));
 
                 setOrders(mapped);
@@ -41,26 +51,36 @@ export default function MyAccountPage() {
     };
 
     useEffect(() => {
-        fetchOrders(page);
-    }, [userId, page]);
+        if (activeTab === 'Orders') {
+            fetchOrders(page);
+        }
+    }, [userId, page, activeTab]);
 
     return (
         <>
-            <Navigation userId={userId}/>
+            <Navigation userId={userId} />
             <div className="account__header">
                 <h1>My Account</h1>
             </div>
             <div className="account__body">
-                <AccountNavigation 
+                <AccountNavigation
                     userId={userId}
+                    activeTab={activeTab}
+                    setActiveTab={setActiveTab}
                 />
-                <div className='account__content'>
-                    <Orders 
-                        orders={orders} 
-                        page={page}
-                        totalPages={totalPages}
-                        onPageChange={setPage}
-                    />
+                <div className="account__content">
+                    {activeTab === 'Account' && <div></div>}
+                    {activeTab === 'Address' && <div></div>}
+                    {activeTab === 'Orders' && (
+                        <Orders
+                            orders={orders}
+                            page={page}
+                            totalPages={totalPages}
+                            userId={userId}
+                            onPageChange={setPage}
+                        />
+                    )}
+                    {activeTab === 'Wishlist' && <div></div>}
                 </div>
             </div>
         </>
