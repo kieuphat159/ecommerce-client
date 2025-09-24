@@ -1,0 +1,50 @@
+.dashboard__nav {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.nav__title {
+    color: white;
+    font-size: 30px;
+    font-weight: 600;
+    text-align: center;
+    margin-top: 38px;
+    margin-bottom: 38px;
+}
+
+.nav__button {
+    width: 100%;
+    margin-top: 180px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.nav__button button {
+    width: 50px;
+    height: 50px;
+    background: none;
+    background-color: #FFB056;
+    border: none;
+    border-radius: 8px;
+    margin-bottom: 25px;
+}
+
+.nav__button button img {
+
+}
+
+.nav__button button:hover {
+    cursor: pointer;
+    opacity: 0.8;
+}
+
+.button--active {
+    background-color: rgb(255, 255, 255) !important;
+}
+
+.button--active img {
+    filter: invert(30%) !important;
+}

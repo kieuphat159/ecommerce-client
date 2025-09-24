@@ -1,0 +1,15 @@
+
+
+.dashboard {
+    display: grid;
+    grid-template-columns: 1fr 9fr;
+    min-height: 100vh;
+}
+
+.dashboard--left {
+    background-color: #FF8901;
+}
+
+.dashboard--right {
+    background-color: #F8F8F8;
+}

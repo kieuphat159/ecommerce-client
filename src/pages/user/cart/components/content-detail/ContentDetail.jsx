@@ -16,23 +16,34 @@ export default function ContentDetail({
     setOrderId
     }) {
     const [ paymentMethod, setPaymentMethod ] = useState("credit_card");
+    const [firstName, setFirstName] = useState("");
+    const [lastName, setLastName] = useState("");
+    const [phoneNumber, setPhoneNumber] = useState("");
+    const [emailAddress, setEmailAddress] = useState("");
 
     const placeOrder = async () => {
-    try {
-        const res = await AuthService.apiCall(`/user/place-order/${cartId}`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ paymentMethod })
-        });
-        if (res.success) {
-            console.log("ok: ", res.orderId);
-            setHeaderTile("Complete!");
-            setActive(3);
-            setOrderId(res.orderId);
+        try {
+            const res = await AuthService.apiCall(`/user/place-order/${cartId}`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ 
+                    paymentMethod,
+                    firstName,
+                    lastName,
+                    phoneNumber,
+                    emailAddress
+                })
+            });
+
+            if (res.success) {
+                console.log("ok: ", res.orderId);
+                setHeaderTile("Complete!");
+                setActive(3);
+                setOrderId(res.orderId);
+            }
+        } catch (err) {
+            console.log('Order error: ', err);
         }
-    } catch (err) {
-        console.log('Order error: ', err);
-    }
     };
 
 
@@ -72,24 +83,44 @@ export default function ContentDetail({
     return (
         <div className='content-detail'>
             <div className="content-detail__contact Content">
-                <h2 className='contact__title title'>Contact Infomation</h2>
+                <h2 className='contact__title title'>Contact Information</h2>
                 <div className='input__name input-column'>
                     <div className='content-detail__contact__input info-input'>
-                            <label>FIRST NAME</label>
-                            <input type="text" placeholder='First name' />
+                        <label>FIRST NAME</label>
+                        <input 
+                            type="text" 
+                            placeholder='First name' 
+                            value={firstName}
+                            onChange={(e) => setFirstName(e.target.value)}
+                        />
                     </div>
                     <div className='content-detail__contact__input info-input'>
-                            <label>LAST NAME</label>
-                            <input type="text" placeholder='Last name' />
+                        <label>LAST NAME</label>
+                        <input 
+                            type="text" 
+                            placeholder='Last name' 
+                            value={lastName}
+                            onChange={(e) => setLastName(e.target.value)}
+                        />
                     </div>
                 </div>
                 <div className='content-detail__contact__input info-input'>
                     <label>PHONE NUMBER</label>
-                    <input type="text" placeholder='Phone number' />
+                    <input 
+                        type="text" 
+                        placeholder='Phone number' 
+                        value={phoneNumber}
+                        onChange={(e) => setPhoneNumber(e.target.value)}
+                    />
                 </div>
                 <div className='content-detail__contact__input info-input'>
                     <label>EMAIL ADDRESS</label>
-                    <input type="text" placeholder='Your Email' />
+                    <input 
+                        type="text" 
+                        placeholder='Your Email' 
+                        value={emailAddress}
+                        onChange={(e) => setEmailAddress(e.target.value)}
+                    />
                 </div>
             </div>
 

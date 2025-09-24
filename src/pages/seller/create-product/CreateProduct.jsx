@@ -177,6 +177,19 @@ const UploadProduct = ({sellerId}) => {
   }, [previewImages]);
 
   return (
+    <>
+    <div className="header">
+            <h2 className="header__title">Update Product</h2>
+            <div>
+              <button
+                className="header__button"
+                onClick={() => navigate('/seller')}
+                disabled={loading}
+              >
+                Back
+              </button>
+            </div>
+          </div>
     <div className="upload-product-container">
       <h2>Create New Product</h2>
       
@@ -230,6 +243,7 @@ const UploadProduct = ({sellerId}) => {
             onChange={handleFileChange}
             multiple
             disabled={loading}
+            className='form__input'
           />
           {previewImages.length > 0 && (
             <div style={{ marginTop: '10px', display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
@@ -323,6 +337,7 @@ const UploadProduct = ({sellerId}) => {
         
         <button 
           type="submit" 
+          className='form__button'
           disabled={loading}
           style={{
             backgroundColor: loading ? '#ccc' : '#000000ff',
@@ -397,6 +412,7 @@ const UploadProduct = ({sellerId}) => {
       )}
       { /* result && navigate('/products') */}
     </div>
+    </>
   );
 };
 
