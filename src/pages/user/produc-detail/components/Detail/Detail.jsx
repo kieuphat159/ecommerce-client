@@ -87,6 +87,10 @@ export default function Detail() {
             if (response.ok) {
                 const data = await response.json();
                 if (data.success && data.data) {
+                    // lowercase the first letter of option name
+                    data.data.forEach(option => {
+                        option.name = option.name.charAt(0).toUpperCase() + option.name.slice(1);
+                    });
                     setOptions(data.data);
                 }
             } else {
@@ -205,10 +209,12 @@ export default function Detail() {
     };
 
     const increase = () => {
+        if (currentQuantity === 0) return;
         setNumberOfProduct(prev => Math.min(prev + 1, currentQuantity));
     };
 
     const decrease = () => {
+        if (currentQuantity === 0) return;
         setNumberOfProduct(prev => Math.max(1, prev - 1));
     };
 
@@ -315,9 +321,30 @@ export default function Detail() {
                 <div className="detail__button-section">
                     <div className="detail__button-top">
                         <div className="number-input">
-                            <button className="number-input__button number-input__button--decrease" onClick={decrease}>-</button>
-                            <span className="number-input__value">{numberOfProduct}</span>
-                            <button className="number-input__button number-input__button--increase" onClick={increase}>+</button>
+                            <button
+                                className="number-input__button number-input__button--decrease"
+                                onClick={decrease}
+                                disabled={currentQuantity === 0 || numberOfProduct <= 1}
+                            >-</button>
+                            <input
+                                type="number"
+                                className="number-input__value"
+                                value={numberOfProduct}
+                                min={1}
+                                max={currentQuantity}
+                                disabled={currentQuantity === 0}
+                                onChange={e => {
+                                    let val = parseInt(e.target.value, 10);
+                                    if (isNaN(val) || val < 1) val = 1;
+                                    if (val > currentQuantity) val = currentQuantity;
+                                    setNumberOfProduct(val);
+                                }}
+                            />
+                            <button
+                                className="number-input__button number-input__button--increase"
+                                onClick={increase}
+                                disabled={currentQuantity === 0 || numberOfProduct >= currentQuantity}
+                            >+</button>
                         </div>
                         <button onClick={addToWishlist} className={wishlistBtn}>♡ Wishlist</button>
                     </div>

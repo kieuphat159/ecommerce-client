@@ -194,7 +194,7 @@ export default function Products({ sellerId }) {
                 <>
                     <div className="product__grid">
                         {realProducts.map((product, index) => (
-                            <div className="product__card" key={index}>
+                            <div className="product__card" key={index} onClick={() => navigate(`products/${product.id}`)}>
                                 {product.discount && (
                                     <span className="discount-tag">{product.discount}</span>
                                 )}

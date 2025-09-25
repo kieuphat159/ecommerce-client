@@ -92,7 +92,7 @@ body {
 }
 
 .product__info__field {
-    margin-bottom: 20px;
+    margin-bottom: -10px;
 }
 
 .product__info__label {
@@ -149,6 +149,25 @@ body {
     object-fit: cover;
     border-radius: 6px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.add-to-stock-button {
+    padding: 8px;
+    border-radius: 5px;
+    border: none;
+    background-color: #FF8901;
+    color: white;
+}
+
+.submit__button {
+    margin-top: 20px !important;
+    background-color: #FF8901 !important;
+}
+
+.product__info__field p {
+    font-size: 14px;
+    color: #666666;
+    margin-top: 8px;
 }
 
 /* Error and result messages */

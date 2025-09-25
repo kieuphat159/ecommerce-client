@@ -631,7 +631,7 @@ const UpdateProduct = ({ sellerId }) => {
                   <div className="product__info__field">
                     <button
                       type="button"
-                      className="header__button"
+                      className="add-to-stock-button"
                       onClick={() => {
                         setOpenStock(!openStock);
                         if (!loadedStock) {
@@ -687,7 +687,7 @@ const UpdateProduct = ({ sellerId }) => {
                       <div className="product__info__field">
                         <button
                           type="button"
-                          className="header__button"
+                          className="add-to-stock-button"
                           onClick={() => {
                             setOpenVariant(!openVariant);
                             if (!loadedVariant) {
@@ -697,7 +697,7 @@ const UpdateProduct = ({ sellerId }) => {
                           }}
                           disabled={loading}
                         >
-                          {openVariant ? 'Hide Variants' : 'Add Variants'}
+                          {openVariant ? 'Hide Variants' : 'Add Options values'}
                         </button>
                       </div>
 

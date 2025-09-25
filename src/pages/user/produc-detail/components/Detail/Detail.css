@@ -10,10 +10,12 @@ hr {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 20px;
-  padding: 80px 40px;
+  padding: 40px;
   font-family: 'Inter', Arial, sans-serif;
   max-width: 1200px;
-  margin: 0 auto;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 100px;
   background-color: #f8f8f8;
   border-radius: 12px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
@@ -125,6 +127,20 @@ hr {
   font-size: 15px;
   font-weight: 500;
   color: #333;
+  border: none;
+  outline: none;
+}
+
+.number-input__value:focus {
+  outline: none;
+  border: none;
+  box-shadow: none;
+}
+
+.number-input__value::-webkit-outer-spin-button,
+.number-input__value::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
 }
 
 .detail__wishlist {

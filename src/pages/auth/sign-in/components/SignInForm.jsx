@@ -29,7 +29,7 @@ export default function SignInForm() {
     try {
       const response = await login(form);
       if (response.role === 'seller') {
-        Navigate('/');
+        Navigate('/seller');
       } else {
         Navigate('/user/home');
       }
