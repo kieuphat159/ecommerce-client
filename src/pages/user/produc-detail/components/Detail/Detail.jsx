@@ -27,14 +27,18 @@ export default function Detail() {
             if (data.success && data.data) {
                 if (Array.isArray(data.data)) {
                     setCurrentQuantity(data.data[0]?.quantity || 0);
+                    setVariantId(data.data[0]?.variant_id || data.data[0]?.id || 0); // sửa dòng này
                 } else {
                     setCurrentQuantity(data.data.quantity || 0);
+                    setVariantId(data.data.variant_id || data.data.id || 0); // sửa dòng này
                 }
             } else {
                 setCurrentQuantity(0);
+                setVariantId(0);
             }
         } catch (err) {
             setCurrentQuantity(0);
+            setVariantId(0);
         }
     }
 
@@ -87,7 +91,6 @@ export default function Detail() {
             if (response.ok) {
                 const data = await response.json();
                 if (data.success && data.data) {
-                    // lowercase the first letter of option name
                     data.data.forEach(option => {
                         option.name = option.name.charAt(0).toUpperCase() + option.name.slice(1);
                     });
@@ -106,10 +109,12 @@ export default function Detail() {
     };
 
     const fetchVariantId = async () => {
+        if (options.length === 0) {
+            return variantId;
+        }
         if (Object.keys(selectedVariants).length !== options.length) {
             return null;
         }
-
         try {
             const token = localStorage.getItem('token');
             const res = await fetch(`${import.meta.env.VITE_API_URL}/api/product-variant-id`, {
@@ -125,6 +130,7 @@ export default function Detail() {
             if (data.success && data.variantId) {
                 return data.variantId;
             }
+            return variantId;
         } catch (err) {
             console.error('Error fetching variant ID:', err);
         }
@@ -223,11 +229,10 @@ export default function Detail() {
     };
 
     const addToCart = async () => {
-        if (Object.keys(selectedVariants).length !== options.length) {
+        if (options.length > 0 && Object.keys(selectedVariants).length !== options.length) {
             alert('Please select all product variants before adding to cart!');
             return;
         }
-
         const token = localStorage.getItem('authToken');
         const userId = localStorage.getItem('userId');
 
@@ -239,8 +244,8 @@ export default function Detail() {
         try {
             setLoading(true);
             const fetchedVariantId = await fetchVariantId();
-            
-            if (!fetchedVariantId) {
+
+            if (!fetchedVariantId || fetchedVariantId === 0) {
                 alert('Invalid product variant selection!');
                 return;
             }

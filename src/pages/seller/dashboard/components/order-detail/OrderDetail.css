@@ -85,8 +85,37 @@
     border-bottom: 1px solid #ddd;
 }
 
+.detail__element div {
+    margin-top: 15px;
+}
+
 .order-detail__items .products-grid {
     display: flex;
+}
+
+.variant-attributes {
+    font-size: 15px;
+    color: #555;
+    margin-top: 4px;
+    text-align: center;
+}
+
+.delete-order {
+    margin: 20px 15px -10px 15px;
+    width: calc(100% - 30px);
+    padding: 12px;
+    border: none;
+    border-radius: 6px;
+    font-size: 16px;
+    font-weight: 600;
+    color: white;
+    background-color: #ff922c;
+}
+
+.delete-order:hover {
+    background-color: #e07b1c92;
+    background: linear-gradient(to top, #ff7e5f, #feb47b);
+    cursor: pointer;
 }
 
 .order-spinner {

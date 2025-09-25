@@ -3,6 +3,7 @@ strong {
 }
 
 .banner {
+  width: 100%;
   position: relative;
   background-color: #f9fafb;
   padding: 28px 0 0 0;
@@ -12,13 +13,11 @@ strong {
 .banner__container {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 0 1rem;
   height: 760px;
   gap: 32px;
 }
 
 .banner__slider {
-  background-image: url('../../../../../../public/images/banner.jpg');
   height: 536px;
   background-size: contain;
   background-repeat: no-repeat;
@@ -64,8 +63,8 @@ strong {
 .banner__content {
   height: 152px;
   padding-top: 24px;
-  padding-left: 120px;
-  padding-right: 120px;
+  padding-left: 195px;
+  padding-right: 170px;
   display: grid;
   grid-template-columns: 1fr 1fr;
 }

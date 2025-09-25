@@ -48,6 +48,9 @@ hr {
   color: #1a1a1a;
   margin-top: 8px;
 }
+.product__quantity {
+  margin-top: 20px;
+}
 
 .detail__image-section img {
   width: 100%;

@@ -1,7 +1,9 @@
 import { useState } from "react";
 import "../Page.css";
+import { useNavigate } from "react-router-dom";
 
 export default function SignUpForm() {
+  const navigate = useNavigate();
   const [form, setForm] = useState({
     name: "",
     username: "",
@@ -62,6 +64,7 @@ export default function SignUpForm() {
         password: "",
       });
       setAgreeToTerms(false);
+      navigate('/signin');
       
     } catch (error) {
       console.error("Error during sign up:", error);
