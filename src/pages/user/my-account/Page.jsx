@@ -57,7 +57,7 @@ export default function MyAccountPage() {
     }, [userId, page, activeTab]);
 
     return (
-        <>
+        <div className="account">
             <Navigation userId={userId} />
             <div className="account__header">
                 <h1>My Account</h1>
@@ -83,6 +83,6 @@ export default function MyAccountPage() {
                     {activeTab === 'Wishlist' && <div></div>}
                 </div>
             </div>
-        </>
+        </div>
     );
 }

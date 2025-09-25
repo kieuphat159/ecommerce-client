@@ -97,6 +97,7 @@ export default function OrderComplete({
                     </div>
                 )}
 
+                <div className='products-grid__container'>
                 {mockProducts && mockProducts.length > 0 && (
                     <div className="products-grid">
                         {mockProducts.map((product, index) => (
@@ -112,6 +113,7 @@ export default function OrderComplete({
                         ))}
                     </div>
                 )}
+                </div>
 
                 <div className="oder-complete__final-info">
                     <div className="final-info__key">Order code:</div>
