@@ -1,0 +1,110 @@
+.order-detail {
+    padding: 30px;
+    height: 100%;
+}
+
+.order-detail__title {
+    font-size: 26px;
+    margin-bottom: 20px;
+    font-weight: 600;
+}
+
+.order-detail__content {
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    height: 100%;
+    width: 100%;
+}
+
+.content__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #ddd;
+    padding: 20px;
+}
+
+.order-detail__items {
+    width: 100%;
+    margin-left: 20px;
+    margin-right: 20px;
+}
+
+.back-to-orders {
+    background: none;
+    border: none;
+    color: #ff922c;
+    cursor: pointer;
+    font-size: 16px;
+    height: 40px;
+    margin-bottom: 10px;
+    font-weight: 600;
+    padding: 0;
+}
+
+.back-to-orders:hover {
+    text-decoration: underline;
+}
+
+.order-detail__status-dropdown {
+    min-width: 180px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.order-detail__status-dropdown label {
+    font-size: 16px;
+    font-weight: 500;
+    margin-bottom: 4px;
+}
+
+.order-detail__status-dropdown select {
+    padding: 8px 12px;
+    border-radius: 6px;
+    border: 1px solid #bbb;
+    font-size: 16px;
+    background: #f9f9f9;
+    outline: none;
+    transition: border 0.2s;
+}
+
+.order-detail__status-dropdown select:focus {
+    border-color: #ff922c;
+}
+
+.order-detail__info {
+    margin-top: 30px;
+    font-size: 18px;
+    margin-right: 20px;
+    margin-left: 20px;
+}
+
+.detail__element {
+    padding: 15px;
+    border-bottom: 1px solid #ddd;
+}
+
+.order-detail__items .products-grid {
+    display: flex;
+}
+
+.order-spinner {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 220px;
+}
+
+.spinner {
+    width: 48px;
+    height: 48px;
+    border: 6px solid #eee;
+    border-top: 6px solid #ff922c;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}

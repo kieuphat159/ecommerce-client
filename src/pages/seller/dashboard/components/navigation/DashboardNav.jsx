@@ -4,7 +4,7 @@ import useAuth from "../../../../../hooks/useAuth";
 import { useState } from 'react';
 
 
-export default function DashboardNav({ activeButton, setActiveButton }) {
+export default function DashboardNav({ activeButton, setActiveButton, setOrderDetail }) {
     const { logout } = useAuth();
       const [showModal, setShowModal] = useState(false);
     
@@ -24,21 +24,21 @@ export default function DashboardNav({ activeButton, setActiveButton }) {
             <h2 className='nav__title'>Store</h2>
             <div className='nav__button'>
                 <button 
-                onClick={() => handleButtonClick('home')}
+                onClick={() => {setOrderDetail(0); handleButtonClick('home')}}
                 className={activeButton === 'home' ? 'button--active' : ''}
                 >
                 <img src="/assets/home.png" alt="home" />
                 </button>
 
                 <button 
-                onClick={() => handleButtonClick('products')}
+                onClick={() => {setOrderDetail(0); handleButtonClick('products')}}
                 className={activeButton === 'products' ? 'button--active' : ''}
                 >
                 <img src="/assets/shopping-bag.png" alt="products" />
                 </button>
 
                 <button 
-                onClick={() => handleButtonClick('orders')}
+                onClick={() => {setOrderDetail(0); handleButtonClick('orders')}}
                 className={activeButton === 'orders' ? 'button--active' : ''}
                 >
                 <img src="/assets/orders.png" alt="orders" />

@@ -104,7 +104,7 @@ export default function ContentProduct({
                 <div className="coupon__title">Have a coupon?</div>
                 <div className="coupon__text">Add your code for an instant cart discount</div>
                 <div className="coupon__input">
-                    <img src="./assets/Vector.png" alt="" />
+                    <img src="/assets/Vector.png" alt="" />
                     <input type="text" placeholder="Coupon Code" />
                     <div className="coupon__input--apply">Apply</div>
                 </div>

@@ -2,7 +2,7 @@ import './Orders.css'
 import { useState, useEffect } from 'react'
 import AuthService from '/src/services/authService'
 
-export default function Orders() {
+export default function Orders({setOrderDetail}) {
   const [orders, setOrders] = useState([]);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
@@ -130,7 +130,7 @@ export default function Orders() {
                   <td>{order.payment_method || '-'}</td>
                   <td className="actions-cell">
                     <div className="actions">
-                      <button className="icon-btn"><img src="/assets/edit-3.png" alt="edit" /></button>
+                      <button className="icon-btn" onClick={() => setOrderDetail(order.order_id)}><img src="/assets/edit-3.png" alt="edit" /></button>
                       <button className="icon-btn" onClick={() => handleDeleteClick(order.order_id)}>
                         <img src="/assets/trash-2.png" alt="delete" />
                       </button>
