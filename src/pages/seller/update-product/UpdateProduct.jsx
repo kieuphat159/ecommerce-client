@@ -35,7 +35,6 @@ const UpdateProduct = ({ sellerId }) => {
   const [optionValues, setOptionValues] = useState({});
   const [currentQuantity, setCurrentQuantity] = useState(0);
 
-  // Fetch product options
   const fetchOptions = async () => {
     try {
       const token = localStorage.getItem('token');
@@ -61,7 +60,6 @@ const UpdateProduct = ({ sellerId }) => {
     }
   };
 
-  // Fetch option values for a specific option_id
   const fetchOptionValues = async (option_id) => {
     try {
       const token = localStorage.getItem('token');
@@ -419,53 +417,65 @@ const UpdateProduct = ({ sellerId }) => {
   };
 
   const fetchCurrentQuantity = async () => {
-    if (!openStock || !product.stock || options.length === 0) {
-      setCurrentQuantity(0);
-      return;
+    if (!openStock || !product.stock) {
+        setCurrentQuantity(0);
+        return;
     }
-
+    if (options.length === 0) {
+        try {
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/api/product-default-quantity/${id}`);
+            const data = await response.json();
+            if (data.success && data.data) {
+                if (Array.isArray(data.data)) {
+                    setCurrentQuantity(data.data[0]?.quantity || 0);
+                } else {
+                    setCurrentQuantity(data.data.quantity || 0);
+                }
+            } else {
+                setCurrentQuantity(0);
+            }
+        } catch (err) {
+            setCurrentQuantity(0);
+        }
+        return;
+    }
     const selectedOptions = {};
     options.forEach(opt => {
-      const val = product[`option_${opt.id}`];
-      if (val) selectedOptions[opt.id] = val;
+        const val = product[`option_${opt.id}`];
+        if (val) selectedOptions[opt.id] = val;
     });
 
     if (Object.keys(selectedOptions).length === 0) {
-      setCurrentQuantity(0);
-      return;
+        setCurrentQuantity(0);
+        return;
     }
 
     try {
-      const token = localStorage.getItem('token');
-      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/product-variant-id`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify({ product_id: id, options: selectedOptions })
-      });
-      console.log(id, selectedOptions)
-      const data = await res.json();
-      console.log('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa ', data.variantId)
-      if (data.success && data.variantId) {
-        const stockRes = await fetch(`${import.meta.env.VITE_API_URL}/api/stock/${data.variantId}?stockId=${product.stock}`, {
-          
+        const token = localStorage.getItem('token');
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/api/product-variant-id`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({ product_id: id, options: selectedOptions })
         });
-        const stockData = await stockRes.json();
-        if (stockData.success) {
-          setCurrentQuantity(stockData.data.quantity || 0);
+        const data = await res.json();
+        if (data.success && data.variantId) {
+            const stockRes = await fetch(`${import.meta.env.VITE_API_URL}/api/stock/${data.variantId}?stockId=${product.stock}`);
+            const stockData = await stockRes.json();
+            if (stockData.success) {
+                setCurrentQuantity(stockData.data.quantity || 0);
+            } else {
+                setCurrentQuantity(0);
+            }
         } else {
-          setCurrentQuantity(0);
+            setCurrentQuantity(0);
         }
-      } else {
-        setCurrentQuantity(0);
-      }
     } catch (err) {
-      console.error('Error fetching current quantity:', err);
-      setCurrentQuantity(0);
+        setCurrentQuantity(0);
     }
-  };
+};
 
   useEffect(() => {
     fetchCurrentQuantity();
@@ -479,16 +489,12 @@ const UpdateProduct = ({ sellerId }) => {
 
   return (
     <div>
-      {loadingProduct ? (
-        <div className="loading">Loading product...</div>
-      ) : error && !originalProduct ? (
-        <div className="error">
-          <p>Error: {error}</p>
-          <button className="header__button" onClick={() => navigate('/seller')}>
-            Back
-          </button>
+      {(loading || loadingProduct) && (
+        <div className="update-product__spinner">
+          <div className="spinner"></div>
         </div>
-      ) : (
+      )}
+      {!(loading || loadingProduct) && (
         <>
           <div className="header">
             <h2 className="header__title">Update Product</h2>
@@ -772,7 +778,7 @@ const UpdateProduct = ({ sellerId }) => {
                     </select>
                   </div>
 
-                  <button type="submit" className="header__button" disabled={loading}>
+                  <button type="submit" className="submit__button" disabled={loading}>
                     {loading ? 'Updating Product...' : 'Update Product'}
                   </button>
                 </form>
@@ -786,30 +792,32 @@ const UpdateProduct = ({ sellerId }) => {
             </div>
           )}
 
-          {uploadResult && (
-            <div className="result">
-              <h4>Image Upload Result:</h4>
-              <pre>{JSON.stringify(uploadResult, null, 2)}</pre>
-            </div>
-          )}
-
           {result && (
-            <div className="result">
-              <h3>Product Updated Successfully!</h3>
-              {result.data && (
-                <div>
-                  <p>Product ID: {result.data.id || id}</p>
-                  <p>SKU: {result.data.sku}</p>
-                  <p>Name: {result.data.name}</p>
-                  <p>Price: {result.data.price}</p>
-                  {result.data.category && <p>Category: {result.data.category}</p>}
-                  <p>Status: {result.data.status === 1 ? 'Active' : 'Inactive'}</p>
-                </div>
-              )}
-              <details>
-                <summary>View Raw Response</summary>
-                <pre>{JSON.stringify(result, null, 2)}</pre>
-              </details>
+            <div className="modal-overlay">
+              <div className="modal">
+                <h3>Product Updated Successfully!</h3>
+                {result.data && (
+                  <div>
+                    <p>Product ID: {result.data.id || id}</p>
+                    <p>SKU: {result.data.sku}</p>
+                    <p>Name: {result.data.name}</p>
+                    <p>Price: {result.data.price}</p>
+                    {result.data.category && <p>Category: {result.data.category}</p>}
+                    <p>Status: {result.data.status === 1 ? 'Active' : 'Inactive'}</p>
+                  </div>
+                )}
+                <details>
+                  <summary>View Raw Response</summary>
+                  <pre>{JSON.stringify(result, null, 2)}</pre>
+                </details>
+                <button
+                  className="btn update-btn--confirm"
+                  onClick={() => setResult(null)}
+                  style={{marginTop: '16px'}}
+                >
+                  Close
+                </button>
+              </div>
             </div>
           )}
         </>

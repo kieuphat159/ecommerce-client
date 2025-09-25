@@ -169,7 +169,6 @@ const UploadProduct = ({sellerId}) => {
     setLoading(false);
   }
 };
-  // Clean up preview URLs when component unmounts
   React.useEffect(() => {
     return () => {
       previewImages.forEach(url => URL.revokeObjectURL(url));
@@ -301,40 +300,6 @@ const UploadProduct = ({sellerId}) => {
             <option value="Clothes">Clothes</option>
           </select>
         </div>
-        {product.category === "Clothes" && (
-          <>
-            <div className="form-group">
-              <label>Size *</label>
-              <select 
-                name="size" 
-                value={product.size} 
-                onChange={handleChange}
-                disabled={loading}
-                required
-              >
-                <option value="">Select Size</option>
-                <option value="S">S</option>
-                <option value="M">M</option>
-                <option value="L">L</option>
-                <option value="XL">XL</option>
-              </select>
-            </div>
-
-            <div className="form-group">
-              <label>Color *</label>
-              <input
-                type="text"
-                name="color"
-                value={product.color}
-                onChange={handleChange}
-                required
-                disabled={loading}
-                placeholder="Enter color (e.g. Red, Blue)"
-              />
-            </div>
-          </>
-        )}
-        
         <button 
           type="submit" 
           className='form__button'
@@ -371,18 +336,11 @@ const UploadProduct = ({sellerId}) => {
       )}
       
       {result && (
-        <div className="result-section" style={{ marginTop: '20px' }}>
-          <div className="success-message" style={{
-            backgroundColor: '#e6ffe6',
-            color: '#2d7d2d',
-            padding: '15px',
-            borderRadius: '4px',
-            border: '1px solid #2d7d2d'
-          }}>
+        <div className="modal-overlay">
+          <div className="modal">
             <h3>Product Created Successfully!</h3>
-            
             {result.data && (
-              <div className="product-details" style={{ marginTop: '10px' }}>
+              <div>
                 <p><strong>Product ID:</strong> {result.data.id}</p>
                 <p><strong>SKU:</strong> {result.data.sku}</p>
                 <p><strong>Name:</strong> {result.data.name}</p>
@@ -391,22 +349,21 @@ const UploadProduct = ({sellerId}) => {
                 <p><strong>Status:</strong> {result.data.status === 1 ? 'Active' : 'Inactive'}</p>
               </div>
             )}
-            
-            <details style={{ marginTop: '10px' }}>
-              <summary style={{ cursor: 'pointer', fontWeight: 'bold' }}>
+            <details >
+              <summary >
                 View Raw Response
               </summary>
-              <pre style={{ 
-                backgroundColor: '#f5f5f5', 
-                padding: '10px', 
-                borderRadius: '4px',
-                overflow: 'auto',
-                fontSize: '12px',
-                marginTop: '5px'
-              }}>
+              <pre >
                 {JSON.stringify(result, null, 2)}
               </pre>
             </details>
+            <button
+              className="btn update-btn--confirm"
+              onClick={() => setResult(null)}
+              style={{marginTop: '16px'}}
+            >
+              Close
+            </button>
           </div>
         </div>
       )}

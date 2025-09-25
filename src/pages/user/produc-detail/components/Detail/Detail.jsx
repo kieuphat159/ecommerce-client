@@ -20,9 +20,27 @@ export default function Detail() {
     const specialVal = ['id', 'name', 'image', 'seller', 'seller_id', 'seller_name'];
     const specialAttr = ['price', 'description', 'categories'];
 
+    const fetchDefaultQuantity = async () => {
+        try {
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/api/product-default-quantity/${id}`);
+            const data = await response.json();
+            if (data.success && data.data) {
+                if (Array.isArray(data.data)) {
+                    setCurrentQuantity(data.data[0]?.quantity || 0);
+                } else {
+                    setCurrentQuantity(data.data.quantity || 0);
+                }
+            } else {
+                setCurrentQuantity(0);
+            }
+        } catch (err) {
+            setCurrentQuantity(0);
+        }
+    }
+
     const calculateCurrentQuantity = () => {
         if (options.length === 0) {
-            setCurrentQuantity(0);
+            fetchDefaultQuantity();
             return;
         }
 
@@ -109,6 +127,17 @@ export default function Detail() {
         return null;
     };
 
+    const fetchVariantPrice = async (variantId) => {
+        try {
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/api/product-variant/${variantId}`);
+            const data = await response.json();
+            if (data.success && data.data) {
+                setPricePerUnit(parseFloat(data.data.price));
+            }
+        } catch (err) {
+        }
+    };
+
     useEffect(() => {
         setTotalPrice((pricePerUnit * numberOfProduct).toFixed(2));
     }, [pricePerUnit, numberOfProduct]);
@@ -140,6 +169,24 @@ export default function Detail() {
             fetchOptions();
         }
     }, [id]);
+
+    useEffect(() => {
+        const updatePrice = async () => {
+            if (options.length === 0) {
+                if (product.price) {
+                    setPricePerUnit(parseFloat(product.price.replace(/[^0-9.-]+/g, "")));
+                }
+            } else if (Object.keys(selectedVariants).length === options.length) {
+                // Đã chọn đủ option, lấy giá variant
+                const fetchedVariantId = await fetchVariantId();
+                if (fetchedVariantId) {
+                    setVariantId(fetchedVariantId);
+                    await fetchVariantPrice(fetchedVariantId);
+                }
+            }
+        };
+        updatePrice();
+    }, [selectedVariants, options, product]);
 
     const renderAttribute = (key, value) => {
         return (

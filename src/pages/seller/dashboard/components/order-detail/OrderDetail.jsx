@@ -7,6 +7,10 @@ export default function OrderDetail({orderId, setOrderDetail}) {
     const [mockProducts, setProducts] = useState([]);
     const [loading, setLoading] = useState(false);
 
+    const [showModal, setShowModal] = useState(false);
+    const [pendingStatus, setPendingStatus] = useState('');
+    const [currentStatus, setCurrentStatus] = useState('');
+
     const fetchOrder = async () => {
         setLoading(true);
         try {
@@ -17,14 +21,14 @@ export default function OrderDetail({orderId, setOrderDetail}) {
             if (response.success) {
                 const orderData = Array.isArray(response.data) ? response.data[0] : response.data;
                 setOrder(orderData);
-                console.log(orderData);
+                setCurrentStatus(orderData.status?.toLowerCase() || 'pending');
+                setPendingStatus(orderData.status?.toLowerCase() || 'pending');
                 const itemsResponse = await AuthService.apiCall(`/seller/order-item/${orderId}`, {
                     method: 'GET',
                     headers: { 'Content-Type': 'application/json' }
                 })
                 if (itemsResponse.success) {
                     setProducts(itemsResponse.data);
-                    console.log(itemsResponse.data);
                 }
             }
         } catch (error) {
@@ -33,10 +37,6 @@ export default function OrderDetail({orderId, setOrderDetail}) {
             setLoading(false);
         }
     }
-
-    const [showModal, setShowModal] = useState(false);
-    const [pendingStatus, setPendingStatus] = useState(mockOrder.status);
-    const [currentStatus, setCurrentStatus] = useState(mockOrder.status);
 
     useEffect(() => {
         fetchOrder();
@@ -48,6 +48,7 @@ export default function OrderDetail({orderId, setOrderDetail}) {
     };
 
     const handleConfirm = async () => {
+        setLoading(true);
         try {
             const response = await AuthService.apiCall(`/seller/order/status/${orderId}`, {
                 method: 'PUT',
@@ -63,6 +64,8 @@ export default function OrderDetail({orderId, setOrderDetail}) {
         } catch (error) {
             alert('Error updating status!');
             console.error(error);
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -108,9 +111,9 @@ export default function OrderDetail({orderId, setOrderDetail}) {
                             value={pendingStatus}
                             onChange={handleStatusChange}
                         >
-                            <option value="Pending">Pending</option>
-                            <option value="Completed">Completed</option>
-                            <option value="Cancelled">Cancelled</option>
+                            <option value="pending">Pending</option>
+                            <option value="completed">Completed</option>
+                            <option value="cancelled">Cancelled</option>
                         </select>
                     </div>
                 </div>
