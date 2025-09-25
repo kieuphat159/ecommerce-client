@@ -25,13 +25,17 @@ export default function Detail() {
             const response = await fetch(`${import.meta.env.VITE_API_URL}/api/product-default-quantity/${id}`);
             const data = await response.json();
             if (data.success && data.data) {
+                let vId = 0;
+                let qty = 0;
                 if (Array.isArray(data.data)) {
-                    setCurrentQuantity(data.data[0]?.quantity || 0);
-                    setVariantId(data.data[0]?.variant_id || data.data[0]?.id || 0); // sửa dòng này
+                    qty = data.data[0]?.quantity || 0;
+                    vId = data.data[0]?.variant_id || data.data[0]?.id || 0;
                 } else {
-                    setCurrentQuantity(data.data.quantity || 0);
-                    setVariantId(data.data.variant_id || data.data.id || 0); // sửa dòng này
+                    qty = data.data.quantity || 0;
+                    vId = data.data.variant_id || data.data.id || 0;
                 }
+                setCurrentQuantity(qty);
+                setVariantId(vId > 0 ? vId : id); // fallback về id nếu variant_id không hợp lệ
             } else {
                 setCurrentQuantity(0);
                 setVariantId(0);
@@ -110,7 +114,7 @@ export default function Detail() {
 
     const fetchVariantId = async () => {
         if (options.length === 0) {
-            return variantId;
+            return variantId > 0 ? variantId : id;
         }
         if (Object.keys(selectedVariants).length !== options.length) {
             return null;
