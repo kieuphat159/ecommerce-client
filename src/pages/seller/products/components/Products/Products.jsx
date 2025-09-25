@@ -8,10 +8,10 @@ const StatsHeader = () => {
     return (
         <div className="stats-header">
             <div className="stats-header__title">
-                <h2>Proucts</h2>
+                <h2>Products</h2>
             </div>
             <button className='stats-header__btn' onClick={() => navigate("/seller/create")}>
-                New prouct
+                New product
             </button>
             <div className="stats-header__date-picker">
                 <span>Jan 01 - Jan 28</span>
