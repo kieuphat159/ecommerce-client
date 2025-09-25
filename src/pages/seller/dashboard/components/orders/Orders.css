@@ -101,15 +101,11 @@
     color: #ffc107;
 }
 
-.status--shipping {
-    background-color: #e6f7ff;
-    color: #1890ff;
+.status--cancelled {
+    background-color: #ffe6e6;
+    color: #e05656;
 }
 
-.status--refund {
-    background-color: #fff2e8;
-    color: #fa8c16;
-}
 
 .status--completed {
     background-color: #f6ffed;

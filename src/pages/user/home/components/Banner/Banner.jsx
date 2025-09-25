@@ -2,6 +2,12 @@ import React, { useState } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import './Banner.css';
 
+const heroSlides = [
+  '/images/banner.jpg',
+  '/images/banner1.jpg',
+  '/images/banner2.jpg'
+];
+
 const Banner = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
 
@@ -16,14 +22,26 @@ const Banner = () => {
   return (
     <section className="banner">
       <div className="banner__container">
-        <div className="banner__slider">
-          <button className="banner__arrow banner__arrow--left">
+        <div
+          className="banner__slider"
+          style={{
+            backgroundImage: `url(${heroSlides[currentSlide]})`
+          }}
+        >
+          <button
+            className="banner__arrow banner__arrow--left"
+            onClick={prevSlide}
+          >
             <ChevronLeft size={24} />
           </button>
-          <button className="banner__arrow banner__arrow--right">
+          <button
+            className="banner__arrow banner__arrow--right"
+            onClick={nextSlide}
+          >
             <ChevronRight size={24} />
           </button>
         </div>
+
         <div className="banner__content">
           <div className="banner__slogan">
             <div>Simply Unique<b>/</b></div>

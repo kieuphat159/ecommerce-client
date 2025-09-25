@@ -10,6 +10,7 @@ export default function Navigation({userId}) {
     const [isShopOpen, setIsShopOpen] = useState(false);
     const [isProductOpen, setIsProductOpen] = useState(false);
     const [searchQuery, setSearchQuery] = useState("");
+    const [showModal, setShowModal] = useState(false);
 
     const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
     const toggleShop = () => setIsShopOpen(!isShopOpen);
@@ -68,7 +69,7 @@ export default function Navigation({userId}) {
                         <Link to={`/profile/${user.userId}`} className="navigation__action">
                             <img src="/assets/profile.png" className="navigation__icon" alt="Profile" />
                         </Link>
-                        <button className="navigation__button" onClick={signOut}>Sign out</button>
+                        <button className="navigation__button" onClick={() => setShowModal(true)}>Sign out</button>
                         <button onClick={handleCartClick} className="navigation__action navigation__button">
                             <img src="/assets/cart.png" className="navigation__icon" alt="Cart" />
                         </button>
@@ -78,7 +79,7 @@ export default function Navigation({userId}) {
                 {isAuthenticated && user.role === 'seller' &&(
                     <>
 
-                        <button className="navigation__button" onClick={signOut}>Sign out</button>
+                        <button className="navigation__button" onClick={() => setShowModal(true)}>Sign out</button>
                     </>
                 )}
 
@@ -184,7 +185,7 @@ export default function Navigation({userId}) {
                             Sign In
                         </Link>
                     ) : (
-                        <button className="navigation__signin-button" onClick={signOut}>
+                        <button className="navigation__signin-button" onClick={() => setShowModal(true)}>
                             Sign Out
                         </button>
                     )}
@@ -202,6 +203,18 @@ export default function Navigation({userId}) {
                     </div>
                 </div>
             </div>
+            {showModal && (
+            <div className="modal-overlay">
+                <div className="modal">
+                    <h3 className="confirm">Confirm signing out</h3>
+                    <p className="sure">Are you sure you want to sign out ?</p>
+                    <div className="modal-actions">
+                    <button className="btn btn-cancel" onClick={() => setShowModal(false)}>Cancel</button>
+                    <button className="btn btn-confirm" onClick={signOut}>Sign out</button>
+                    </div>
+                </div>
+                </div>
+            )}
         </nav>
     );
 }

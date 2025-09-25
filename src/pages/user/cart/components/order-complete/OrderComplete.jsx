@@ -71,7 +71,7 @@ export default function OrderComplete({
                         className="order__delete"
                         onClick={() => setShowConfirm(true)}
                     >
-                        Delete order?
+                        Cancel this order?
                     </button>
                 </div>
 

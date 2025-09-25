@@ -7,6 +7,29 @@ export default function OrderDetail({orderId, setOrderDetail}) {
     const [mockProducts, setProducts] = useState([]);
     const [loading, setLoading] = useState(false);
 
+    const [showModal, setShowModal] = useState(false);
+    const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+    const [pendingStatus, setPendingStatus] = useState('');
+    const [currentStatus, setCurrentStatus] = useState('');
+
+    const handleDeleteConfirm = async () => {
+        setShowDeleteConfirm(false);
+        setLoading(true);
+        try {
+          await AuthService.apiCall(`/seller/orders/${orderId}`, {
+            method: "DELETE",
+            headers: { "Content-Type": "application/json" }
+          });
+    
+          setShowModal(false);
+          setOrderDetail(0);
+        } catch (err) {
+          console.error("Delete failed:", err);
+        } finally {
+            setLoading(false);
+        }
+    };
+
     const fetchOrder = async () => {
         setLoading(true);
         try {
@@ -17,14 +40,15 @@ export default function OrderDetail({orderId, setOrderDetail}) {
             if (response.success) {
                 const orderData = Array.isArray(response.data) ? response.data[0] : response.data;
                 setOrder(orderData);
-                console.log(orderData);
+                setCurrentStatus(orderData.status?.toLowerCase() || 'pending');
+                setPendingStatus(orderData.status?.toLowerCase() || 'pending');
+
                 const itemsResponse = await AuthService.apiCall(`/seller/order-item/${orderId}`, {
                     method: 'GET',
                     headers: { 'Content-Type': 'application/json' }
                 })
                 if (itemsResponse.success) {
                     setProducts(itemsResponse.data);
-                    console.log(itemsResponse.data);
                 }
             }
         } catch (error) {
@@ -33,10 +57,6 @@ export default function OrderDetail({orderId, setOrderDetail}) {
             setLoading(false);
         }
     }
-
-    const [showModal, setShowModal] = useState(false);
-    const [pendingStatus, setPendingStatus] = useState(mockOrder.status);
-    const [currentStatus, setCurrentStatus] = useState(mockOrder.status);
 
     useEffect(() => {
         fetchOrder();
@@ -48,6 +68,7 @@ export default function OrderDetail({orderId, setOrderDetail}) {
     };
 
     const handleConfirm = async () => {
+        setLoading(true);
         try {
             const response = await AuthService.apiCall(`/seller/order/status/${orderId}`, {
                 method: 'PUT',
@@ -63,6 +84,8 @@ export default function OrderDetail({orderId, setOrderDetail}) {
         } catch (error) {
             alert('Error updating status!');
             console.error(error);
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -87,6 +110,7 @@ export default function OrderDetail({orderId, setOrderDetail}) {
                         {mockProducts && mockProducts.length > 0 && (
                             <div className="products-grid">
                                 {mockProducts.map((product, index) => (
+                                    <div className='products-grid__item' key={index}>
                                     <div key={index} className="product-item">
                                         <img
                                             src={product.img || product.image_path}
@@ -95,6 +119,12 @@ export default function OrderDetail({orderId, setOrderDetail}) {
                                         <div className="quantity-badge">
                                             {product.quantity}
                                         </div>
+                                    </div>
+                                    {product.variant_attributes && (
+                                        <div className="variant-attributes">
+                                            <span>{product.variant_attributes}</span>
+                                        </div>
+                                    )}
                                     </div>
                                 ))}
                             </div>
@@ -108,9 +138,9 @@ export default function OrderDetail({orderId, setOrderDetail}) {
                             value={pendingStatus}
                             onChange={handleStatusChange}
                         >
-                            <option value="Pending">Pending</option>
-                            <option value="Completed">Completed</option>
-                            <option value="Cancelled">Cancelled</option>
+                            <option value="pending">Pending</option>
+                            <option value="completed">Completed</option>
+                            <option value="cancelled">Cancelled</option>
                         </select>
                     </div>
                 </div>
@@ -133,13 +163,14 @@ export default function OrderDetail({orderId, setOrderDetail}) {
                     </div>
                     <div className='detail__element'>
                         <strong>Total Amount:</strong>
-                        <div>{mockOrder.total_amount}</div>
+                        <div>${mockOrder.total_amount}</div>
                     </div>
                     <div className='detail__element'>
                         <strong>Payment Method:</strong>
                         <div>{mockOrder.payment_method}</div>
                     </div>
                 </div>
+                <button className='delete-order' onClick={() => setShowDeleteConfirm(true)}>Delete this order?</button>
             </div>
             )}
             {showModal && (
@@ -152,6 +183,20 @@ export default function OrderDetail({orderId, setOrderDetail}) {
                         <div className="modal-actions">
                             <button className="btn btn-cancel" onClick={handleCancel}>Cancel</button>
                             <button className="btn btn-confirm" onClick={handleConfirm}>Confirm</button>
+                        </div>
+                    </div>
+                </div>
+            )}
+            {showDeleteConfirm && (
+                <div className="modal-overlay">
+                    <div className="modal">
+                        <h3>Confirm delete order</h3>
+                        <p>
+                            Are you sure you want to delete order <strong>{orderId}</strong>?
+                        </p>
+                        <div className="modal-actions">
+                            <button className="btn btn-cancel" onClick={() => setShowDeleteConfirm(false)}>Cancel</button>
+                            <button className="btn btn-confirm" onClick={handleDeleteConfirm}>Confirm</button>
                         </div>
                     </div>
                 </div>

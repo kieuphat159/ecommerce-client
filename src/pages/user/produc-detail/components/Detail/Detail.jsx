@@ -20,9 +20,31 @@ export default function Detail() {
     const specialVal = ['id', 'name', 'image', 'seller', 'seller_id', 'seller_name'];
     const specialAttr = ['price', 'description', 'categories'];
 
+    const fetchDefaultQuantity = async () => {
+        try {
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/api/product-default-quantity/${id}`);
+            const data = await response.json();
+            if (data.success && data.data) {
+                if (Array.isArray(data.data)) {
+                    setCurrentQuantity(data.data[0]?.quantity || 0);
+                    setVariantId(data.data[0]?.variant_id || data.data[0]?.id || 0); // sửa dòng này
+                } else {
+                    setCurrentQuantity(data.data.quantity || 0);
+                    setVariantId(data.data.variant_id || data.data.id || 0); // sửa dòng này
+                }
+            } else {
+                setCurrentQuantity(0);
+                setVariantId(0);
+            }
+        } catch (err) {
+            setCurrentQuantity(0);
+            setVariantId(0);
+        }
+    }
+
     const calculateCurrentQuantity = () => {
         if (options.length === 0) {
-            setCurrentQuantity(0);
+            fetchDefaultQuantity();
             return;
         }
 
@@ -69,6 +91,9 @@ export default function Detail() {
             if (response.ok) {
                 const data = await response.json();
                 if (data.success && data.data) {
+                    data.data.forEach(option => {
+                        option.name = option.name.charAt(0).toUpperCase() + option.name.slice(1);
+                    });
                     setOptions(data.data);
                 }
             } else {
@@ -84,10 +109,12 @@ export default function Detail() {
     };
 
     const fetchVariantId = async () => {
+        if (options.length === 0) {
+            return variantId;
+        }
         if (Object.keys(selectedVariants).length !== options.length) {
             return null;
         }
-
         try {
             const token = localStorage.getItem('token');
             const res = await fetch(`${import.meta.env.VITE_API_URL}/api/product-variant-id`, {
@@ -103,10 +130,22 @@ export default function Detail() {
             if (data.success && data.variantId) {
                 return data.variantId;
             }
+            return variantId;
         } catch (err) {
             console.error('Error fetching variant ID:', err);
         }
         return null;
+    };
+
+    const fetchVariantPrice = async (variantId) => {
+        try {
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/api/product-variant/${variantId}`);
+            const data = await response.json();
+            if (data.success && data.data) {
+                setPricePerUnit(parseFloat(data.data.price));
+            }
+        } catch (err) {
+        }
     };
 
     useEffect(() => {
@@ -141,6 +180,24 @@ export default function Detail() {
         }
     }, [id]);
 
+    useEffect(() => {
+        const updatePrice = async () => {
+            if (options.length === 0) {
+                if (product.price) {
+                    setPricePerUnit(parseFloat(product.price.replace(/[^0-9.-]+/g, "")));
+                }
+            } else if (Object.keys(selectedVariants).length === options.length) {
+                // Đã chọn đủ option, lấy giá variant
+                const fetchedVariantId = await fetchVariantId();
+                if (fetchedVariantId) {
+                    setVariantId(fetchedVariantId);
+                    await fetchVariantPrice(fetchedVariantId);
+                }
+            }
+        };
+        updatePrice();
+    }, [selectedVariants, options, product]);
+
     const renderAttribute = (key, value) => {
         return (
             <div key={key} id="detail__attr-content" className={`detail__${key.toLowerCase()}`}>
@@ -158,10 +215,12 @@ export default function Detail() {
     };
 
     const increase = () => {
+        if (currentQuantity === 0) return;
         setNumberOfProduct(prev => Math.min(prev + 1, currentQuantity));
     };
 
     const decrease = () => {
+        if (currentQuantity === 0) return;
         setNumberOfProduct(prev => Math.max(1, prev - 1));
     };
 
@@ -170,11 +229,10 @@ export default function Detail() {
     };
 
     const addToCart = async () => {
-        if (Object.keys(selectedVariants).length !== options.length) {
+        if (options.length > 0 && Object.keys(selectedVariants).length !== options.length) {
             alert('Please select all product variants before adding to cart!');
             return;
         }
-
         const token = localStorage.getItem('authToken');
         const userId = localStorage.getItem('userId');
 
@@ -186,8 +244,8 @@ export default function Detail() {
         try {
             setLoading(true);
             const fetchedVariantId = await fetchVariantId();
-            
-            if (!fetchedVariantId) {
+
+            if (!fetchedVariantId || fetchedVariantId === 0) {
                 alert('Invalid product variant selection!');
                 return;
             }
@@ -268,9 +326,30 @@ export default function Detail() {
                 <div className="detail__button-section">
                     <div className="detail__button-top">
                         <div className="number-input">
-                            <button className="number-input__button number-input__button--decrease" onClick={decrease}>-</button>
-                            <span className="number-input__value">{numberOfProduct}</span>
-                            <button className="number-input__button number-input__button--increase" onClick={increase}>+</button>
+                            <button
+                                className="number-input__button number-input__button--decrease"
+                                onClick={decrease}
+                                disabled={currentQuantity === 0 || numberOfProduct <= 1}
+                            >-</button>
+                            <input
+                                type="number"
+                                className="number-input__value"
+                                value={numberOfProduct}
+                                min={1}
+                                max={currentQuantity}
+                                disabled={currentQuantity === 0}
+                                onChange={e => {
+                                    let val = parseInt(e.target.value, 10);
+                                    if (isNaN(val) || val < 1) val = 1;
+                                    if (val > currentQuantity) val = currentQuantity;
+                                    setNumberOfProduct(val);
+                                }}
+                            />
+                            <button
+                                className="number-input__button number-input__button--increase"
+                                onClick={increase}
+                                disabled={currentQuantity === 0 || numberOfProduct >= currentQuantity}
+                            >+</button>
                         </div>
                         <button onClick={addToWishlist} className={wishlistBtn}>♡ Wishlist</button>
                     </div>
