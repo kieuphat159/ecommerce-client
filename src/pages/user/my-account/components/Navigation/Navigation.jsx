@@ -42,7 +42,7 @@ export default function AccountNavigation({ userId, activeTab, setActiveTab }) {
                         key={item} 
                         onClick={() => setActiveTab(item)}
                     >
-                        <div className={activeTab === item ? 'button-active' : ''}>
+                        <div className={activeTab === item ? 'button-active' : 'button-inactive'}>
                             {item}
                         </div>
                     </button>

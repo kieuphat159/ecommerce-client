@@ -165,7 +165,7 @@
   cursor: pointer;
 }
 
-@media screen and (min-width: 779px) {
+@media screen and (min-width: 1178px) {
     hr {
         display: none;
     }
@@ -211,7 +211,7 @@
     }
     
     .oder-complete__final-info {
-        margin: 15px 70px;
+        margin: 15px 60px;
         display: grid;
         grid-template-columns: 1fr 1fr;
         align-items: left;
@@ -231,5 +231,26 @@
         width: 50%;
         height: 50px;
         font-size: 15px;
+    }
+}
+
+@media screen and (max-width: 1294px) {
+    .order-complete {
+        text-align: center;
+        margin-left: calc(40% - 200px);
+        max-width: 90% !important;
+    }
+
+    .order-complete__content {
+        margin: 20px;
+        text-align: center;
+    }
+
+    .oder-complete__final-info {
+        margin: 10px 30px;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        align-items: left;
+        text-align: left;
     }
 }

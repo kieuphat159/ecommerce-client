@@ -531,7 +531,7 @@ const UpdateProduct = ({ sellerId }) => {
               </div>
               <div className="product__info">
                 <form onSubmit={handleSubmit}>
-                  <div className="product__info__field">
+                  <div className="info__field">
                     <label className="product__info__label">SKU</label>
                     <input
                       type="text"
@@ -544,7 +544,7 @@ const UpdateProduct = ({ sellerId }) => {
                     />
                   </div>
 
-                  <div className="product__info__field">
+                  <div className="info__field">
                     <label className="product__info__label">Product Name *</label>
                     <input
                       type="text"
@@ -558,7 +558,7 @@ const UpdateProduct = ({ sellerId }) => {
                     />
                   </div>
 
-                  <div className="product__info__field">
+                  <div className="info__field">
                     <label className="product__info__label">Price ($) *</label>
                     <input
                       type="number"
@@ -574,7 +574,7 @@ const UpdateProduct = ({ sellerId }) => {
                     />
                   </div>
 
-                  <div className="product__info__field">
+                  <div className="info__field">
                     <label className="product__info__label">Update Product Images</label>
                     <input
                       type="file"
@@ -596,7 +596,7 @@ const UpdateProduct = ({ sellerId }) => {
                     )}
                   </div>
 
-                  <div className="product__info__field">
+                  <div className="info__field">
                     <label className="product__info__label">Description</label>
                     <textarea
                       name="description"
@@ -609,7 +609,7 @@ const UpdateProduct = ({ sellerId }) => {
                     />
                   </div>
 
-                  <div className="product__info__field">
+                  <div className="info__field">
                     <label className="product__info__label">Category</label>
                     <select
                       name="category"
@@ -628,12 +628,17 @@ const UpdateProduct = ({ sellerId }) => {
                     </select>
                   </div>
 
-                  <div className="product__info__field">
+                  <div className="info__field">
                     <button
                       type="button"
                       className="add-to-stock-button"
                       onClick={() => {
                         setOpenStock(!openStock);
+                        setOpenVariant(!openVariant);
+                        if (!loadedVariant) {
+                          fetchOptions();
+                          setLoadedVariant(true);
+                        }
                         if (!loadedStock) {
                           fetchStock();
                           setLoadedStock(true);
@@ -641,12 +646,12 @@ const UpdateProduct = ({ sellerId }) => {
                       }}
                       disabled={loading}
                     >
-                      {openStock ? 'Hide Stock Options' : 'Add to Stock'}
+                      {openStock ? 'Hide Quantity Options' : 'Add Quantity'}
                     </button>
                   </div>
 
                   {openStock && (
-                    <div className="product__info__field">
+                    <div className="info__field">
                       <label className="product__info__label">Stock</label>
                       <select
                         name="stock"
@@ -662,7 +667,7 @@ const UpdateProduct = ({ sellerId }) => {
                         ))}
                       </select>
 
-                      <div className="product__info__field">
+                      <div className="info__field">
                         <label className="product__info__label">Add New Option</label>
                         <div style={{ display: 'flex', gap: '8px' }}>
                           <input
@@ -675,7 +680,7 @@ const UpdateProduct = ({ sellerId }) => {
                           />
                           <button
                             type="button"
-                            className="header__button"
+                            className="header__button add-option-button"
                             onClick={addOption}
                             disabled={loading}
                           >
@@ -684,27 +689,10 @@ const UpdateProduct = ({ sellerId }) => {
                         </div>
                       </div>
 
-                      <div className="product__info__field">
-                        <button
-                          type="button"
-                          className="add-to-stock-button"
-                          onClick={() => {
-                            setOpenVariant(!openVariant);
-                            if (!loadedVariant) {
-                              fetchOptions();
-                              setLoadedVariant(true);
-                            }
-                          }}
-                          disabled={loading}
-                        >
-                          {openVariant ? 'Hide Variants' : 'Add Options values'}
-                        </button>
-                      </div>
-
                       {openVariant && (
                         <>
                           {options.map(option => (
-                            <div key={option.id} className="product__info__field">
+                            <div key={option.id} className="info__field">
                               <label className="product__info__label">{option.name}</label>
                               <select
                                 name={`option_${option.id}`}
@@ -719,7 +707,7 @@ const UpdateProduct = ({ sellerId }) => {
                                   </option>
                                 ))}
                               </select>
-                              <div className="product__info__field" style={{ display: 'flex', gap: '8px' }}>
+                              <div className="info__field" style={{ display: 'flex', gap: '8px' }}>
                                 <input
                                   type="text"
                                   value={newOptionValue[option.id] || ''}
@@ -735,7 +723,7 @@ const UpdateProduct = ({ sellerId }) => {
                                 />
                                 <button
                                   type="button"
-                                  className="header__button"
+                                  className="header__button add-option-button"
                                   onClick={() => addOptionValue(option.id)}
                                   disabled={loading}
                                 >
@@ -747,7 +735,7 @@ const UpdateProduct = ({ sellerId }) => {
                         </>
                       )}
 
-                      <div className="product__info__field">
+                      <div className="info__field">
                         <label className="product__info__label">Quantity *</label>
                         <input
                           type="number"
@@ -764,7 +752,7 @@ const UpdateProduct = ({ sellerId }) => {
                     </div>
                   )}
 
-                  <div className="product__info__field">
+                  <div className="info__field">
                     <label className="product__info__label">Status</label>
                     <select
                       name="status"

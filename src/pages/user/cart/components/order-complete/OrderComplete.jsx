@@ -12,12 +12,27 @@ export default function OrderComplete({
     const [order, setOrder] = useState(null);
     const [showConfirm, setShowConfirm] = useState(false);
     const navigate = useNavigate();
+    const [isCancelled, setIsCancelled] = useState(false);
+    const [status, setStatus] = useState('');
+    const [paymentMethod, setPaymentMethod] = useState('');
+
+    console.log('OrderComplete rendered with orderId:', orderId);
 
     const fetchOrder = async () => {
+        console.log('Fetching order with ID:', orderId);
         try {
             const result = await AuthService.apiCall(`/user/order/${orderId}`, { method: 'GET' });
             if (result.success) {
                 setOrder(result.data[0]);
+                setIsCancelled(result.data[0].status === 'cancelled');
+                setStatus(
+                    result.data[0].status.charAt(0).toUpperCase() +
+                    result.data[0].status.slice(1)
+                );
+                setPaymentMethod(
+                    result.data[0].payment_method.charAt(0).toUpperCase() +
+                    result.data[0].payment_method.slice(1)
+                );
             }
         } catch (err) {
             console.log('Error fetching order: ', err);
@@ -45,19 +60,10 @@ export default function OrderComplete({
         navigate(`/profile/${userId}?tab=Orders`);
     };
 
-    useEffect(() => {
-        fetchOrder();
-    }, [orderId]);
-
-    if (!order) {
-        return (
-            <div className="order-complete">
-                <div className="order-complete__content">
-                    <h2>Order not found or deleted</h2>
-                </div>
-            </div>
-        );
-    }
+useEffect(() => {
+    console.log('useEffect called with orderId:', orderId);
+    fetchOrder();
+}, [orderId]);
 
     return (
         <div className="order-complete">
@@ -66,13 +72,15 @@ export default function OrderComplete({
                     <h3 className="content__grate">Thank you! 🎉</h3>
                 )}
                 <div className="order__header">
-                    <h2 className="content__noti">Your order has been received</h2>
+                    <h2 className="content__noti">Your order has been { isCancelled ? 'cancelled' : 'received'}!</h2>
+                    {!isCancelled && (
                     <button
                         className="order__delete"
                         onClick={() => setShowConfirm(true)}
                     >
                         Cancel this order?
                     </button>
+                    )}
                 </div>
 
                 {showConfirm && (
@@ -123,25 +131,25 @@ export default function OrderComplete({
 
                 <div className="oder-complete__final-info">
                     <div className="final-info__key">Date:</div>
-                    <div className="final-info__value">{order.created_at}</div>
+                    <div className="final-info__value">{order?.created_at}</div>
                     <hr />
                 </div>
 
                 <div className="oder-complete__final-info">
                     <div className="final-info__key">Total</div>
-                    <div className="final-info__value">${order.total_amount}</div>
+                    <div className="final-info__value">${order?.total_amount}</div>
                     <hr />
                 </div>
 
                 <div className="oder-complete__final-info">
                     <div className="final-info__key">Payment method</div>
-                    <div className="final-info__value">{order.payment_method}</div>
+                    <div className="final-info__value">{paymentMethod}</div>
                     <hr />
                 </div>
 
                 <div className="oder-complete__final-info">
                     <div className="final-info__key">Status</div>
-                    <div className="final-info__value">{order.status}</div>
+                    <div className="final-info__value">{status}</div>
                     <hr />
                 </div>
 

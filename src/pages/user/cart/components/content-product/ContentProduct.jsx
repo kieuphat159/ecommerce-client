@@ -29,7 +29,6 @@ export default function ContentProduct({
         }
     };
 
-    // TÃ­nh toÃ¡n subtotal vÃ  total
     const calculateSubtotal = () => {
         return mockProducts.reduce((total, product, index) => {
             const price = parseFloat(product.price.replace('$', ''));
