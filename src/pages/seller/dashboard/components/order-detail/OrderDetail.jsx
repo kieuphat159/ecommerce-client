@@ -137,10 +137,12 @@ export default function OrderDetail({orderId, setOrderDetail}) {
                             id="order-status"
                             value={pendingStatus}
                             onChange={handleStatusChange}
+                            className={`status--${pendingStatus}`}
+                            disabled={currentStatus !== 'pending'}
                         >
-                            <option value="pending">Pending</option>
-                            <option value="completed">Completed</option>
-                            <option value="cancelled">Cancelled</option>
+                            <option className='status--pending' value="pending">Pending</option>
+                            <option className='status--completed' value="completed">Completed</option>
+                            <option className='status--cancelled' value="cancelled">Cancelled</option>
                         </select>
                     </div>
                 </div>
@@ -170,7 +172,9 @@ export default function OrderDetail({orderId, setOrderDetail}) {
                         <div>{mockOrder.payment_method}</div>
                     </div>
                 </div>
-                <button className='delete-order' onClick={() => setShowDeleteConfirm(true)}>Delete this order?</button>
+                {currentStatus === 'pending' && (
+                    <button className='delete-order' onClick={() => setShowDeleteConfirm(true)}>Cancel this order?</button>
+                )}
             </div>
             )}
             {showModal && (

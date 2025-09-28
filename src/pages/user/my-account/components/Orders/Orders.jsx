@@ -52,6 +52,8 @@ export default function Orders({ orders, page, totalPages, onPageChange, userId 
     );
   }
 
+  const capitalize = (str) => str.charAt(0).toUpperCase() + str.slice(1);
+
   return (
     <div className='orders__container'>
       <div className='orders__title'>Orders History</div>
@@ -75,7 +77,7 @@ export default function Orders({ orders, page, totalPages, onPageChange, userId 
               >
                 <td>{order.id}</td>
                 <td>{order.date}</td>
-                <td>{order.status}</td>
+                <td>{capitalize(order.status)}</td> 
                 <td>${order.price}</td>
               </tr>
             ))

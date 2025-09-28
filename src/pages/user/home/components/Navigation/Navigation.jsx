@@ -1,7 +1,8 @@
 import "./Navigation.css";
 import { Link, useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import useAuth from "../../../../../hooks/useAuth";
+import AuthService from '/src/services/authService'
 
 export default function Navigation({userId}) {
     const navigate = useNavigate();
@@ -11,10 +12,32 @@ export default function Navigation({userId}) {
     const [isProductOpen, setIsProductOpen] = useState(false);
     const [searchQuery, setSearchQuery] = useState("");
     const [showModal, setShowModal] = useState(false);
+    const [cartQuantity, setCartQuantity] = useState(0);
 
     const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
     const toggleShop = () => setIsShopOpen(!isShopOpen);
     const toggleProduct = () => setIsProductOpen(!isProductOpen);
+
+    const getCartQuantity = async () => {
+        const user = localStorage.getItem("userId");
+        console.log('User id idi ididididid: ', user);
+        try {
+            const response =  await AuthService.apiCall(`/user/get-cart-quantity/${user}`, {
+                method: "GET",
+                headers: { "Content-Type": "application/json" }
+            });
+            if (response.success) {
+                console.log('Cart data: ', response.data);
+                setCartQuantity(response.data);
+            }
+        } catch (err) {
+            console.log('Err: ', err);
+        }
+    }
+
+    useEffect(() => {
+        getCartQuantity();
+    }, [userId])
 
     const signOut = () => {
         logout();
@@ -42,7 +65,7 @@ export default function Navigation({userId}) {
                 <span className="navigation__hamburger-line"></span>
             </button>
             
-            <div className="navigation__logo">3legant.</div>
+            <div className="navigation__logo" onClick={() => navigate('/')}>3legant.</div>
             
             <div className="navigation__desktop-menu">
                 <a href="/" className="navigation__link">Home</a>
@@ -72,6 +95,9 @@ export default function Navigation({userId}) {
                         <button className="navigation__button" onClick={() => setShowModal(true)}>Sign out</button>
                         <button onClick={handleCartClick} className="navigation__action navigation__button">
                             <img src="/assets/cart.png" className="navigation__icon" alt="Cart" />
+                            {cartQuantity > 0 && (
+                                <span className="cart__badge">{cartQuantity}</span>
+                            )}
                         </button>
                     </>
                 )}
@@ -170,7 +196,9 @@ export default function Navigation({userId}) {
                         <button onClick={handleCartClick} className="navigation__mobile-action">
                             <img src="/assets/cart.png" className="navigation__mobile-icon" alt="Cart" />
                             <span>Cart</span>
-                            <span className="navigation__badge">2</span>
+                            {cartQuantity > 0 && (
+                                <span className="navigation__badge">{cartQuantity}</span>
+                            )}
                         </button>
                         
                         <Link to="/wishlist" className="navigation__mobile-action" onClick={toggleMenu}>

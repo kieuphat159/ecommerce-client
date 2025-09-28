@@ -30,6 +30,10 @@
     color: rgba(0, 0, 0, 0.639);
 }
 
+.navigation__logo:hover {
+    cursor: pointer;
+}
+
 .navigation__desktop-menu {
     display: flex;
     align-items: center;
@@ -97,6 +101,7 @@
     cursor: pointer;
     font-weight: 500;
     transition: color 0.3s ease;
+    display: flex;
 }
 
 .navigation__button:hover {
@@ -325,6 +330,19 @@
     font-size: 12px;
     font-weight: 600;
     margin-left: auto;
+}
+
+.cart__badge {
+    background-color: #000;
+    color: white;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 600;
+    display: flex;
 }
 
 .navigation__signin-button {

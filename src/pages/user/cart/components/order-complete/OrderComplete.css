@@ -1,6 +1,7 @@
 .order-complete {
     margin: 20px;
     border: 1px solid #ccc;
+    box-shadow: 0 8px 28px rgba(0, 0, 0, 0.4);
     border-radius: 5px;
 }
 
@@ -87,6 +88,7 @@
 .oder-complete__final-info {
     margin-top: 30px;
     font-weight: 600;
+
 }
 
 .final-info__key {
@@ -162,4 +164,94 @@
   border: none;
   border-radius: 6px;
   cursor: pointer;
+}
+
+@media screen and (min-width: 1078px) {
+    hr {
+        display: none;
+    }
+
+    .order-complete {
+        text-align: center;
+        margin-left: calc(40% - 300px);
+        max-width: 80% !important;
+    }
+
+    .order-complete__content {
+        margin: 80px;
+        text-align: center;
+    }
+
+    .products-grid__container {
+        display: flex;
+        justify-content: center;
+        margin-bottom: 35px;
+    }
+
+    .products-grid {
+        grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+        gap: 15px;
+        margin-right: 0;
+    }
+
+    .product-item {
+        width: 100px;
+        height: 100px;
+    }
+
+    .product-item img {
+        max-width: 60px;
+    }
+
+    .quantity-badge {
+        left: 88px;
+        bottom: 80px;
+        width: 20px;
+        height: 20px;
+        font-size: 12px;
+    }
+    
+    .oder-complete__final-info {
+        margin: 15px 60px;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        align-items: left;
+        text-align: left;
+    }
+
+    .final-info__key {
+        margin-left: 60px;
+        margin-right: -30px;
+    }
+
+    .final-info__value {
+        margin-left: 60px;
+    }
+
+    .order-complete__content__button {
+        width: 50%;
+        height: 50px;
+        font-size: 15px;
+    }
+}
+
+@media screen and (max-width: 1294px) and (min-width: 1178px) {
+    .order-complete {
+        text-align: center;
+        margin-left: calc(40% - 200px);
+        max-width: 90% !important;
+    }
+
+    .order-complete__content {
+        margin: 20px;
+        text-align: center;
+    }
+
+    .oder-complete__final-info {
+        margin: 10px 30px;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        align-items: left;
+        text-align: left;
+    }
 }

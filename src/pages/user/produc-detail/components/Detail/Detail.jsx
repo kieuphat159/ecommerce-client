@@ -16,6 +16,9 @@ export default function Detail() {
     const [pricePerUnit, setPricePerUnit] = useState(0);
     const [totalPrice, setTotalPrice] = useState(0);
     const [variantId, setVariantId] = useState(0);
+    const [showVariantModal, setShowVariantModal] = useState(false);
+    const [showSuccessModal, setShowSuccessModal] = useState(false);
+
 
     const specialVal = ['id', 'name', 'image', 'seller', 'seller_id', 'seller_name'];
     const specialAttr = ['price', 'description', 'categories'];
@@ -35,7 +38,7 @@ export default function Detail() {
                     vId = data.data.variant_id || data.data.id || 0;
                 }
                 setCurrentQuantity(qty);
-                setVariantId(vId > 0 ? vId : id); // fallback về id nếu variant_id không hợp lệ
+                setVariantId(vId > 0 ? vId : id);
             } else {
                 setCurrentQuantity(0);
                 setVariantId(0);
@@ -234,7 +237,7 @@ export default function Detail() {
 
     const addToCart = async () => {
         if (options.length > 0 && Object.keys(selectedVariants).length !== options.length) {
-            alert('Please select all product variants before adding to cart!');
+            setShowVariantModal(true);
             return;
         }
         const token = localStorage.getItem('authToken');
@@ -272,7 +275,7 @@ export default function Detail() {
 
             const result = await res.json();
             if (res.ok && result.success) {
-                alert('Added to cart successfully!');
+                setShowSuccessModal(true);
             } else {
                 alert(result.message || 'Failed to add to cart');
             }
@@ -312,8 +315,8 @@ export default function Detail() {
                                     >
                                         <option value="">Select {option.name}</option>
                                         {option.values?.map(value => (
-                                            <option key={value.id} value={value.id}>
-                                                {value.value} {value.quantity > 0 ? `(${value.quantity} available)` : '(Out of stock)'}
+                                            <option key={value.id} value={value.id} disabled={value.quantity === 0}>
+                                                {value.value} {value.quantity > 0 ? `` : '(Out of stock)'}
                                             </option>
                                         ))}
                                     </select>
@@ -329,15 +332,15 @@ export default function Detail() {
                 <div className="product__price">Total price: ${totalPrice}</div>
                 <div className="detail__button-section">
                     <div className="detail__button-top">
-                        <div className="number-input">
+                        <div className="number__input">
                             <button
-                                className="number-input__button number-input__button--decrease"
+                                className="number-input__button number-input__button--decrease input__value"
                                 onClick={decrease}
                                 disabled={currentQuantity === 0 || numberOfProduct <= 1}
                             >-</button>
                             <input
                                 type="number"
-                                className="number-input__value"
+                                className="number-input__value input__value"
                                 value={numberOfProduct}
                                 min={1}
                                 max={currentQuantity}
@@ -350,14 +353,14 @@ export default function Detail() {
                                 }}
                             />
                             <button
-                                className="number-input__button number-input__button--increase"
+                                className="number-input__button number-input__button--increase input__value"
                                 onClick={increase}
                                 disabled={currentQuantity === 0 || numberOfProduct >= currentQuantity}
                             >+</button>
                         </div>
                         <button onClick={addToWishlist} className={wishlistBtn}>♡ Wishlist</button>
                     </div>
-                    <button onClick={addToCart} className="detail__add" disabled={loading || currentQuantity === 0}>
+                    <button onClick={addToCart} className="detail__add" >
                         {loading ? 'Adding...' : 'Add to Cart'}
                     </button>
                 </div>
@@ -367,6 +370,28 @@ export default function Detail() {
                     </div>
                 )}
             </div>
+            {showVariantModal && (
+            <div className="detail-modal-overlay">
+                <div className="detail-modal">
+                    <h3>Please select all product variants</h3>
+                    <p>You need to choose options before adding this product to cart.</p>
+                    <button onClick={() => setShowVariantModal(false)}>OK</button>
+                </div>
+            </div>
+            )}
+
+            {showSuccessModal && (
+            <div className="detail-modal-overlay">
+                <div className="detail-modal">
+                    <h3>Added to cart successfully!</h3>
+                    <button onClick={() => {
+                        setShowSuccessModal(false);
+                        window.location.reload();
+                    }}>
+                        OK</button>
+                </div>
+            </div>
+            )}
         </div>
     );
 }
