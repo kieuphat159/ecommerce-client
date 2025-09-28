@@ -258,6 +258,10 @@ input[type="radio"] {
     max-width: 1200px;
     margin: 0 auto;
   }
+
+  .shop-now-button {
+    margin: 0 auto;
+  }
   
   .content-left {
     flex: 2;

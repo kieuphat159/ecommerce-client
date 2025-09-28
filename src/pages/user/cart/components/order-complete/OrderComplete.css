@@ -88,6 +88,7 @@
 .oder-complete__final-info {
     margin-top: 30px;
     font-weight: 600;
+
 }
 
 .final-info__key {
@@ -165,7 +166,7 @@
   cursor: pointer;
 }
 
-@media screen and (min-width: 1178px) {
+@media screen and (min-width: 1078px) {
     hr {
         display: none;
     }
@@ -234,7 +235,7 @@
     }
 }
 
-@media screen and (max-width: 1294px) {
+@media screen and (max-width: 1294px) and (min-width: 1178px) {
     .order-complete {
         text-align: center;
         margin-left: calc(40% - 200px);
