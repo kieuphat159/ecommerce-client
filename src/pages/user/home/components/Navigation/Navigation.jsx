@@ -70,7 +70,7 @@ export default function Navigation({userId}) {
             
             <div className="navigation__desktop-menu">
                 <a href="/" className="navigation__link">Home</a>
-                <a href="#" className="navigation__link">Shop</a>
+                <a href="/shop" className="navigation__link">Shop</a>
                 <a href="/products" className="navigation__link">Product</a>
                 <a href="#" className="navigation__link">Contact Us</a>
             </div>
