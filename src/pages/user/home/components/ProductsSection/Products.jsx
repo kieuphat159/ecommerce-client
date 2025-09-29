@@ -132,14 +132,14 @@ export default function Products() {
           )}
 
           {!loading && !error && products.length > 0 && (
-            <div className="products__grid">
+            <div className="arrivals__grid">
               {products.slice(0, 4).map((product) => (
                 <div key={product.id} className="product-card" onClick={() => navigate(`/product/${product.id}`)}>
                   <div className="product-card__image-container">
                     <img 
                       src={product.image || product.image_url || "./images/placeholder.jpg"}
                       alt={product.name}
-                      className="product-card__image"
+                      className="arrivals-card__image"
                       onError={(e) => {
                         e.target.src = "./images/placeholder.jpg";
                       }}

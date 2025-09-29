@@ -9,7 +9,6 @@ export default function Products() {
     const [categories, setCategories] = useState([]);
     const [category, setCategory] = useState('All');
     const [error, setError] = useState('');
-    const [visibleCount, setVisibleCount] = useState(8);
     const [currentPage, setCurrentPage] = useState(1);  
     const [totalPages, setTotalPages] = useState(1);
     const navigate = useNavigate();
@@ -38,73 +37,56 @@ export default function Products() {
         }
     };
 
-    const getProducts = async (page = 1, limit = 4) => {
+    const getProducts = async (page = 1, limit = 8, categoryName = category) => {
         try {
             setLoading(true);
-            const response = await fetch(`${import.meta.env.VITE_API_URL}/api/products?limit=${limit}&page=${page}`, {
+
+            let url = `${import.meta.env.VITE_API_URL}/api/products?limit=${limit}&page=${page}`;
+            if (categoryName && categoryName !== 'All') {
+                url += `&category=${encodeURIComponent(categoryName)}`;
+            }
+
+            const response = await fetch(url, {
                 method: "GET",
-                headers: {
-                    'Content-Type': 'application/json',
-                }
+                headers: { "Content-Type": "application/json" }
             });
 
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
+            if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+
             const data = await response.json();
-            console.log("ok", data);
-            
+            console.log("Products fetched:", data);
+
             if (data.success) {
                 setRealProducts(data.data);
                 setError(null);
                 setTotalPages(data.pagination.totalPages);
                 setCurrentPage(data.pagination.page);
             } else {
-                setError(data.message || 'Failed to load products');
+                setError(data.message || "Failed to load products");
             }
         } catch (err) {
-            console.error('Error fetching products:', err);
-            setError('Failed to load products. Please try again.');
+            console.error("Error fetching products:", err);
+            setError("Failed to load products. Please try again.");
         } finally {
             setLoading(false);
         }
     };
 
-    const getProductsByCategory = async (categoryName) => {
-        try {
-            setLoading(true);
-            const response = await fetch(`${import.meta.env.VITE_API_URL}/api/products/${categoryName}`, {
-                method: "GET",
-                headers: {
-                    'Content-Type': 'application/json',
-                }
-            });
-
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-
-            const data = await response.json();
-            console.log("ok products by category", data);
-
-            if (data.success) {
-                setRealProducts(data.data);
-                setError(null);
-                setVisibleCount(8);
-            } else {
-                setError(data.message || 'Failed to load products by category');
-            }
-        } catch (err) {
-            console.error('Error fetching products by category:', err);
-            setError('Failed to load products by category. Please try again.');
-        } finally {
-            setLoading(false);
-        }
+    const handleCategoryChange = (categoryName) => {
+        setCategory(categoryName);
+        setOpenCategory(false);
+        getProducts(1, 8, categoryName);
     };
+
+
+    const handlePageChange = (page) => {
+        getProducts(page, 8, category);
+    };
+
 
     useEffect(() => {
         getCategories();
-        getProducts(1, 4);
+        getProducts(1, 8);
     }, []);
 
     return (  
@@ -114,7 +96,13 @@ export default function Products() {
                     <div>
                         <label>Category</label>
                         <div className='dropdown'>
-                            <button className='dropdown__button' onClick={() => setOpenCategory(!openCategory)}>{category}</button>
+                            <button 
+                                className='dropdown__button' 
+                                onClick={() => setOpenCategory(!openCategory)}
+                                disabled={loading}
+                            >
+                                {category}
+                            </button>
                             {openCategory && (
                                 <div className="dropdown__menu">
                                     <a
@@ -122,9 +110,7 @@ export default function Products() {
                                         className="dropdown__option"
                                         onClick={(e) => {
                                             e.preventDefault();
-                                            setCategory('All');
-                                            setOpenCategory(false);
-                                            getProducts();
+                                            handleCategoryChange('All');
                                         }}
                                     >
                                         All
@@ -137,9 +123,7 @@ export default function Products() {
                                                 className="dropdown__option"
                                                 onClick={(e) => {
                                                     e.preventDefault();
-                                                    setCategory(cat.name);
-                                                    setOpenCategory(false);
-                                                    getProductsByCategory(cat.name);
+                                                    handleCategoryChange(cat.name);
                                                 }}
                                             >
                                                 {cat.name}
@@ -155,41 +139,55 @@ export default function Products() {
                 </div>
             </div>
 
-            <div className='products__grid'>
-                {realProducts.slice(0, visibleCount).map((product, index) => (
-                    <div className='product-card' key={index} onClick={() => navigate(`/product/${product.id}`)}>
-                        <img src={product.image} alt={product.name} className='product-card__image' />
-                        <div className='product-card__info'>
-                            <div className='product-card__rating'>★★★★★</div>
-                            <div className='product-card__name'>{product.name}</div>
-                            <div className='product-card__price'>
-                                <span className='product-card__current-price'>{product.price}</span>
-                            </div>
-                            <button className='product-card__add-to-cart'>Add to cart</button>
-                        </div>
-                    </div>
-                ))}
-            </div>
+            {loading && <div className="loading">Loading...</div>}
+            {error && <div className="error">{error}</div>}
 
-            {visibleCount < realProducts.length && (
-                <button
-                    className='products__show-more'
-                    onClick={() => setVisibleCount(prev => prev + 16)} 
-                >
-                    Show more
-                </button>
-            )}
-            <div className="pagination">
-                {Array.from({ length: totalPages }, (_, i) => (
-                    <button
-                        key={i + 1}
-                        onClick={() => getProducts(i + 1, 4)}
-                        className={`pagination__button ${currentPage === i + 1 ? 'active' : ''}`}
-                    >
-                        {i + 1}
-                    </button>
-                ))}
+            <div className='products__grid'>
+    {realProducts.map((product, index) => (
+        <div 
+            className='product-card' 
+            key={product.id || index} 
+            onClick={() => navigate(`/product/${product.id}`)}
+        >
+            <div className='product-card__image-wrapper'>
+                <img src={product.image} alt={product.name} className='product-card__image' />
+                {product.quantity < 1 && (
+                    <div className='product-card__out-of-stock'>
+                        <span>OUT OF STOCK</span>
+                    </div>
+                )}
             </div>
+            <div className='product-card__info'>
+                <div className='product-card__rating'>★★★★★</div>
+                <div className='product-card__name'>{product.name}</div>
+                <div className='product-card__price'>
+                    <span className='product-card__current-price'>{product.price}</span>
+                </div>
+                <button 
+                    className='product-card__add-to-cart'
+                    disabled={product.quantity < 1}
+                >
+                    {product.quantity < 1 ? 'Out of Stock' : 'Add to cart'}
+                </button>
+            </div>
+        </div>
+    ))}
+</div>
+
+            {category === 'All' && totalPages > 1 && (
+                <div className="pagination">
+                    {Array.from({ length: totalPages }, (_, i) => (
+                        <button
+                            key={i + 1}
+                            onClick={() => handlePageChange(i + 1)}
+                            className={`pagination__button ${currentPage === i + 1 ? 'active' : ''}`}
+                            disabled={loading}
+                        >
+                            {i + 1}
+                        </button>
+                    ))}
+                </div>
+            )}
         </div>
     );
 }

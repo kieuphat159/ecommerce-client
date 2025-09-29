@@ -1,6 +1,7 @@
 import "./Detail.css"
 import { useState, useEffect } from 'react'
 import { useParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 export default function Detail() {
     const [loading, setLoading] = useState(false);
@@ -18,7 +19,9 @@ export default function Detail() {
     const [variantId, setVariantId] = useState(0);
     const [showVariantModal, setShowVariantModal] = useState(false);
     const [showSuccessModal, setShowSuccessModal] = useState(false);
+    const [showLoginModal, setShowLoginModal] = useState(false);
 
+    const navigate = useNavigate();
 
     const specialVal = ['id', 'name', 'image', 'seller', 'seller_id', 'seller_name'];
     const specialAttr = ['price', 'description', 'categories'];
@@ -244,7 +247,7 @@ export default function Detail() {
         const userId = localStorage.getItem('userId');
 
         if (!token || !userId) {
-            alert('Please login to Add to cart!');
+            setShowLoginModal(true);
             return;
         }
 
@@ -360,7 +363,7 @@ export default function Detail() {
                         </div>
                         <button onClick={addToWishlist} className={wishlistBtn}>♡ Wishlist</button>
                     </div>
-                    <button onClick={addToCart} className="detail__add" >
+                    <button onClick={addToCart} className="detail__add" disabled={currentQuantity === 0}>
                         {loading ? 'Adding...' : 'Add to Cart'}
                     </button>
                 </div>
@@ -387,6 +390,19 @@ export default function Detail() {
                     <button onClick={() => {
                         setShowSuccessModal(false);
                         window.location.reload();
+                    }}>
+                        OK</button>
+                </div>
+            </div>
+            )}
+
+            {showLoginModal && (
+            <div className="detail-modal-overlay">
+                <div className="detail-modal">
+                    <h3>Please login to Add to cart!</h3>
+                    <button onClick={() => {
+                        setShowLoginModal(false);
+                        navigate('/signin');
                     }}>
                         OK</button>
                 </div>
