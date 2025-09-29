@@ -9,6 +9,9 @@ export default function Products() {
   const [error, setError] = useState(null);
 
   const navigate = useNavigate();
+  const handleShopNow = (categoryName) => {
+    navigate(`/products?category=${encodeURIComponent(categoryName)}`);
+  };
 
   const categories = [
     {
@@ -69,7 +72,7 @@ export default function Products() {
         <div className="categories__container">
           <div className="categories__grid">
             <div className="categories__card--large">
-              <div className="categories__card">
+              <div className="categories__card"  onClick={() => handleShopNow(categories[0].name)}>
                 <img 
                   src={categories[0].image}
                   alt={categories[0].name}
@@ -79,7 +82,7 @@ export default function Products() {
                 <div className="categories__content">
                   <h3 className="categories__title">{categories[0].name}</h3>
                   <button className="categories__link">
-                    {categories[0].link} →
+                    {categories[0].link} → 
                   </button>
                 </div>
               </div>
@@ -87,7 +90,7 @@ export default function Products() {
 
             <div className="categories__small">
               {categories.slice(1).map((category, index) => (
-                <div key={index} className="categories__card">
+                <div key={index} className="categories__card"  onClick={() => handleShopNow(category.name)}>
                   <img 
                     src={category.image}
                     alt={category.name}
@@ -96,7 +99,7 @@ export default function Products() {
                   <div className="categories__overlay"></div>
                   <div className="categories__content">
                     <h3 className="categories__title">{category.name}</h3>
-                    <button className="categories__link">
+                    <button className="categories__link" onClick={() => handleShopNow(category.name)}>
                       {category.link} →
                     </button>
                   </div>

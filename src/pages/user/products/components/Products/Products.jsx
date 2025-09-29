@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import './Products.css'
 
 export default function Products() {
@@ -85,8 +85,14 @@ export default function Products() {
 
 
     useEffect(() => {
+        const params = new URLSearchParams(location.search);
+        const categoryFromUrl = params.get('category') || 'All';
+        setCategory(categoryFromUrl);
+        getProducts(1, 8, categoryFromUrl);
+    }, [location.search]);
+
+    useEffect(() => {
         getCategories();
-        getProducts(1, 8);
     }, []);
 
     return (  

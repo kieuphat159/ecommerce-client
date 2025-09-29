@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import "./CreateProduct.css";
 import { useNavigate } from 'react-router-dom';
 
@@ -20,7 +20,28 @@ const UploadProduct = ({sellerId}) => {
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [categories, setCategories] = useState([]);
   const navigate = useNavigate();
+
+  const token = localStorage.getItem("authToken")
+
+  const fetchCategories = async () => {
+    try {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/categories`, {
+        method: "GET",
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': token ? `Bearer ${token}` : undefined
+        }
+      })
+      const data = await response.json();
+      setCategories(data.data)
+      // console.log('Categories data:', data);
+      // console.log('ookk: ', response);
+    } catch (err) {
+      console.error('Failed to fetch categories:', err.message);
+    }
+  } 
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -40,6 +61,10 @@ const UploadProduct = ({sellerId}) => {
       setPreviewImages([]);
     }
   };
+
+  useEffect(() => {
+    fetchCategories();
+  }, [])
 
   // Upload image function similar to SellerPage
   const uploadImage = async () => {
@@ -127,9 +152,7 @@ const UploadProduct = ({sellerId}) => {
       category: product.category,
       status: product.status,
       sellerId: product.sellerId,
-      image: imageUrl,
-      size: product.category === "Clothes" ? product.size : undefined,
-      color: product.category === "Clothes" ? product.color : undefined
+      image: imageUrl
     };
 
 
@@ -178,7 +201,7 @@ const UploadProduct = ({sellerId}) => {
   return (
     <>
     <div className="header">
-            <h2 className="header__title">Update Product</h2>
+            <h2 className="header__title">Create Product</h2>
             <div>
               <button
                 className="header__button"
@@ -291,13 +314,9 @@ const UploadProduct = ({sellerId}) => {
             disabled={loading}
           >
             <option value="">Select Category (Optional)</option>
-            <option value="Living Room">Living Room</option>
-            <option value="Bedroom">Bedroom</option>
-            <option value="Kitchen">Kitchen</option>
-            <option value="Bathroom">Bathroom</option>
-            <option value="Office">Office</option>
-            <option value="Outdoor">Outdoor</option>
-            <option value="Clothes">Clothes</option>
+            {categories.map(category => (
+              <option value={category.name}> {category.name}</option>
+            ))}
           </select>
         </div>
         <button 
