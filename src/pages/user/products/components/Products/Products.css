@@ -1,5 +1,5 @@
 .products {
-    margin-top: 80px;
+    margin-top: 20px;
     padding: 30px 30px 30px; 
     max-width: 1280px;
     margin-left: auto;
@@ -32,7 +32,6 @@
 
 .dropdown__button {
     padding: 12px 20px;
-    border: 2px solid #ffffff;
     background: #ffffff;
     color: #000000;
     cursor: pointer;
@@ -45,7 +44,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    border: 3px solid black;
+    border: 2px solid black;
 }
 
 .dropdown__button::after {
@@ -57,7 +56,7 @@
 .dropdown__button:hover {
     background: #f3f3f390;
     border-color: #000000;
-    border: 3px solid rgb(124, 124, 124);
+    border: 2px solid rgb(124, 124, 124);
 }
 
 .dropdown__menu {

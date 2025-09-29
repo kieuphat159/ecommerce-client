@@ -9,7 +9,6 @@ export default function Products() {
     const [categories, setCategories] = useState([]);
     const [category, setCategory] = useState('All');
     const [error, setError] = useState('');
-    const [visibleCount, setVisibleCount] = useState(8);
     const [currentPage, setCurrentPage] = useState(1);  
     const [totalPages, setTotalPages] = useState(1);
     const navigate = useNavigate();
@@ -38,7 +37,7 @@ export default function Products() {
         }
     };
 
-    const getProducts = async (page = 1, limit = 4) => {
+    const getProducts = async (page = 1, limit = 8) => {
         try {
             setLoading(true);
             const response = await fetch(`${import.meta.env.VITE_API_URL}/api/products?limit=${limit}&page=${page}`, {
@@ -90,9 +89,12 @@ export default function Products() {
             if (data.success) {
                 setRealProducts(data.data);
                 setError(null);
-                setVisibleCount(8);
+                setTotalPages(1);
+                setCurrentPage(1);
             } else {
                 setError(data.message || 'Failed to load products by category');
+                setTotalPages(1);
+                setCurrentPage(1);
             }
         } catch (err) {
             console.error('Error fetching products by category:', err);
@@ -102,9 +104,26 @@ export default function Products() {
         }
     };
 
+    const handleCategoryChange = (categoryName) => {
+        setCategory(categoryName);
+        setOpenCategory(false);
+        
+        if (categoryName === 'All') {
+            getProducts(1, 8);
+        } else {
+            getProductsByCategory(categoryName);
+        }
+    };
+
+    const handlePageChange = (page) => {
+        if (category === 'All') {
+            getProducts(page, 8);
+        }
+    };
+
     useEffect(() => {
         getCategories();
-        getProducts(1, 4);
+        getProducts(1, 8);
     }, []);
 
     return (  
@@ -114,7 +133,13 @@ export default function Products() {
                     <div>
                         <label>Category</label>
                         <div className='dropdown'>
-                            <button className='dropdown__button' onClick={() => setOpenCategory(!openCategory)}>{category}</button>
+                            <button 
+                                className='dropdown__button' 
+                                onClick={() => setOpenCategory(!openCategory)}
+                                disabled={loading}
+                            >
+                                {category}
+                            </button>
                             {openCategory && (
                                 <div className="dropdown__menu">
                                     <a
@@ -122,9 +147,7 @@ export default function Products() {
                                         className="dropdown__option"
                                         onClick={(e) => {
                                             e.preventDefault();
-                                            setCategory('All');
-                                            setOpenCategory(false);
-                                            getProducts();
+                                            handleCategoryChange('All');
                                         }}
                                     >
                                         All
@@ -137,9 +160,7 @@ export default function Products() {
                                                 className="dropdown__option"
                                                 onClick={(e) => {
                                                     e.preventDefault();
-                                                    setCategory(cat.name);
-                                                    setOpenCategory(false);
-                                                    getProductsByCategory(cat.name);
+                                                    handleCategoryChange(cat.name);
                                                 }}
                                             >
                                                 {cat.name}
@@ -155,9 +176,16 @@ export default function Products() {
                 </div>
             </div>
 
+            {loading && <div className="loading">Loading...</div>}
+            {error && <div className="error">{error}</div>}
+
             <div className='products__grid'>
-                {realProducts.slice(0, visibleCount).map((product, index) => (
-                    <div className='product-card' key={index} onClick={() => navigate(`/product/${product.id}`)}>
+                {realProducts.map((product, index) => (
+                    <div 
+                        className='product-card' 
+                        key={product.id || index} 
+                        onClick={() => navigate(`/product/${product.id}`)}
+                    >
                         <img src={product.image} alt={product.name} className='product-card__image' />
                         <div className='product-card__info'>
                             <div className='product-card__rating'>★★★★★</div>
@@ -171,25 +199,20 @@ export default function Products() {
                 ))}
             </div>
 
-            {visibleCount < realProducts.length && (
-                <button
-                    className='products__show-more'
-                    onClick={() => setVisibleCount(prev => prev + 16)} 
-                >
-                    Show more
-                </button>
+            {category === 'All' && totalPages > 1 && (
+                <div className="pagination">
+                    {Array.from({ length: totalPages }, (_, i) => (
+                        <button
+                            key={i + 1}
+                            onClick={() => handlePageChange(i + 1)}
+                            className={`pagination__button ${currentPage === i + 1 ? 'active' : ''}`}
+                            disabled={loading}
+                        >
+                            {i + 1}
+                        </button>
+                    ))}
+                </div>
             )}
-            <div className="pagination">
-                {Array.from({ length: totalPages }, (_, i) => (
-                    <button
-                        key={i + 1}
-                        onClick={() => getProducts(i + 1, 4)}
-                        className={`pagination__button ${currentPage === i + 1 ? 'active' : ''}`}
-                    >
-                        {i + 1}
-                    </button>
-                ))}
-            </div>
         </div>
     );
 }
