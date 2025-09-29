@@ -2,28 +2,51 @@
   min-height: 100vh;
 }
 
-.categories__container,
+.categories__container {
+  max-width: 850px;
+  min-height: 600px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
 .arrivals__container {
-  max-width: 1200px;
+  max-width: 850px;
+  min-height: 400px;
   margin: 0 auto;
   padding: 0 1rem;
 }
 
 .categories {
+  height: 90%;
   padding: 4rem 0;
   background-color: white;
 }
 
 .categories__grid {
-  display: grid;
-  grid-template-columns: 1fr 2fr;
-  gap: 2rem;
-}
-
-.categories__small {
+  height: 100%;
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 2rem;
+  align-items: stretch;
+}
+
+.categories__card--large {
+  height: 100%;
+}
+
+.categories__card--large .categories__card {
+  height: 100%;
+}
+
+.categories__small {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  height: 100%;
+}
+
+.categories__small .categories__card {
+  flex: 1;
 }
 
 .categories__card {
@@ -40,17 +63,12 @@
 
 .categories__image {
   width: 100%;
-  height: 320px;
   object-fit: contain;
   transition: transform 0.3s ease;
 }
 
 .categories__card--large .categories__image {
-  height: 400px;
-}
-
-.categories__card:hover .categories__image {
-  transform: scale(1.05);
+  height: 100%;
 }
 
 .categories__overlay {
@@ -158,6 +176,7 @@
 .arrivals {
   padding: 4rem 0;
   background-color: #f9fafb;
+  display: block;
 }
 
 .arrivals__header {
@@ -188,13 +207,18 @@
   text-decoration: none;
 }
 
-.products__grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 1.5rem;
+.arrivals__grid {
+  display: flex;              /* sắp ngang */
+  gap: 1rem;                  /* khoảng cách giữa card */
+  overflow-x: auto;           /* cho phép cuộn ngang */
+  scroll-snap-type: x mandatory; /* cuộn mượt */
+  padding-bottom: 1rem;    
 }
 
 .product-card {
+  flex: 0 0 calc(25% - 1rem); /* 4 card trên 1 hàng (25%) */
+  min-width: 220px;           /* không bé quá */
+  scroll-snap-align: start;
   cursor: pointer;
   transition: transform 0.2s ease;
 }
@@ -211,10 +235,10 @@
   background-color: white;
 }
 
-.product-card__image {
-  width: 100%;
-  height: 256px;
-  object-fit: cover;
+.arrivals-card__image {
+  width: 70%;
+  height: 150px;
+  object-fit: contain;
   transition: transform 0.3s ease;
 }
 

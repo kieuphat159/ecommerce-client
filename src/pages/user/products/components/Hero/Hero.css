@@ -35,3 +35,36 @@
     font-size: 24px;
     font-weight: 500;
 }
+
+
+@media screen and (max-width: 883px) {
+    .hero {
+        height: 510px;
+    }
+    
+    .hero__background img {
+        object-fit: contain;
+    }
+
+    .hero__title {
+        font-size: 32px;
+    }
+
+    .hero__description {
+        font-size: 18px;
+    }
+}
+
+@media screen and (max-width: 525px) {
+    .hero {
+        height: 460px;
+    }
+
+    .hero__title {
+        font-size: 328x;
+    }
+
+    .hero__description {
+        font-size: 16px;
+    }
+}

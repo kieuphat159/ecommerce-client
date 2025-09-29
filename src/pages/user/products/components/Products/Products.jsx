@@ -37,68 +37,36 @@ export default function Products() {
         }
     };
 
-    const getProducts = async (page = 1, limit = 8) => {
+    const getProducts = async (page = 1, limit = 8, categoryName = category) => {
         try {
             setLoading(true);
-            const response = await fetch(`${import.meta.env.VITE_API_URL}/api/products?limit=${limit}&page=${page}`, {
+
+            let url = `${import.meta.env.VITE_API_URL}/api/products?limit=${limit}&page=${page}`;
+            if (categoryName && categoryName !== 'All') {
+                url += `&category=${encodeURIComponent(categoryName)}`;
+            }
+
+            const response = await fetch(url, {
                 method: "GET",
-                headers: {
-                    'Content-Type': 'application/json',
-                }
+                headers: { "Content-Type": "application/json" }
             });
 
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
+            if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+
             const data = await response.json();
-            console.log("ok", data);
-            
+            console.log("Products fetched:", data);
+
             if (data.success) {
                 setRealProducts(data.data);
                 setError(null);
                 setTotalPages(data.pagination.totalPages);
                 setCurrentPage(data.pagination.page);
             } else {
-                setError(data.message || 'Failed to load products');
+                setError(data.message || "Failed to load products");
             }
         } catch (err) {
-            console.error('Error fetching products:', err);
-            setError('Failed to load products. Please try again.');
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    const getProductsByCategory = async (categoryName) => {
-        try {
-            setLoading(true);
-            const response = await fetch(`${import.meta.env.VITE_API_URL}/api/products/${categoryName}`, {
-                method: "GET",
-                headers: {
-                    'Content-Type': 'application/json',
-                }
-            });
-
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-
-            const data = await response.json();
-            console.log("ok products by category", data);
-
-            if (data.success) {
-                setRealProducts(data.data);
-                setError(null);
-                setTotalPages(1);
-                setCurrentPage(1);
-            } else {
-                setError(data.message || 'Failed to load products by category');
-                setTotalPages(1);
-                setCurrentPage(1);
-            }
-        } catch (err) {
-            console.error('Error fetching products by category:', err);
-            setError('Failed to load products by category. Please try again.');
+            console.error("Error fetching products:", err);
+            setError("Failed to load products. Please try again.");
         } finally {
             setLoading(false);
         }
@@ -107,19 +75,14 @@ export default function Products() {
     const handleCategoryChange = (categoryName) => {
         setCategory(categoryName);
         setOpenCategory(false);
-        
-        if (categoryName === 'All') {
-            getProducts(1, 8);
-        } else {
-            getProductsByCategory(categoryName);
-        }
+        getProducts(1, 8, categoryName);
     };
 
+
     const handlePageChange = (page) => {
-        if (category === 'All') {
-            getProducts(page, 8);
-        }
+        getProducts(page, 8, category);
     };
+
 
     useEffect(() => {
         getCategories();
