@@ -211,7 +211,7 @@ const UploadProduct = ({sellerId}) => {
                 Back
               </button>
             </div>
-          </div>
+      </div>
     <div className="upload-product-container">
       <h2>Create New Product</h2>
       

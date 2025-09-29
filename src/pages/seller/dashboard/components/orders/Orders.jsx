@@ -1,14 +1,17 @@
 import './Orders.css'
 import { useState, useEffect } from 'react'
 import AuthService from '/src/services/authService'
+import { useNavigate } from "react-router-dom";
 
-export default function Orders({setOrderDetail}) {
+export default function Orders() {
   const [orders, setOrders] = useState([]);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [totalItem, setTotalItem] = useState(0);
   const [showModal, setShowModal] = useState(false);
   const [orderToDelete, setOrderToDelete] = useState(null);
+
+  const navigate = useNavigate();
 
   const StatsHeader = () => {
     const stats = [
@@ -130,8 +133,16 @@ export default function Orders({setOrderDetail}) {
                   <td>{order.payment_method || '-'}</td>
                   <td className="actions-cell">
                     <div className="actions">
-                      <button className="icon-btn" onClick={() => setOrderDetail(order.order_id)}><img src="/assets/edit-3.png" alt="edit" /></button>
-                      <button className="icon-btn" onClick={() => handleDeleteClick(order.order_id)}>
+                      <button
+                        className="icon-btn"
+                        onClick={() => navigate(`/seller/order-detail/${order.order_id}`, { state: { fromTab: "orders" } })}
+                      >
+                        <img src="/assets/edit-3.png" alt="view detail" />
+                      </button>
+                      <button
+                        className="icon-btn"
+                        onClick={() => handleDeleteClick(order.order_id)}
+                      >
                         <img src="/assets/trash-2.png" alt="delete" />
                       </button>
                     </div>
