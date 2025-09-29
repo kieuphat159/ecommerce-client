@@ -97,8 +97,9 @@ useEffect(() => {
                                 <button
                                     className="btn-confirm"
                                     onClick={handleDelete}
+                                    
                                 >
-                                    Yes, Delete
+                                    Yes, cancel it!
                                 </button>
                             </div>
                         </div>

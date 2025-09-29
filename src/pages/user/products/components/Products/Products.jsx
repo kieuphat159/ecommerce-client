@@ -180,24 +180,36 @@ export default function Products() {
             {error && <div className="error">{error}</div>}
 
             <div className='products__grid'>
-                {realProducts.map((product, index) => (
-                    <div 
-                        className='product-card' 
-                        key={product.id || index} 
-                        onClick={() => navigate(`/product/${product.id}`)}
-                    >
-                        <img src={product.image} alt={product.name} className='product-card__image' />
-                        <div className='product-card__info'>
-                            <div className='product-card__rating'>★★★★★</div>
-                            <div className='product-card__name'>{product.name}</div>
-                            <div className='product-card__price'>
-                                <span className='product-card__current-price'>{product.price}</span>
-                            </div>
-                            <button className='product-card__add-to-cart'>Add to cart</button>
-                        </div>
+    {realProducts.map((product, index) => (
+        <div 
+            className='product-card' 
+            key={product.id || index} 
+            onClick={() => navigate(`/product/${product.id}`)}
+        >
+            <div className='product-card__image-wrapper'>
+                <img src={product.image} alt={product.name} className='product-card__image' />
+                {product.quantity < 1 && (
+                    <div className='product-card__out-of-stock'>
+                        <span>OUT OF STOCK</span>
                     </div>
-                ))}
+                )}
             </div>
+            <div className='product-card__info'>
+                <div className='product-card__rating'>★★★★★</div>
+                <div className='product-card__name'>{product.name}</div>
+                <div className='product-card__price'>
+                    <span className='product-card__current-price'>{product.price}</span>
+                </div>
+                <button 
+                    className='product-card__add-to-cart'
+                    disabled={product.quantity < 1}
+                >
+                    {product.quantity < 1 ? 'Out of Stock' : 'Add to cart'}
+                </button>
+            </div>
+        </div>
+    ))}
+</div>
 
             {category === 'All' && totalPages > 1 && (
                 <div className="pagination">
