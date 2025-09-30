@@ -21,6 +21,7 @@ export default function Detail() {
     const [showVariantModal, setShowVariantModal] = useState(false);
     const [showSuccessModal, setShowSuccessModal] = useState(false);
     const [showLoginModal, setShowLoginModal] = useState(false);
+    const [totalQuantity, setTotalQuantity] = useState(0);
 
     const navigate = useNavigate();
 
@@ -29,29 +30,49 @@ export default function Detail() {
 
     const fetchDefaultQuantity = async () => {
         try {
-            const response = await fetch(`${import.meta.env.VITE_API_URL}/api/product-default-quantity/${id}`);
-            const data = await response.json();
+            const [resDefault, resTotal] = await Promise.all([
+                fetch(`${import.meta.env.VITE_API_URL}/api/product-default-quantity/${id}`),
+                fetch(`${import.meta.env.VITE_API_URL}/api/stock/total-quantity/${id}`)
+            ]);
+
+            const data = await resDefault.json();
+            const totalData = await resTotal.json();
+            console.log(totalData);
+
             if (data.success && data.data) {
                 let vId = 0;
                 let qty = 0;
+
                 if (Array.isArray(data.data)) {
-                    qty = data.data[0]?.quantity || 0;
-                    vId = data.data[0]?.variant_id || data.data[0]?.id || 0;
+                    qty = data.data[0]?.quantity ?? 0;
+                    vId = data.data[0]?.variant_id ?? data.data[0]?.id ?? 0;
                 } else {
-                    qty = data.data.quantity || 0;
-                    vId = data.data.variant_id || data.data.id || 0;
+                    qty = data.data.quantity ?? 0;
+                    vId = data.data.variant_id ?? data.data.id ?? 0;
                 }
+
                 setCurrentQuantity(qty);
-                setVariantId(vId > 0 ? vId : id);
+                setVariantId(vId || id);
             } else {
                 setCurrentQuantity(0);
                 setVariantId(0);
             }
+
+            if (totalData.success) {
+                const total = totalData.data?.total_quantity || 0;
+                setTotalQuantity(total);
+                setCurrentQuantity(total);
+            } else {
+                setTotalQuantity(0);
+            }
         } catch (err) {
+            console.error("Error fetching quantity:", err);
             setCurrentQuantity(0);
             setVariantId(0);
+            setTotalQuantity(0);
         }
-    }
+    };
+
 
     const calculateCurrentQuantity = () => {
         if (options.length === 0) {
@@ -61,7 +82,7 @@ export default function Detail() {
 
         const selectedOptionIds = Object.keys(selectedVariants);
         if (selectedOptionIds.length !== options.length) {
-            setCurrentQuantity(0);
+            setCurrentQuantity(totalQuantity);
             return;
         }
 
@@ -295,8 +316,22 @@ export default function Detail() {
         () => debounce(addToCart, 400), [numberOfProduct, pricePerUnit, selectedVariants, options]
     )
 
+    const handleAddToCart = () => {
+    if (currentQuantity === 0) {
+        setShowVariantModal(true);
+    } else {
+        debounceAddToCart();
+    }
+};
+
+
     return (
         <div className="detail">
+        {loading && (
+            <div className="order-spinner">
+            <div className="spinner"></div>
+            </div>
+        )}
             <div className="detail__image-section">
                 <img src={image || "https://placehold.co/600x400"} alt="Product image" />
             </div>
@@ -368,7 +403,7 @@ export default function Detail() {
                         </div>
                         <button onClick={addToWishlist} className={wishlistBtn}>♡ Wishlist</button>
                     </div>
-                    <button onClick={debounceAddToCart} className="detail__add" disabled={currentQuantity === 0}>
+                    <button onClick={handleAddToCart} className="detail__add">
                         {loading ? 'Adding...' : 'Add to Cart'}
                     </button>
                 </div>
@@ -378,6 +413,7 @@ export default function Detail() {
                     </div>
                 )}
             </div>
+      
             {showVariantModal && (
             <div className="detail-modal-overlay">
                 <div className="detail-modal">

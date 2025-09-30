@@ -27,7 +27,7 @@ export default function OrderDetail(setOrderDetail) {
       });
 
       setShowModal(false);
-      navigate(-1); // 🔑 quay lại Orders
+      navigate(-1); 
     } catch (err) {
       console.error("Delete failed:", err);
     } finally {
