@@ -157,7 +157,7 @@ useEffect(() => {
                 {firstTime && (
                     <button
                         className="order-complete__content__button"
-                        onClick={handlePurchaseHistory} // Update to use new handler
+                        onClick={handlePurchaseHistory}
                     >
                         Purchase history
                     </button>

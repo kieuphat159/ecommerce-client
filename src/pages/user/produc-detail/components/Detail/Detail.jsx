@@ -1,7 +1,8 @@
 import "./Detail.css"
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { useParams } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
+import { debounce } from "/src/components/debounce"
 
 export default function Detail() {
     const [loading, setLoading] = useState(false);
@@ -290,6 +291,10 @@ export default function Detail() {
         }
     };
 
+    const debounceAddToCart = useMemo(
+        () => debounce(addToCart, 400), [numberOfProduct, pricePerUnit, selectedVariants, options]
+    )
+
     return (
         <div className="detail">
             <div className="detail__image-section">
@@ -363,7 +368,7 @@ export default function Detail() {
                         </div>
                         <button onClick={addToWishlist} className={wishlistBtn}>♡ Wishlist</button>
                     </div>
-                    <button onClick={addToCart} className="detail__add" disabled={currentQuantity === 0}>
+                    <button onClick={debounceAddToCart} className="detail__add" disabled={currentQuantity === 0}>
                         {loading ? 'Adding...' : 'Add to Cart'}
                     </button>
                 </div>
@@ -389,7 +394,7 @@ export default function Detail() {
                     <h3>Added to cart successfully!</h3>
                     <button onClick={() => {
                         setShowSuccessModal(false);
-                        window.location.reload();
+                        //window.location.reload();
                     }}>
                         OK</button>
                 </div>
