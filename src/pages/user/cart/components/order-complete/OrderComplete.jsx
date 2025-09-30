@@ -86,7 +86,7 @@ useEffect(() => {
                 )}
                 <div className="order__header">
                     <h2 className="content__noti">Your order has been { isCancelled ? 'cancelled' : 'received'}!</h2>
-                    {!isCancelled && (
+                    {status === 'Pending' && (
                     <button
                         className="order__delete"
                         onClick={() => setShowConfirm(true)}
