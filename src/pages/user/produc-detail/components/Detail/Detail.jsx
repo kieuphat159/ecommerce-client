@@ -2,7 +2,7 @@ import "./Detail.css"
 import { useState, useEffect, useMemo } from 'react'
 import { useParams } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
-import { debounce } from "/src/components/debounce"
+import { debounce } from "/src/components/Debounce"
 
 export default function Detail() {
     const [loading, setLoading] = useState(false);
