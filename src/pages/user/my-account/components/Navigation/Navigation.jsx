@@ -27,7 +27,7 @@ export default function AccountNavigation({ userId, activeTab, setActiveTab }) {
         fetchUser();
     }, [userId])
 
-    const menuItems = ['Account', 'Address', 'Orders', 'Wishlist'];
+    const menuItems = ['Account', 'Address', 'Orders'];
 
     return (
         <nav className='account__navigation'>
@@ -40,7 +40,7 @@ export default function AccountNavigation({ userId, activeTab, setActiveTab }) {
                 {menuItems.map(item => (
                     <button 
                         key={item} 
-                        onClick={() => setActiveTab(item)}
+                        onClick={() => navigate(`/profile/${userId}?tab=${item}`)}
                     >
                         <div className={activeTab === item ? 'button-active' : 'button-inactive'}>
                             {item}

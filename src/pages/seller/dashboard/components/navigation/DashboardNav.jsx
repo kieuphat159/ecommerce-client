@@ -3,67 +3,68 @@ import { useNavigate } from "react-router-dom";
 import useAuth from "../../../../../hooks/useAuth";
 import { useState } from 'react';
 
-
 export default function DashboardNav({ activeButton, setActiveButton, setOrderDetail }) {
     const { logout } = useAuth();
-      const [showModal, setShowModal] = useState(false);
-    
+    const [showModal, setShowModal] = useState(false);
     const navigate = useNavigate();
 
     const handleButtonClick = (buttonName) => {
+        setOrderDetail(0); // reset order detail khi đổi tab
         setActiveButton(buttonName);
+
+        // Cập nhật URL query param để hỗ trợ nút Back/Forward
+        navigate(`/seller?tab=${buttonName}`, { replace: false });
     };
 
-     const signOut = () => {
+    const signOut = () => {
         logout();
         navigate("/signin");
     };
 
-    return(
+    return (
         <div className='dashboard__nav'>
             <h2 className='nav__title'>Store</h2>
             <div className='nav__button'>
-                <button 
-                onClick={() => {setOrderDetail(0); handleButtonClick('home')}}
-                className={activeButton === 'home' ? 'button--active' : ''}
+                <button
+                    onClick={() => handleButtonClick('home')}
+                    className={activeButton === 'home' ? 'button--active' : ''}
                 >
-                <img src="/assets/home.png" alt="home" />
+                    <img src="/assets/home.png" alt="home" />
                 </button>
 
-                <button 
-                onClick={() => {setOrderDetail(0); handleButtonClick('products')}}
-                className={activeButton === 'products' ? 'button--active' : ''}
+                <button
+                    onClick={() => handleButtonClick('products')}
+                    className={activeButton === 'products' ? 'button--active' : ''}
                 >
-                <img src="/assets/shopping-bag.png" alt="products" />
+                    <img src="/assets/shopping-bag.png" alt="products" />
                 </button>
 
-                <button 
-                onClick={() => {setOrderDetail(0); handleButtonClick('orders')}}
-                className={activeButton === 'orders' ? 'button--active' : ''}
+                <button
+                    onClick={() => handleButtonClick('orders')}
+                    className={activeButton === 'orders' ? 'button--active' : ''}
                 >
-                <img src="/assets/orders.png" alt="orders" />
+                    <img src="/assets/orders.png" alt="orders" />
                 </button>
 
-                <button 
-                onClick={() => setShowModal(true)}
-                className={activeButton === 'settings' ? 'button--active' : ''}
+                <button
+                    onClick={() => setShowModal(true)}
                 >
-                <img src="/assets/icons8-logout-26.png" alt="signout" />
+                    <img src="/assets/icons8-logout-26.png" alt="signout" />
                 </button>
-                
             </div>
+
             {showModal && (
                 <div className="modal-overlay">
-                <div className="modal">
-                    <h3>Confirm signing out</h3>
-                    <p>Are you sure you want to sign out ?</p>
-                    <div className="modal-actions">
-                    <button className="btn btn-cancel" onClick={() => setShowModal(false)}>Cancel</button>
-                    <button className="btn btn-confirm" onClick={signOut}>Sign out</button>
+                    <div className="modal">
+                        <h3>Confirm signing out</h3>
+                        <p>Are you sure you want to sign out?</p>
+                        <div className="modal-actions">
+                            <button className="btn btn-cancel" onClick={() => setShowModal(false)}>Cancel</button>
+                            <button className="btn btn-confirm" onClick={signOut}>Sign out</button>
+                        </div>
                     </div>
-                </div>
                 </div>
             )}
         </div>
-    )
+    );
 }

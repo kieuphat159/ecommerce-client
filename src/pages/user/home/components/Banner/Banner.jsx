@@ -3,9 +3,9 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 import './Banner.css';
 
 const heroSlides = [
-  '/images/banner.jpg',
-  '/images/banner1.jpg',
-  '/images/banner2.jpg'
+  '/images/banner.webp',
+  '/images/banner1.webp',
+  '/images/banner2.webp'
 ];
 
 const Banner = () => {

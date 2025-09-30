@@ -8,8 +8,8 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import ProductsPage from "./pages/user/products/Page";
 import CartPage from "./pages/user/cart/Page";
 import MyAccountPage from "./pages/user/my-account/Page";
-
-const API_URL = import.meta.env.VITE_API_URL;
+import { ShopPage } from "./pages/user/shop/Page";
+import ContactUsPage from "./pages/user/contact-us/Page";
 
 function App() {
     
@@ -17,6 +17,8 @@ function App() {
     <>
         <Routes>
           <Route path="/" element={<HomePage />} />
+          <Route path="/shop" element={<ShopPage />} />
+          <Route path="/contact-us" element={<ContactUsPage />} />
           <Route path="/profile/:userId" element={<MyAccountPage/>} />
           <Route path="/user/home" element={<HomePage />} />
           <Route path="/signin" element={<SignInPage />} />

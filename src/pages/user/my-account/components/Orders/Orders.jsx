@@ -2,10 +2,12 @@ import './Order.css'
 import { useState } from 'react'
 import OrderComplete from '../../../cart/components/order-complete/OrderComplete';
 import AuthService from '/src/services/authService'
+import { useNavigate } from 'react-router-dom';
 
 export default function Orders({ orders, page, totalPages, onPageChange, userId }) {
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [quantities, setQuantities] = useState([]);
+  const navigate = useNavigate()
 
   const fetchOrder = async (order) => {
     try {
@@ -72,7 +74,7 @@ export default function Orders({ orders, page, totalPages, onPageChange, userId 
             orders.map(order => (
               <tr 
                 key={order.id} 
-                onClick={() => fetchOrder(order)}
+                onClick={() => navigate(`/profile/${userId}?tab=Orders&orderId=${order.id}`)}
                 style={{ cursor: "pointer" }}
               >
                 <td>{order.id}</td>

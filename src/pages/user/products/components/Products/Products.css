@@ -297,8 +297,34 @@
     font-size: 16px;
     font-weight: bold;
     color: #e74c3c;
-    -webkit-text-stroke: 1px rgba(255, 255, 255, 0.274);
+    -webkit-text-stroke: 1px rgba(255, 255, 255, 0.342);
     text-transform: uppercase;
     letter-spacing: 2px;
     text-shadow: 1px 1px 3px rgba(255, 255, 255, 0.9);
+}
+
+.order-spinner {
+     position: fixed;          
+    top: 0;
+    left: 0;
+    width: 100vw;             
+    height: 100vh;            
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.6); 
+    z-index: 9999;  
+}
+
+.spinner {
+    width: 48px;
+    height: 48px;
+    border: 6px solid #eee;
+    border-top: 6px solid #414141;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
 }

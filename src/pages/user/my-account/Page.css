@@ -1,5 +1,6 @@
 .account {
-
+    height: 800px;
+    margin-top: -25px;
 }
 
 .account__header {

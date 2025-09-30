@@ -15,11 +15,13 @@ export default function OrderComplete({
     const [isCancelled, setIsCancelled] = useState(false);
     const [status, setStatus] = useState('');
     const [paymentMethod, setPaymentMethod] = useState('');
+    const [loading, setLoading] = useState(false)
 
     console.log('OrderComplete rendered with orderId:', orderId);
 
     const fetchOrder = async () => {
         console.log('Fetching order with ID:', orderId);
+        setLoading(true);
         try {
             const result = await AuthService.apiCall(`/user/order/${orderId}`, { method: 'GET' });
             if (result.success) {
@@ -36,10 +38,13 @@ export default function OrderComplete({
             }
         } catch (err) {
             console.log('Error fetching order: ', err);
+        } finally {
+            setLoading(false);
         }
     };
 
     const handleDelete = async () => {
+        setLoading(true);
         try {
             const result = await AuthService.apiCall(`/user/order/${orderId}`, {
                 method: 'DELETE',
@@ -47,12 +52,15 @@ export default function OrderComplete({
             if (result.success) {
                 setOrder(null);
                 setShowConfirm(false);
-                navigate(`/profile/${userId}?tab=Orders`);
+                window.location.reload();
+                //navigate(`/profile/${userId}?tab=Orders`);
             } else {
                 alert('Failed to delete order ❌');
             }
         } catch (err) {
             console.error('Error deleting order: ', err);
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -67,6 +75,11 @@ useEffect(() => {
 
     return (
         <div className="order-complete">
+            {loading && (
+                <div className="order-spinner">
+                <div className="spinner"></div>
+                </div>
+            )}
             <div className="order-complete__content">
                 {firstTime && (
                     <h3 className="content__grate">Thank you! 🎉</h3>
@@ -157,7 +170,7 @@ useEffect(() => {
                 {firstTime && (
                     <button
                         className="order-complete__content__button"
-                        onClick={handlePurchaseHistory} // Update to use new handler
+                        onClick={handlePurchaseHistory}
                     >
                         Purchase history
                     </button>

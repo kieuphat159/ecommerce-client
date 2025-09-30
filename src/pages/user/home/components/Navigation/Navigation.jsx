@@ -70,9 +70,9 @@ export default function Navigation({userId}) {
             
             <div className="navigation__desktop-menu">
                 <a href="/" className="navigation__link">Home</a>
-                <a href="#" className="navigation__link">Shop</a>
+                <a href="/shop" className="navigation__link">Shop</a>
                 <a href="/products" className="navigation__link">Product</a>
-                <a href="#" className="navigation__link">Contact Us</a>
+                <a href="/contact-us" className="navigation__link">Contact Us</a>
             </div>
 
             <div className="navigation__actions">
@@ -187,7 +187,7 @@ export default function Navigation({userId}) {
                         )}
                     </div>
 
-                    <Link to="/contact" className="navigation__mobile-link" onClick={toggleMenu}>
+                    <Link to="/contact-us" className="navigation__mobile-link" onClick={toggleMenu}>
                         Contact Us
                     </Link>
                 </div>
@@ -202,7 +202,7 @@ export default function Navigation({userId}) {
                             )}
                         </button>
                         
-                        <Link to="/wishlist" className="navigation__mobile-action" onClick={toggleMenu}>
+                        <Link to="#" className="navigation__mobile-action" onClick={toggleMenu}>
                             <img src="/assets/heart.png" className="navigation__mobile-icon" alt="Wishlist" />
                             <span>Wishlist</span>
                             <span className="navigation__badge">2</span>
