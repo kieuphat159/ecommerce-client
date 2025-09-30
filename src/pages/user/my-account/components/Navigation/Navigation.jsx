@@ -27,7 +27,7 @@ export default function AccountNavigation({ userId, activeTab, setActiveTab }) {
         fetchUser();
     }, [userId])
 
-    const menuItems = ['Account', 'Address', 'Orders', 'Wishlist'];
+    const menuItems = ['Account', 'Address', 'Orders'];
 
     return (
         <nav className='account__navigation'>
