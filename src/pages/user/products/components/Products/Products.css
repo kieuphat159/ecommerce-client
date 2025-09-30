@@ -302,3 +302,24 @@
     letter-spacing: 2px;
     text-shadow: 1px 1px 3px rgba(255, 255, 255, 0.9);
 }
+
+.order-spinner {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 220px;
+    z-index: 10;
+}
+
+.spinner {
+    width: 48px;
+    height: 48px;
+    border: 6px solid #eee;
+    border-top: 6px solid #414141;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}

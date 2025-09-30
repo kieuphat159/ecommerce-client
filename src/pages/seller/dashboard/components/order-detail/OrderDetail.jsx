@@ -140,7 +140,7 @@ export default function OrderDetail(setOrderDetail) {
             <div className="order-detail__status-dropdown">
               <button 
                     className='back-to-orders' 
-                    onClick={() => setOrderDetail(0)}
+                    onClick={() => navigate(-1)}
                 >
                     {'< Back to orders'}
                 </button>
