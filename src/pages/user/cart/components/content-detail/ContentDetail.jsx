@@ -69,8 +69,8 @@ export default function ContentDetail({
 
     const getShippingCost = () => {
         switch(shippingMethod) {
-            case 'Express': return 15.00;
-            case 'Pick-up': return 21.00;
+            case 'express': return 15.00;
+            case 'pick-up': return 21.00;
             default: return 0.00;
         }
     };

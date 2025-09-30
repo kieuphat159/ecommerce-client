@@ -21,7 +21,6 @@ export default function Navigation({userId}) {
     const getCartQuantity = async () => {
         const user = localStorage.getItem("userId");
         if (!user) return;
-        // console.log('User id idi ididididid: ', user);
         try {
             const response =  await AuthService.apiCall(`/user/get-cart-quantity/${user}`, {
                 method: "GET",

@@ -4,7 +4,7 @@ import ContentProduct from "../content-product/ContentProduct";
 import ContentDetail from "../content-detail/ContentDetail";
 import OrderComplete from "../order-complete/OrderComplete";
 import AuthService from "/src/services/authService";
-import { debounce } from "../../../../../components/Debounce"; // giữ import của bạn
+import { debounce } from "../../../../../components/Debounce"; 
 
 export default function CartContainer({ userId }) {
   const [active, setActive] = useState(1);
@@ -15,10 +15,9 @@ export default function CartContainer({ userId }) {
   const [cartId, setCartId] = useState(0);
   const [orderId, setOrderId] = useState(0);
 
-  // refs để luôn truy cập dữ liệu mới trong hàm debounce
   const realProductsRef = useRef([]);
   const userIdRef = useRef(userId);
-  const pendingDeltasRef = useRef({}); // { [cart_item_id]: totalDelta }
+  const pendingDeltasRef = useRef({}); 
 
   useEffect(() => { realProductsRef.current = realProducts; }, [realProducts]);
   useEffect(() => { userIdRef.current = userId; }, [userId]);
@@ -85,9 +84,7 @@ export default function CartContainer({ userId }) {
     }
   };
 
-  // Hàm gửi delta lên server (gọi API per item)
   const sendDeltaToServer = useCallback(async (cartItemId, delta) => {
-    // tìm product hiện tại (cần variant id, unit_price)
     const product = realProductsRef.current.find(p => p.cart_item_id === Number(cartItemId));
     if (!product) {
       console.warn("Product not found for cartItemId", cartItemId);
@@ -105,7 +102,7 @@ export default function CartContainer({ userId }) {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             variantId: product.variant_id,
-            quantity: delta, // IMPORTANT: API expects delta (add)
+            quantity: delta, 
             unit_price: unitPrice,
             total_price: totalPrice
           })
@@ -114,39 +111,30 @@ export default function CartContainer({ userId }) {
 
       if (!data.success) {
         console.error("Update quantity failed:", data.message || data.error);
-        // Optional: nếu muốn retry/rollback, có thể push lại vào pendingDeltasRef.current[cartItemId]
       }
     } catch (err) {
       console.error("Error updating quantity:", err);
-      // Optional: re-add delta for retry
     }
   }, []);
 
-  // flush tất cả pending deltas (gọi mỗi khi debounce xảy ra)
   const flushPendingDeltas = useCallback(async () => {
     const pending = { ...pendingDeltasRef.current };
-    // reset ngay để tránh gửi trùng khi flush đang chạy
     pendingDeltasRef.current = {};
 
     const entries = Object.entries(pending);
     if (entries.length === 0) return;
 
-    // gửi song song (hoặc tuần tự nếu cần)
     await Promise.all(entries.map(([cartItemId, delta]) => {
       if (!delta || delta === 0) return Promise.resolve();
       return sendDeltaToServer(cartItemId, delta);
     }));
   }, [sendDeltaToServer]);
 
-  // debounce flush (tạo 1 lần)
   const debouncedFlush = useMemo(() => debounce(flushPendingDeltas, 400), [flushPendingDeltas]);
 
-  // Hàm được truyền vào con: cập nhật UI ngay, ghi pending delta, gọi debouncedFlush
   const handleQuantityChange = (productIndex, delta) => {
-    // 1) update UI ngay (quantities và realProducts)
     setQuantities(prev => {
       const updated = [...prev];
-      // bảo đảm index hợp lệ
       updated[productIndex] = (updated[productIndex] || 0) + delta;
       return updated;
     });
@@ -158,7 +146,6 @@ export default function CartContainer({ userId }) {
       return updated;
     });
 
-    // 2) add to pending deltas keyed by cart_item_id (ổn định hơn dùng index)
     const item = realProductsRef.current[productIndex];
     if (!item) {
       console.warn("handleQuantityChange: productIndex not found", productIndex);
@@ -167,7 +154,6 @@ export default function CartContainer({ userId }) {
     const key = String(item.cart_item_id);
     pendingDeltasRef.current[key] = (pendingDeltasRef.current[key] || 0) + delta;
 
-    // 3) debounce flush
     debouncedFlush();
   };
 
@@ -200,7 +186,7 @@ export default function CartContainer({ userId }) {
             setShippingMethod={setShippingMethod}
             quantities={quantities}
             setQuantities={setQuantities}
-            updateQuantity={handleQuantityChange} // truyền delta handler
+            updateQuantity={handleQuantityChange} 
             setActive={setActive}
             setHeaderTile={setHeaderTile}
           />
