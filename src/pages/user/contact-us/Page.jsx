@@ -84,7 +84,6 @@ export default function ContactUsPage() {
                     </div>
                 </div>
 
-                {/* Features Section */}
                 <div className='features-section'>
                     <div className='feature-item'>
                         <img src="/images/fast delivery.png" alt="shipping" className='feature-icon' />

@@ -26,12 +26,12 @@ export default function Products() {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
             const data = await response.json(); 
-            console.log("ok cate", data);
+            // console.log("ok cate", data);
             if (data.success) {
                 setCategories(data.data);
             }
         } catch (err) {
-            console.log('Fail to fetch categories: ', err);
+            // console.log('Fail to fetch categories: ', err);
         } finally {
            setLoading(false);
         }
@@ -54,7 +54,7 @@ export default function Products() {
             if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
 
             const data = await response.json();
-            console.log("Products fetched:", data);
+            // console.log("Products fetched:", data);
 
             if (data.success) {
                 setRealProducts(data.data);

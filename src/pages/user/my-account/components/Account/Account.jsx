@@ -59,7 +59,6 @@ export default function Account() {
                             name="email"
                             className="account__input"
                             placeholder="Email"
-                            required
                         />
                     </div>
                 </section>

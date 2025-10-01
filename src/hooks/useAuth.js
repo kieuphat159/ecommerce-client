@@ -7,7 +7,7 @@ const useAuth = () => {
     const [loading, setLoading] = useState(true); // co dang check auth status?
 
     useEffect(() => {
-        console.log('checking auth status');
+        // console.log('checking auth status');
         checkAuthStatus();
     }, []);
 
@@ -20,15 +20,15 @@ const useAuth = () => {
                 const payload = JSON.parse(atob(token.split('.')[1]));
                 const currentTime = Date.now() / 1000;
                 if (payload.exp > currentTime) {
-                    console.log('Valid token');
+                    // console.log('Valid token');
                     setIsAuthenticated(true);
                     setUser(userInfo);
                 } else {
-                    console.log('Outdated token');
+                    // console.log('Outdated token');
                     logout();
                 }
             } else {
-                console.log('No token or user info found');
+                // console.log('No token or user info found');
                 setIsAuthenticated(false);
                 setUser(null);
             }  
@@ -42,12 +42,12 @@ const useAuth = () => {
 
      const login = async (credentials) => {
     try {
-      console.log('Attempting login with:', credentials);
+      // console.log('Attempting login with:', credentials);
       
       const response = await AuthService.signin(credentials);
       
       if (response.token) {
-        console.log('Login successful:', response);
+        // console.log('Login successful:', response);
         
         setIsAuthenticated(true);
         setUser({ 
@@ -66,19 +66,19 @@ const useAuth = () => {
   };
 
   const logout = () => {
-    console.log('clear');
-    console.log('Logging out user...');
+    // console.log('clear');
+    // console.log('Logging out user...');
     
     AuthService.logout();
     
     setIsAuthenticated(false);
     setUser(null);
     
-    console.log('User logged out successfully');
+    // console.log('User logged out successfully');
   };
 
   const refreshAuth = () => {
-    console.log('Refreshing auth status...');
+    // console.log('Refreshing auth status...');
     setLoading(true);
     checkAuthStatus();
   };

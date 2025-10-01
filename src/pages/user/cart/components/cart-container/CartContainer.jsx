@@ -44,7 +44,7 @@ export default function CartContainer({ userId }) {
         }));
         if (mapped.length > 0) {
           setCartId(mapped[0].cart_id);
-          console.log("cart_id from API:", mapped[0].cart_id);
+          // console.log("cart_id from API:", mapped[0].cart_id);
         }
         setRealProducts(mapped);
         if (quantities.length === 0) {

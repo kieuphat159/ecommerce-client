@@ -33,7 +33,7 @@ export default function MyAccountPage() {
                 { method: 'GET' }
             );
 
-            console.log('API response:', data);
+            // console.log('API response:', data);
 
             if (data.success && data.data?.orders) {
                 const mapped = data.data.orders.map((item) => ({

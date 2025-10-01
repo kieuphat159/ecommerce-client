@@ -1,19 +1,42 @@
-import './Orders.css'
 import { useState, useEffect } from 'react'
-import AuthService from '/src/services/authService'
 import { useNavigate } from "react-router-dom";
+import AuthService from '/src/services/authService'
+import './Home.css'
 
-export default function Orders() {
+const salesForecast = [
+  { title: "Revenue", value: "+24.2%", color: "orange" },
+  { title: "Net Profit", value: "-2.5%", color: "red" },
+  { title: "Orders", value: "+32.8%", color: "green" },
+  { title: "Visitors", value: "+60%", color: "orange" },
+];
+
+export default function DashboardHome() {
   const [orders, setOrders] = useState([]);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [totalItem, setTotalItem] = useState(0);
-  const [showModal, setShowModal] = useState(false);
-  const [orderToDelete, setOrderToDelete] = useState(null);
   const [revenue, setRevenue] = useState(0);
+  const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  const navigate = useNavigate();
+  const fetchBestsellers = async () => {
+    setLoading(true);
+    try {
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/api/seller/bestsellers`, {
+            method: "GET",
+            headers: { "Content-Type": "application/json" }
+        });
+        const response = await res.json();
+        if (response.success) {
+            setProducts(response.data);
+            // // console.log(response.data);
+        }
+    } catch (err) {
+        // console.log('Err: ', err);
+    } finally {
+        setLoading(false);
+    }
+  }
 
   const fetchRevenue = async () => {
     setLoading(true);
@@ -28,7 +51,7 @@ export default function Orders() {
     } catch (err) {
       // console.log(err);
     } finally {
-      setLoading(false);
+        setLoading(false)
     }
   }
 
@@ -43,7 +66,7 @@ export default function Orders() {
     return (
       <div className="stats-header">
         <div className="stats-header__title">
-          <h2>Orders</h2>
+          <h2>Dashboard</h2>
         </div>
 
         <div className="stats-grid">
@@ -66,7 +89,7 @@ export default function Orders() {
   const fetchOrders = async () => {
     setLoading(true);
     try {
-      const response = await AuthService.apiCall(`/seller/orders?page=${page}&limit=5`, {
+      const response = await AuthService.apiCall(`/seller/orders?page=${page}&limit=4`, {
         method: "GET",
         headers: { "Content-Type": "application/json" }
       });
@@ -74,55 +97,86 @@ export default function Orders() {
         setOrders(response.data.orders || []);
         setTotalPages(response.data.totalPages || 1);
         setTotalItem(response.data.totalItems);
+        // console.log(response.data.orders)
       }
     } catch (err) {
       // console.log(err);
     } finally {
-      setLoading(false);
+        setLoading(false);
     }
   };
 
   useEffect(() => {
     fetchOrders();
     fetchRevenue();
+    fetchBestsellers();
   }, [page]);
 
-  const handleDeleteClick = (orderId) => {
-    setOrderToDelete(orderId);
-    setShowModal(true);
-  };
-
-  const handleDeleteConfirm = async () => {
-    try {
-      await AuthService.apiCall(`/seller/orders/${orderToDelete}`, {
-        method: "DELETE",
-        headers: { "Content-Type": "application/json" }
-      });
-
-      setOrders((prev) => prev.filter(order => order.order_id !== orderToDelete));
-      setShowModal(false);
-      setOrderToDelete(null);
-    } catch (err) {
-      console.error("Delete failed:", err);
-    }
-  };
-
-  const handleDeleteCancel = () => {
-    setShowModal(false);
-    setOrderToDelete(null);
-  };
-
-  return (
-    <div className="orders-section">
-      {loading && (
-        <div className="order-spinner">
-          <div className="spinner"></div>
+  const navigate = useNavigate();
+  return(
+    <>
+        {loading && (
+            <div className="order-spinner">
+            <div className="spinner"></div>
+            </div>
+        )}
+        <StatsHeader />
+        <div className="home-container">
+        <div className="card bestsellers">
+            <div className="card-header">
+            <h3>Bestsellers</h3>
+            </div>
+            <table className="bestsellers-table">
+            <thead>
+                <tr>
+                <th>Product</th>
+                <th>Price</th>
+                <th>Sold</th>
+                <th>Revenue</th>
+                </tr>
+            </thead>
+            <tbody>
+                {products.map((item) => (
+                <tr key={item.entity_id}>
+                    <td className="product-cell">
+                    <img src={item.img} alt={item.name} />
+                    <span>{item.name}</span>
+                    </td>
+                    <td>${item.price}</td>
+                    <td>{item.sold_quantity}</td>
+                    <td>${item.revenue}</td>
+                </tr>
+                ))}
+            </tbody>
+            </table>
         </div>
-      )}
-      <StatsHeader />
-      <div className="latest-orders">
+
+        <div className="card forecast">
+            <div className="card-header">
+            <h3>Sales forecast</h3>
+            </div>
+            <div className="forecast-grid">
+            {salesForecast.map((item, idx) => (
+                <div className="forecast-item" key={idx}>
+                <span className="forecast-title">{item.title}</span>
+                <span className={`forecast-value ${item.color}`}>
+                    {item.value}
+                </span>
+                <div className={`forecast-line ${item.color}`}></div>
+                </div>
+            ))}
+            </div>
+        </div>
+        </div>
+        <div className="home__latest-orders">
         <div className="latest-orders__header">
           <h2>Latest orders</h2>
+            <button 
+                className="more-btn" 
+                onClick={() => navigate("/seller?tab=orders")}
+            >
+                More →
+            </button>
         </div>
         <div className="order-table-container">
           <table className="order-table">
@@ -180,46 +234,7 @@ export default function Orders() {
             </tbody>
           </table>
         </div>
-
-        <div className="orders__pagination">
-          <button 
-            disabled={page === 1} 
-            onClick={() => setPage(prev => prev - 1)}
-          >
-            Prev
-          </button>
-
-          {Array.from({ length: totalPages }, (_, i) => (
-            <button
-              key={i + 1}
-              className={page === i + 1 ? "orders__pagination--active" : ""}
-              onClick={() => setPage(i + 1)}
-            >
-              {i + 1}
-            </button>
-          ))}
-
-          <button 
-            disabled={page === totalPages} 
-            onClick={() => setPage(prev => prev + 1)}
-          >
-            Next
-          </button>
-        </div>
-      </div>
-
-      {showModal && (
-        <div className="modal-overlay">
-          <div className="modal">
-            <h3>Confirm deletion</h3>
-            <p>Are you sure you want to delete the order #{orderToDelete} ?</p>
-            <div className="modal-actions">
-              <button className="btn btn-cancel" onClick={handleDeleteCancel}>Cancel</button>
-              <button className="btn btn-confirm" onClick={handleDeleteConfirm}>Delete</button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
+    </>
   );
 }

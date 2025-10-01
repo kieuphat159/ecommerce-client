@@ -5,6 +5,7 @@ import DashboardNav from './components/navigation/DashboardNav';
 import Products from '../products/components/Products/Products';
 import Orders from './components/orders/Orders';
 import OrderDetail from './components/order-detail/OrderDetail';
+import DashboardHome from './components/home/Home';
 
 export default function Dashboard({ sellerId }) {
   const [orderDetail, setOrderDetail] = useState(0);
@@ -29,7 +30,7 @@ export default function Dashboard({ sellerId }) {
       </nav>
 
       <div className="dashboard--right">
-        {currentTab === "home" && <h2>Home</h2>}
+        {currentTab === "home" && <DashboardHome />}
         {currentTab === "products" && <Products sellerId={sellerId} />}
         {currentTab === "orders" && orderDetail === 0 && <Orders />}
         {currentTab === "orders" && orderDetail !== 0 && (

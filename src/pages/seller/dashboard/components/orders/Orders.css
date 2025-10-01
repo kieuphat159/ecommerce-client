@@ -42,6 +42,10 @@
     font-size: 14px;
 }
 
+.orders-section {
+    padding: 8px 58px;
+}
+
 .order-table th,
 .order-table td {
     padding: 16px;
@@ -106,7 +110,6 @@
     color: #e05656;
 }
 
-
 .status--completed {
     background-color: #f6ffed;
     color: #52c41a;
@@ -158,7 +161,77 @@
 }
 
 @media (max-width: 768px) {
+    .orders-section {
+        padding: 10px !important;
+    }
+
+    .latest-orders {
+        margin: 16px;
+        padding: 16px;
+        height: auto;
+    }
+
+    .latest-orders__header h2 {
+        font-size: 18px;
+    }
+
     .order-table {
         font-size: 12px;
+    }
+
+    .order-table th,
+    .order-table td {
+        padding: 12px 8px;
+    }
+
+    .order-table th:nth-child(3),
+    .order-table td:nth-child(3),
+    .order-table th:nth-child(4), 
+    .order-table td:nth-child(4),
+    .order-table th:nth-child(8), 
+    .order-table td:nth-child(8) {
+        display: none;
+    }
+
+    .actions {
+        margin: 0 10px 0 0;
+        gap: 4px;
+    }
+
+    .icon-btn {
+        font-size: 14px;
+    }
+
+    .orders__pagination {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .orders__pagination button {
+        padding: 8px;
+        margin: 3px;
+        font-size: 13px;
+    }
+
+    .orders__pagination--active {
+        font-size: 15px !important;
+    }
+
+    .stats-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+    }
+
+    .stat-card {
+        padding: 12px;
+    }
+
+    .stat-label {
+        font-size: 12px;
+    }
+
+    .stat-value {
+        font-size: 18px;
     }
 }

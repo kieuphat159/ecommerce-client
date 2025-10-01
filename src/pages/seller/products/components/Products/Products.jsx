@@ -23,22 +23,22 @@ export default function Products({ sellerId }) {
         setRevenue(response.data);
       }
     } catch (err) {
-      console.log(err);
+      // console.log(err);
     }
   }
 
   const StatsHeader = () => {
     const stats = [
-      { label: 'Revenue', value: revenue, change: '+ 22%', type: 'positive' },
+      { label: 'Revenue', value: `$${revenue}`, change: '+ 22%', type: 'positive' },
       { label: 'Orders', value: totalItem, change: '+ 5.7%', type: 'positive' },
       { label: 'Visitors', value: '7,283', change: '18%', type: 'negative' },
       { label: 'Conversion', value: '28%', change: '+ 12%', type: 'positive' }
     ];
 
     return (
-      <div className="stats-header">
+      <div className="stat-header">
         <div className="stats-header__title">
-          <h2>Orders</h2>
+          <h2>Products</h2>
         </div>
 
         {/* <div className="stats-header__date-picker">
@@ -108,7 +108,6 @@ export default function Products({ sellerId }) {
 
     const handleDeleteProduct = async () => {
         if (!productToDelete) return;
-
         try {
             setDeleteLoading(true);
 
@@ -197,7 +196,9 @@ export default function Products({ sellerId }) {
             {error && <div className="error-message">{error}</div>}
 
             {loading ? (
-                <div className="loading">Loading products...</div>
+                <div className="order-spinner">
+                    <div className="spinner"></div>
+                </div>
             ) : (
                 <>
                     <div className="product__grid">

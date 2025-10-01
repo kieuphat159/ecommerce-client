@@ -9,6 +9,7 @@ export default function AccountNavigation({ userId, activeTab, setActiveTab }) {
     const { logout } = useAuth();
     const navigate = useNavigate();
     const [showModal, setShowModal] = useState(false);
+    const [open, setOpen] = useState(false);
 
     const signOut = () => {
         logout();
@@ -26,27 +27,28 @@ export default function AccountNavigation({ userId, activeTab, setActiveTab }) {
         fetchUser();
     }, [userId])
 
-    const menuItems = ['Account', 'Address', 'Orders'];
+    const menuItems = ['Account', 'Address', 'Orders', 'Log Out'];
 
-    const handleDropdownChange = (e) => {
-        const value = e.target.value;
-        if (value === 'Log Out') {
+    const handleSelect = (item) => {
+        setOpen(false);
+        if (item === 'Log Out') {
             setShowModal(true);
         } else {
-            navigate(`/profile/${userId}?tab=${value}`);
-            setActiveTab(value);
+            navigate(`/profile/${userId}?tab=${item}`);
+            setActiveTab(item);
         }
     };
 
     return (
         <nav className='account__navigation'>
             <div className='account__navigation__me'>
-                <img src="/public/assets/profile.png" alt="" />
+                <img src="/images/avatar.webp" alt="" />
                 <div>{name}</div>
             </div>
 
+            {/* Desktop */}
             <div className='account__navigation__button desktop-only'>
-                {menuItems.map(item => (
+                {menuItems.slice(0,3).map(item => (
                     <button 
                         key={item} 
                         onClick={() => navigate(`/profile/${userId}?tab=${item}`)}
@@ -59,15 +61,26 @@ export default function AccountNavigation({ userId, activeTab, setActiveTab }) {
                 <button onClick={() => setShowModal(true)}>Log Out</button>
             </div>
 
-            <div className='account__navigation__dropdown mobile-only'>
-                <select value={activeTab} onChange={handleDropdownChange}>
-                    {menuItems.map(item => (
-                        <option key={item} value={item}>{item}</option>
-                    ))}
-                    <option value='Log Out'>Log Out</option>
-                </select>
+            {/* Mobile custom dropdown */}
+            <div className="account__navigation__dropdown mobile-only">
+                <div 
+                    className="dropdown-selected"
+                    onClick={() => setOpen(!open)}
+                >
+                    {activeTab} <span className="arrow">▼</span>
+                </div>
+                {open && (
+                    <ul className="dropdown-menu">
+                        {menuItems.map((item) => (
+                            <li key={item} onClick={() => handleSelect(item)}>
+                                {item}
+                            </li>
+                        ))}
+                    </ul>
+                )}
             </div>
 
+            {/* Modal confirm logout */}
             {showModal && (
                 <div className="modal-overlay">
                     <div className="modal">

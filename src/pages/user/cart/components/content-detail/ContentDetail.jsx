@@ -38,13 +38,13 @@ export default function ContentDetail({
             });
 
             if (res.success) {
-                console.log("ok: ", res.orderId);
+                // console.log("ok: ", res.orderId);
                 setHeaderTile("Complete!");
                 setActive(3);
                 setOrderId(res.orderId);
             }
         } catch (err) {
-            console.log('Order error: ', err);
+            // console.log('Order error: ', err);
         } finally {
             setLoading(false);
         }

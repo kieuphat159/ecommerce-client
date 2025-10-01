@@ -37,7 +37,7 @@ export default function Detail() {
 
             const data = await resDefault.json();
             const totalData = await resTotal.json();
-            console.log(totalData);
+            // console.log(totalData);
 
             if (data.success && data.data) {
                 let vId = 0;
@@ -129,11 +129,11 @@ export default function Detail() {
                     setOptions(data.data);
                 }
             } else {
-                console.log('Failed to fetch options');
+                // console.log('Failed to fetch options');
                 setError('Failed to fetch product options');
             }
         } catch (err) {
-            console.log('Error fetching options: ', err);
+            // console.log('Error fetching options: ', err);
             setError('Failed to fetch product options');
         } finally {
             setLoading(false);
@@ -202,7 +202,7 @@ export default function Detail() {
                 const numericPrice = parseFloat(data.price.replace(/[^0-9.-]+/g, ""));
                 setPricePerUnit(numericPrice);
             } catch (err) {
-                console.log('Error: ', err);
+                // console.log('Error: ', err);
                 setError('Failed to load product');
             }
         };
@@ -304,7 +304,7 @@ export default function Detail() {
                 alert(result.message || 'Failed to add to cart');
             }
         } catch (err) {
-            console.log('Err: ', err);
+            // console.log('Err: ', err);
             alert('Something went wrong while adding to cart!');
         } finally {
             setLoading(false);

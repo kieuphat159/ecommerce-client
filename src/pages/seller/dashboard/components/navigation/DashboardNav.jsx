@@ -9,10 +9,9 @@ export default function DashboardNav({ activeButton, setActiveButton, setOrderDe
     const navigate = useNavigate();
 
     const handleButtonClick = (buttonName) => {
-        setOrderDetail(0); // reset order detail khi đổi tab
+        setOrderDetail(0);
         setActiveButton(buttonName);
 
-        // Cập nhật URL query param để hỗ trợ nút Back/Forward
         navigate(`/seller?tab=${buttonName}`, { replace: false });
     };
 
