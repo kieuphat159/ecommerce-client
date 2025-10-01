@@ -229,7 +229,6 @@ export default function Detail() {
         };
         updatePrice();
     }, [selectedVariants, options, product]);
-
     const renderAttribute = (key, value) => {
         return (
             <div key={key} id="detail__attr-content" className={`detail__${key.toLowerCase()}`}>
@@ -350,27 +349,33 @@ export default function Detail() {
                             {options.map(option => (
                                 <div key={option.id} className="product__info__field">
                                     <label className="product__info__label">{option.name}</label>
-                                    <select
-                                        name={`option_${option.id}`}
-                                        onChange={handleChange}
-                                        value={selectedVariants[`option_${option.id}`] || ''}
-                                        className="product__info__select"
-                                    >
-                                        <option value="">Select {option.name}</option>
-                                        {option.values?.map(value => (
-                                            <option key={value.id} value={value.id} disabled={value.quantity === 0}>
-                                                {value.value} {value.quantity > 0 ? `` : '(Out of stock)'}
-                                            </option>
-                                        ))}
-                                    </select>
+                                    
+                                    {option.values?.map(value => {
+                                        const isSelected = selectedVariants[`option_${option.id}`] === value.id.toString();
+                                        return (
+                                            <button
+                                                key={value.id}
+                                                className={`btn-option-value ${isSelected ? 'selected' : ''}`}
+                                                value={value.id}
+                                                disabled={value.quantity === 0}
+                                                onClick={() => setSelectedVariants(prev => ({
+                                                    ...prev,
+                                                    [`option_${option.id}`]: value.id.toString()
+                                                }))}
+                                            >
+                                            {value.value} {value.quantity > 0 ? `` : '(Out of stock)'}
+                                            </button>
+                                        );
+                                        })}
+
                                 </div>
                             ))}
                             
                         </>
                     </div>
                 )}
-                <p className="product__quantity">
-                    Available Quantity: {currentQuantity}
+                <p className={`product__quantity ${currentQuantity === 0 ? `out-of-stock`: ``}`}>
+                    {totalQuantity === 0 ? 'Out of stock' : `Available Quantity: ${currentQuantity}`}
                 </p>
                 <div className="product__price">Total price: ${totalPrice}</div>
                 <div className="detail__button-section">
