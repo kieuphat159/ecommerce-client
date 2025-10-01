@@ -1,55 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './Products.css';
-
-const StatsHeader = () => {
-    const navigate = useNavigate();
-
-    return (
-        <div className="stats-header">
-            <div className="stats-header__title">
-                <h2>Products</h2>
-            </div>
-            <button className='stats-header__btn' onClick={() => navigate("/seller/create")}>
-                New product
-            </button>
-            <div className="stats-header__date-picker">
-                <span>Jan 01 - Jan 28</span>
-                <i className="fas fa-ellipsis-h"></i>
-            </div>
-            <div className="stats-grid">
-                <div className="stat-card">
-                    <div className="stat-card__info">
-                        <span className="stat-label">Revenue</span>
-                        <span className="stat-value">$75,620</span>
-                    </div>
-                    <div className="stat-card__change positive">+ 22%</div>
-                </div>
-                <div className="stat-card">
-                    <div className="stat-card__info">
-                        <span className="stat-label">Paid order</span>
-                        <span className="stat-value">520</span>
-                    </div>
-                    <div className="stat-card__change positive">+ 5.7%</div>
-                </div>
-                <div className="stat-card">
-                    <div className="stat-card__info">
-                        <span className="stat-label">Refund</span>
-                        <span className="stat-value">7,283</span>
-                    </div>
-                    <div className="stat-card__change negative">18%</div>
-                </div>
-                <div className="stat-card">
-                    <div className="stat-card__info">
-                        <span className="stat-label">Profit</span>
-                        <span className="stat-value">28%</span>
-                    </div>
-                    <div className="stat-card__change positive">+ 12%</div>
-                </div>
-            </div>
-        </div>
-    );
-};
+import AuthService from '/src/services/authService'
 
 export default function Products({ sellerId }) {
     const [loading, setLoading] = useState(false);
@@ -57,7 +9,62 @@ export default function Products({ sellerId }) {
     const [error, setError] = useState('');
     const [showConfirmModal, setShowConfirmModal] = useState(false);
     const [productToDelete, setProductToDelete] = useState(null);
+    const [revenue, setRevenue] = useState(0);
     const [deleteLoading, setDeleteLoading] = useState(false);
+    const [totalItem, setTotalItem] = useState(0);
+    
+  const fetchRevenue = async () => {
+    try{
+      const response = await AuthService.apiCall(`/seller/revenue`, {
+        method: "GET",
+        headers: { "Content-Type": "application/json" }
+      });
+      if (response.success) {
+        setRevenue(response.data);
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  }
+
+  const StatsHeader = () => {
+    const stats = [
+      { label: 'Revenue', value: revenue, change: '+ 22%', type: 'positive' },
+      { label: 'Orders', value: totalItem, change: '+ 5.7%', type: 'positive' },
+      { label: 'Visitors', value: '7,283', change: '18%', type: 'negative' },
+      { label: 'Conversion', value: '28%', change: '+ 12%', type: 'positive' }
+    ];
+
+    return (
+      <div className="stats-header">
+        <div className="stats-header__title">
+          <h2>Orders</h2>
+        </div>
+
+        {/* <div className="stats-header__date-picker">
+          <span>Jan 01 - Jan 28</span>
+          <i className="fas fa-ellipsis-h"></i>
+        </div> */}
+        <button className='stats-header__btn' onClick={() => navigate("/seller/create")}>
+                New product
+            </button>
+
+        <div className="stats-grid">
+          {stats.map((stat, index) => (
+            <div key={index} className="stat-card">
+              <div className="stat-card__info">
+                <span className="stat-label">{stat.label}</span>
+                <span className="stat-value">{stat.value}</span>
+              </div>
+              <div className={`stat-card__change ${stat.type}`}>
+                {stat.change}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  };
 
  
     const [currentPage, setCurrentPage] = useState(1);
@@ -144,6 +151,7 @@ export default function Products({ sellerId }) {
 
     useEffect(() => {
         getProducts(currentPage);
+        fetchRevenue();
     }, [sellerId, currentPage]);
 
     const renderPagination = () => {

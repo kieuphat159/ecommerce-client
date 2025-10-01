@@ -10,12 +10,27 @@ export default function Orders() {
   const [totalItem, setTotalItem] = useState(0);
   const [showModal, setShowModal] = useState(false);
   const [orderToDelete, setOrderToDelete] = useState(null);
+  const [revenue, setRevenue] = useState(0);
 
   const navigate = useNavigate();
 
+  const fetchRevenue = async () => {
+    try{
+      const response = await AuthService.apiCall(`/seller/revenue`, {
+        method: "GET",
+        headers: { "Content-Type": "application/json" }
+      });
+      if (response.success) {
+        setRevenue(response.data);
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  }
+
   const StatsHeader = () => {
     const stats = [
-      { label: 'Revenue', value: '$75,620', change: '+ 22%', type: 'positive' },
+      { label: 'Revenue', value: revenue, change: '+ 22%', type: 'positive' },
       { label: 'Orders', value: totalItem, change: '+ 5.7%', type: 'positive' },
       { label: 'Visitors', value: '7,283', change: '18%', type: 'negative' },
       { label: 'Conversion', value: '28%', change: '+ 12%', type: 'positive' }
@@ -27,10 +42,10 @@ export default function Orders() {
           <h2>Orders</h2>
         </div>
 
-        <div className="stats-header__date-picker">
+        {/* <div className="stats-header__date-picker">
           <span>Jan 01 - Jan 28</span>
           <i className="fas fa-ellipsis-h"></i>
-        </div>
+        </div> */}
 
         <div className="stats-grid">
           {stats.map((stat, index) => (
@@ -67,6 +82,7 @@ export default function Orders() {
 
   useEffect(() => {
     fetchOrders();
+    fetchRevenue();
   }, [page]);
 
   const handleDeleteClick = (orderId) => {

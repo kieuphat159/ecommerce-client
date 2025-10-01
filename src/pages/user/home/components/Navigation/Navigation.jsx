@@ -189,6 +189,11 @@ export default function Navigation({userId}) {
                     <Link to="/contact-us" className="navigation__mobile-link" onClick={toggleMenu}>
                         Contact Us
                     </Link>
+                    {isAuthenticated && user.role === 'customer' && (
+                    <Link to={`/profile/${user.userId}`} className="navigation__mobile-link" onClick={toggleMenu}>
+                        Profile
+                    </Link>
+                    )}
                 </div>
 
                 <div className="navigation__mobile-bottom">

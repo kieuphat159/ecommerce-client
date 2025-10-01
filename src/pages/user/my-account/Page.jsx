@@ -5,7 +5,9 @@ import Orders from './components/Orders/Orders';
 import { useParams, useLocation } from 'react-router-dom'; 
 import AuthService from '/src/services/authService';
 import { useEffect, useState } from 'react';
+import Account from './components/Account/Account'
 import OrderComplete from '../cart/components/order-complete/OrderComplete';
+import Address from './components/Address/Address';
 
 export default function MyAccountPage() {
     const { userId } = useParams();
@@ -70,8 +72,8 @@ export default function MyAccountPage() {
                     setActiveTab={setActiveTab}
                 />
                 <div className="account__content">
-                    {activeTab === 'Account' && <div></div>}
-                    {activeTab === 'Address' && <div></div>}
+                    {activeTab === 'Account' && <Account />}
+                    {activeTab === 'Address' && <Address />}
                     {activeTab === 'Orders' && (() => {
                         const queryParams = new URLSearchParams(location.search);
                         const orderId = queryParams.get("orderId");

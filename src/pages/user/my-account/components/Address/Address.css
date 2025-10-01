@@ -1,0 +1,58 @@
+.address {
+    width: 100%;
+}
+
+.address__title {
+    font-size: 26px;
+    font-weight: bold;
+    margin-bottom: 16px;
+}
+
+.address__list {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+.address__card {
+    flex: 1;
+    min-width: 260px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    padding: 12px;
+    background-color: #fff;
+}
+
+.address__card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.address__card-title {
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.address__edit {
+    background: none;
+    border: none;
+    font-size: 12px;
+    color: #666;
+    cursor: pointer;
+}
+
+.address__edit:hover {
+    text-decoration: underline;
+}
+
+.address__card-body {
+    font-size: 14px;
+    line-height: 1.5;
+    color: #333;
+}
+
+.address__text {
+    margin: 2px 0;
+}
