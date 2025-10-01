@@ -65,7 +65,7 @@ export default function Products() {
             const data = await response.json(); 
             if (data.success) setCategories(data.data);
         } catch (err) {
-            console.log('Fail to fetch categories: ', err);
+            // console.log('Fail to fetch categories: ', err);
         } finally {
             setLoading(false);
         }
@@ -82,7 +82,7 @@ export default function Products() {
             const data = await response.json();
 
             if (data.success) {
-                console.log('opp: ', data.data);
+                // console.log('opp: ', data.data);
                 setRealProducts(data.data);
                 setError(null);
                 setTotalPages(data.pagination.totalPages);

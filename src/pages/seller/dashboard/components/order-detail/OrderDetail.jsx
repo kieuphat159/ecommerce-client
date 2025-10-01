@@ -21,9 +21,9 @@ export default function OrderDetail(setOrderDetail) {
     setShowDeleteConfirm(false);
     setLoading(true);
     try {
-      await AuthService.apiCall(`/seller/orders/${orderId}`, {
-        method: "DELETE",
-        headers: { "Content-Type": "application/json" }
+      await AuthService.apiCall(`/seller/order/status/${orderId}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
       });
 
       setShowModal(false);
@@ -80,7 +80,7 @@ export default function OrderDetail(setOrderDetail) {
       const response = await AuthService.apiCall(`/seller/order/status/${orderId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ status: pendingStatus })
+        body: JSON.stringify({ status: 'completed' })
       });
       if (response.success) {
         setCurrentStatus(pendingStatus);
@@ -185,7 +185,7 @@ export default function OrderDetail(setOrderDetail) {
             </div>
           </div>
           {currentStatus === 'pending' && (
-            <button className='delete-order' onClick={() => setShowDeleteConfirm(true)}>Cancel this order?</button>
+            <button className='delete-order' onClick={() => setShowDeleteConfirm(true)}>Mark as completed</button>
           )}
         </div>
       )}
@@ -206,9 +206,9 @@ export default function OrderDetail(setOrderDetail) {
       {showDeleteConfirm && (
         <div className="modal-overlay">
           <div className="modal">
-            <h3>Confirm delete order</h3>
+            <h3>Confirm completing order</h3>
             <p>
-              Are you sure you want to delete order <strong>{orderId}</strong>?
+              Are you sure you want to mark order <strong>{orderId}</strong> as completed?
             </p>
             <div className="modal-actions">
               <button className="btn btn-cancel" onClick={() => setShowDeleteConfirm(false)}>Cancel</button>

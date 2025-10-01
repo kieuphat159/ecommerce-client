@@ -20,8 +20,10 @@ export default function ContentDetail({
     const [lastName, setLastName] = useState("");
     const [phoneNumber, setPhoneNumber] = useState("");
     const [emailAddress, setEmailAddress] = useState("");
+    const [loading, setLoading] = useState(false);
 
     const placeOrder = async () => {
+        setLoading(true);
         try {
             const res = await AuthService.apiCall(`/user/place-order/${cartId}`, {
                 method: "POST",
@@ -36,13 +38,15 @@ export default function ContentDetail({
             });
 
             if (res.success) {
-                console.log("ok: ", res.orderId);
+                // console.log("ok: ", res.orderId);
                 setHeaderTile("Complete!");
                 setActive(3);
                 setOrderId(res.orderId);
             }
         } catch (err) {
-            console.log('Order error: ', err);
+            // console.log('Order error: ', err);
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -81,6 +85,11 @@ export default function ContentDetail({
     
     return (
         <div className='content-detail'>
+            {loading && (
+                <div className="order-spinner">
+                    <div className="spinner"></div>
+                </div>
+            )}
             <div className="content-detail__left-column">
                 <div className="content-detail__contact Content">
                     <h2 className='contact__title title'>Contact Information</h2>

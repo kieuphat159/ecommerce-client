@@ -6,7 +6,7 @@ const ProtectedRoute = ({ children, requiredRole }) => {
   const [loading, setLoading] = useState(true);
   const [isAuthorized, setIsAuthorized] = useState(false);
   const [userRole, setUserRole] = useState(null);
-console.log(requiredRole);
+// console.log(requiredRole);
   useEffect(() => {
     checkAuthorization();
   }, [requiredRole]);
@@ -15,12 +15,12 @@ console.log(requiredRole);
     try {
       const token = authService.getToken();
       
-      console.log('=== ProtectedRoute Debug ===');
-      console.log('Token exists:', !!token);
-      console.log('Required Role:', requiredRole);
+      // console.log('=== ProtectedRoute Debug ===');
+      // console.log('Token exists:', !!token);
+      // console.log('Required Role:', requiredRole);
       
       if (!token) {
-        console.log('No token found, redirecting to signin');
+        // console.log('No token found, redirecting to signin');
         setIsAuthorized(false);
         setLoading(false);
         return;
@@ -30,28 +30,28 @@ console.log(requiredRole);
       const payload = JSON.parse(atob(token.split('.')[1]));
       const currentTime = Date.now() / 1000;
 
-      console.log('Token payload:', payload);
-      console.log('Current time:', currentTime);
-      console.log('Token exp:', payload.exp);
-      console.log('Token valid:', payload.exp > currentTime);
+      // console.log('Token payload:', payload);
+      // console.log('Current time:', currentTime);
+      // console.log('Token exp:', payload.exp);
+      // console.log('Token valid:', payload.exp > currentTime);
 
       // Kiểm tra token hết hạn
       if (payload.exp < currentTime) {
-        console.log('Token expired, clearing and redirecting');
+        // console.log('Token expired, clearing and redirecting');
         authService.refreshAccessToken();
         setLoading(false);
         return;
       }
 
       setUserRole(payload.role);
-      console.log('User role from token:', payload.role);
+      // console.log('User role from token:', payload.role);
 
       // Kiểm tra role nếu có yêu cầu
       if (requiredRole && payload.role !== requiredRole) {
-        console.log(`Role mismatch: required ${requiredRole}, got ${payload.role}`);
+        // console.log(`Role mismatch: required ${requiredRole}, got ${payload.role}`);
         setIsAuthorized(false);
       } else {
-        console.log('Authorization successful');
+        // console.log('Authorization successful');
         setIsAuthorized(true);
       }
 
@@ -82,18 +82,18 @@ console.log(requiredRole);
     const token = authService.getToken();
     
     if (!token) {
-      console.log('Redirecting to signin: No token');
+      // console.log('Redirecting to signin: No token');
       return <Navigate to="/signin" replace />;
     } else if (requiredRole && userRole !== requiredRole) {
-      console.log('Redirecting to home: Wrong role');
+      // console.log('Redirecting to home: Wrong role');
       return <Navigate to="/" replace />;
     } else {
-      console.log('Redirecting to signin: Token expired or other error');
+      // console.log('Redirecting to signin: Token expired or other error');
       return <Navigate to="/signin" replace />;
     }
   }
 
-  console.log('Rendering protected content');
+  // console.log('Rendering protected content');
   return children;
 };
 

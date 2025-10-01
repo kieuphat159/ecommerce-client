@@ -17,10 +17,10 @@ export default function OrderComplete({
     const [paymentMethod, setPaymentMethod] = useState('');
     const [loading, setLoading] = useState(false)
 
-    console.log('OrderComplete rendered with orderId:', orderId);
+    // console.log('OrderComplete rendered with orderId:', orderId);
 
     const fetchOrder = async () => {
-        console.log('Fetching order with ID:', orderId);
+        // console.log('Fetching order with ID:', orderId);
         setLoading(true);
         try {
             const result = await AuthService.apiCall(`/user/order/${orderId}`, { method: 'GET' });
@@ -37,7 +37,7 @@ export default function OrderComplete({
                 );
             }
         } catch (err) {
-            console.log('Error fetching order: ', err);
+            // console.log('Error fetching order: ', err);
         } finally {
             setLoading(false);
         }
@@ -69,7 +69,7 @@ export default function OrderComplete({
     };
 
 useEffect(() => {
-    console.log('useEffect called with orderId:', orderId);
+    // console.log('useEffect called with orderId:', orderId);
     fetchOrder();
 }, [orderId]);
 

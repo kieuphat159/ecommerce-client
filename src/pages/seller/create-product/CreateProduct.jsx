@@ -36,8 +36,8 @@ const UploadProduct = ({sellerId}) => {
       })
       const data = await response.json();
       setCategories(data.data)
-      // console.log('Categories data:', data);
-      // console.log('ookk: ', response);
+      // // console.log('Categories data:', data);
+      // // console.log('ookk: ', response);
     } catch (err) {
       console.error('Failed to fetch categories:', err.message);
     }
@@ -96,7 +96,7 @@ const UploadProduct = ({sellerId}) => {
       setUploadResult(data);
       return data;
     } catch (err) {
-      console.log("Error uploading image: ", err);
+      // // console.log("Error uploading image: ", err);
       throw new Error("Failed to upload image");
     }
   };
@@ -178,7 +178,7 @@ const UploadProduct = ({sellerId}) => {
       const fileInput = document.querySelector('input[type="file"]');
       if (fileInput) fileInput.value = '';
       
-      console.log('Product created successfully:', createResult.data);
+      // // console.log('Product created successfully:', createResult.data);
       
     } else {
       throw new Error(createResult.message || 'Failed to create product');

@@ -20,7 +20,7 @@ class AuthService {
     setUserInfo(userInfo) {
         this.userInfo = userInfo;
         localStorage.setItem('userInfo', JSON.stringify(userInfo));
-        console.log('User info saved:', userInfo);
+        // console.log('User info saved:', userInfo);
     }
 
     getUserInfo() {

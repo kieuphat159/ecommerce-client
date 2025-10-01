@@ -27,11 +27,11 @@ export default function Navigation({userId}) {
                 headers: { "Content-Type": "application/json" }
             });
             if (response.success) {
-                console.log('Cart data: ', response.data);
+                // console.log('Cart data: ', response.data);
                 setCartQuantity(response.data);
             }
         } catch (err) {
-            console.log('Err: ', err);
+            // console.log('Err: ', err);
         }
     }
 
@@ -54,7 +54,7 @@ export default function Navigation({userId}) {
 
     const handleSearch = (e) => {
         e.preventDefault();
-        console.log("Searching for:", searchQuery);
+        // console.log("Searching for:", searchQuery);
     };
 
     return (
@@ -116,7 +116,7 @@ export default function Navigation({userId}) {
 
             <div className={`navigation__mobile-menu ${isMenuOpen ? 'active' : ''}`}>
                 <div className="navigation__mobile-header">
-                    <div className="navigation__mobile-logo">3legant.</div>
+                    <div className="navigation__mobile-logo" onClick={() => navigate('/')}>3legant.</div>
                     <button className="navigation__close" onClick={toggleMenu}>
                         <span className="navigation__close-icon">×</span>
                     </button>
@@ -189,6 +189,11 @@ export default function Navigation({userId}) {
                     <Link to="/contact-us" className="navigation__mobile-link" onClick={toggleMenu}>
                         Contact Us
                     </Link>
+                    {isAuthenticated && user.role === 'customer' && (
+                    <Link to={`/profile/${user.userId}`} className="navigation__mobile-link" onClick={toggleMenu}>
+                        Profile
+                    </Link>
+                    )}
                 </div>
 
                 <div className="navigation__mobile-bottom">
@@ -200,12 +205,6 @@ export default function Navigation({userId}) {
                                 <span className="navigation__badge">{cartQuantity}</span>
                             )}
                         </button>
-                        
-                        <Link to="#" className="navigation__mobile-action" onClick={toggleMenu}>
-                            <img src="/assets/heart.png" className="navigation__mobile-icon" alt="Wishlist" />
-                            <span>Wishlist</span>
-                            <span className="navigation__badge">2</span>
-                        </Link>
                     </div>
 
                     {!isAuthenticated ? (

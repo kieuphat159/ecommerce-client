@@ -48,15 +48,15 @@ const UpdateProduct = ({ sellerId }) => {
         const data = await response.json();
         if (data.success && data.data) {
           const optionsData = data.data;
-          console.log('Options: ', optionsData);
+          // console.log('Options: ', optionsData);
           setOptions(optionsData);
           optionsData.forEach(option => fetchOptionValues(option.id));
         }
       } else {
-        console.log('Failed to fetch options');
+        // console.log('Failed to fetch options');
       }
     } catch (err) {
-      console.log('Error fetching options: ', err);
+      // console.log('Error fetching options: ', err);
     }
   };
 
@@ -72,17 +72,17 @@ const UpdateProduct = ({ sellerId }) => {
       if (response.ok) {
         const data = await response.json();
         if (data.success && data.data) {
-          console.log(`Option values for ${option_id}: `, data.data);
+          // console.log(`Option values for ${option_id}: `, data.data);
           setOptionValues(prev => ({
             ...prev,
             [option_id]: data.data
           }));
         }
       } else {
-        console.log(`Failed to fetch option values for option ${option_id}`);
+        // console.log(`Failed to fetch option values for option ${option_id}`);
       }
     } catch (err) {
-      console.log(`Error fetching option values for option ${option_id}: `, err);
+      // console.log(`Error fetching option values for option ${option_id}: `, err);
     }
   };
 
@@ -164,14 +164,14 @@ const UpdateProduct = ({ sellerId }) => {
         const data = await response.json();
         if (data.success && data.data) {
           const stocksData = data.data;
-          console.log('Stock: ', stocksData);
+          // console.log('Stock: ', stocksData);
           setStocks(stocksData);
         }
       } else {
-        console.log('Failed to fetch stock');
+        // console.log('Failed to fetch stock');
       }
     } catch (err) {
-      console.log('Error fetching stock: ', err);
+      // console.log('Error fetching stock: ', err);
     }
   };
 
@@ -192,7 +192,7 @@ const UpdateProduct = ({ sellerId }) => {
         const data = await response.json();
         if (data.success && data.data) {
           const productData = data.data;
-          console.log('Data:', data);
+          // console.log('Data:', data);
           setProduct({
             name: productData.name || '',
             price: productData.price ? String(productData.price).replace(/[^0-9.]/g, '') : '',
@@ -203,7 +203,7 @@ const UpdateProduct = ({ sellerId }) => {
             sku: productData.sku || ''
           });
           setOriginalProduct(productData);
-          console.log('Product data: ', productData);
+          // console.log('Product data: ', productData);
           setCurrentImage(productData.image);
         } else {
           throw new Error(data.message || 'Product not found');
@@ -268,7 +268,7 @@ const UpdateProduct = ({ sellerId }) => {
       setUploadResult(data);
       return data;
     } catch (err) {
-      console.log("Error uploading image: ", err);
+      // console.log("Error uploading image: ", err);
       throw new Error("Failed to upload image");
     }
   };
@@ -331,7 +331,7 @@ const UpdateProduct = ({ sellerId }) => {
       }
 
       if (openStock && product.stock && product.quantity) {
-        console.log(">>> [FE] Submitting stock add with:", {
+         console.log("", {
           entityId: id,
           stockId: product.stock,
           quantity: product.quantity,
@@ -360,7 +360,7 @@ const UpdateProduct = ({ sellerId }) => {
         });
 
         const stockResult = await response.json();
-        console.log(">>> [FE] Stock API response:", stockResult);
+        // console.log(">>> [FE] Stock API response:", stockResult);
 
         if (!stockResult.success) {
           throw new Error(stockResult.message || 'Failed to update stock');

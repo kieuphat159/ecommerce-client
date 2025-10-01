@@ -46,7 +46,7 @@ export default function Products() {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
       const data = await response.json();
-      console.log("ok", data);
+      // console.log("ok", data);
       
       if (data.success) {
         setProducts(data.data);
@@ -171,6 +171,36 @@ export default function Products() {
           )}
         </div>
       </section>
+      <div className='features-section'>
+                    <div className='feature-item'>
+                        <img src="/images/fast delivery.png" alt="shipping" className='feature-icon' />
+                        <div className='feature-content'>
+                            <h3 className='feature-title'>Free Shipping</h3>
+                            <p className='feature-text'>Order above $200</p>
+                        </div>
+                    </div>
+                    <div className='feature-item'>
+                        <img src="/images/money.png" alt="money back" className='feature-icon' />
+                        <div className='feature-content'>
+                            <h3 className='feature-title'>Money-back</h3>
+                            <p className='feature-text'>30 days guarantee</p>
+                        </div>
+                    </div>
+                    <div className='feature-item'>
+                        <img src="/images/lock 01.png" alt="secure payments" className='feature-icon' />
+                        <div className='feature-content'>
+                            <h3 className='feature-title'>Secure Payments</h3>
+                            <p className='feature-text'>Secured by Stripe</p>
+                        </div>
+                    </div>
+                    <div className='feature-item'>
+                        <img src="/images/call.png" alt="support" className='feature-icon' />
+                        <div className='feature-content'>
+                            <h3 className='feature-title'>24/7 Support</h3>
+                            <p className='feature-text'>Phone and Email support</p>
+                        </div>
+                    </div>
+                </div>
     </main>
   );
 }
