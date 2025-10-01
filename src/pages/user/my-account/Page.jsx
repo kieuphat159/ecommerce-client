@@ -16,6 +16,7 @@ export default function MyAccountPage() {
     const [page, setPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
     const [activeTab, setActiveTab] = useState('Account'); 
+    const [loading, setLoading] = useState(false);
     const limit = 5;
 
     useEffect(() => {
@@ -27,6 +28,7 @@ export default function MyAccountPage() {
     }, [location.search]);
 
     const fetchOrders = async (pageNum) => {
+        setLoading(true);
         try {
             const data = await AuthService.apiCall(
                 `/user/my-orders/${userId}?page=${pageNum}&limit=${limit}`,
@@ -50,6 +52,8 @@ export default function MyAccountPage() {
             }
         } catch (err) {
             console.error('Err: ', err);
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -61,6 +65,11 @@ export default function MyAccountPage() {
 
     return (
         <div className="account">
+            {loading && (
+                <div className="order-spinner">
+                    <div className="spinner"></div>
+                </div>
+            )}
             <Navigation userId={userId} />
             <div className="account__header">
                 <h1>My Account</h1>
