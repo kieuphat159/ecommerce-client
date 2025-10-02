@@ -29,11 +29,41 @@ const UpdateProduct = ({ sellerId }) => {
   const [loadedVariant, setLoadedVariant] = useState(false);
   const [newOptionName, setNewOptionName] = useState('');
   const [newOptionValue, setNewOptionValue] = useState({});
+  const [variantQuantities, setVariantQuantities] = useState({});
+
   const navigate = useNavigate();
   
   const [options, setOptions] = useState([]);
   const [optionValues, setOptionValues] = useState({});
   const [currentQuantity, setCurrentQuantity] = useState(0);
+
+  const generateCombinations = () => {
+    if (options.length === 0) return [];
+
+    const valuesArray = options.map(opt => optionValues[opt.id] || []);
+    if (valuesArray.some(arr => arr.length === 0)) return [];
+
+    const cartesian = (arr) =>
+      arr.reduce((a, b) => a.flatMap(d => b.map(e => [...d, e])), [[]]);
+
+    return cartesian(valuesArray).map(comb =>
+      comb.map((val, idx) => ({
+        optionId: options[idx].id,
+        optionName: options[idx].name,
+        valueId: val.id,
+        valueName: val.value
+      }))
+    );
+  };
+
+
+  const handleQuantityChange = (key, quantity) => {
+    setVariantQuantities(prev => ({
+      ...prev,
+      [key]: quantity
+    }));
+  };
+
 
   const fetchOptions = async () => {
     try {
@@ -293,7 +323,7 @@ const UpdateProduct = ({ sellerId }) => {
     setError('');
     setResult(null);
     setUploadResult(null);
-    
+
     try {
       if (!product.name.trim()) {
         throw new Error('Product name is required');
@@ -307,7 +337,7 @@ const UpdateProduct = ({ sellerId }) => {
 
       let imageUploadData = null;
       let imageUrl = currentImage;
-      
+
       if (files.length > 0) {
         imageUploadData = await uploadImage();
         imageUrl = imageUploadData?.url?.[0] || currentImage;
@@ -330,40 +360,44 @@ const UpdateProduct = ({ sellerId }) => {
         throw new Error(updateResult.message || 'Failed to update product');
       }
 
-      if (openStock && product.stock && product.quantity) {
-         console.log("", {
-          entityId: id,
-          stockId: product.stock,
-          quantity: product.quantity,
-          options: Object.keys(optionValues).reduce((acc, optionId) => {
-            acc[optionId] = product[`option_${optionId}`] || null;
-            return acc;
-          }, {})
-        });
-
+      // 🔥 Xử lý thêm stock theo bảng variantQuantities
+      if (openStock && product.stock) {
         const token = localStorage.getItem('token');
-        const response = await fetch(`${import.meta.env.VITE_API_URL}/api/stock/add`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${token}`
-          },
-          body: JSON.stringify({
-            entityId: id,
-            stockId: product.stock,
-            quantity: parseInt(product.quantity, 10),
-            options: Object.keys(optionValues).reduce((acc, optionId) => {
-              acc[optionId] = product[`option_${optionId}`] || null;
-              return acc;
-            }, {})
-          })
-        });
 
-        const stockResult = await response.json();
-        // console.log(">>> [FE] Stock API response:", stockResult);
+        // duyệt từng combination
+        for (const [key, qty] of Object.entries(variantQuantities)) {
+          if (!qty || qty <= 0) continue; // bỏ qua nếu chưa nhập
 
-        if (!stockResult.success) {
-          throw new Error(stockResult.message || 'Failed to update stock');
+          // key là dạng "1-4" (id của option value)
+          const optionIds = key.split('-').map(id => parseInt(id, 10));
+
+          // chuyển thành object { optionId: valueId }
+          const optionMap = {};
+          optionIds.forEach((valId, idx) => {
+            const optId = options[idx]?.id;
+            if (optId) {
+              optionMap[optId] = valId;
+            }
+          });
+
+          const response = await fetch(`${import.meta.env.VITE_API_URL}/api/stock/add`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "Authorization": `Bearer ${token}`
+            },
+            body: JSON.stringify({
+              entityId: id,
+              stockId: product.stock,
+              quantity: parseInt(qty, 10),
+              options: optionMap
+            })
+          });
+
+          const stockResult = await response.json();
+          if (!stockResult.success) {
+            throw new Error(stockResult.message || 'Failed to update stock');
+          }
         }
       }
 
@@ -382,6 +416,7 @@ const UpdateProduct = ({ sellerId }) => {
       setLoading(false);
     }
   };
+
 
   const handleDelete = async () => {
     if (!window.confirm('Are you sure you want to delete this product? This action cannot be undone.')) {
@@ -690,50 +725,42 @@ const UpdateProduct = ({ sellerId }) => {
                       </div>
 
                       {openVariant && (
-                        <>
-                          {options.map(option => (
-                            <div key={option.id} className="info__field">
-                              <label className="product__info__label">{option.name}</label>
-                              <select
-                                name={`option_${option.id}`}
-                                onChange={handleChange}
-                                disabled={loading}
-                                className="product__info__select"
-                              >
-                                <option value="">None</option>
-                                {optionValues[option.id]?.map(value => (
-                                  <option key={value.id} value={value.id}>
-                                    {value.value}
-                                  </option>
+                        <div className="variant-table">
+                          <table>
+                            <thead>
+                              <tr>
+                                {options.map(opt => (
+                                  <th key={opt.id}>{opt.name}</th>
                                 ))}
-                              </select>
-                              <div className="info__field" style={{ display: 'flex', gap: '8px' }}>
-                                <input
-                                  type="text"
-                                  value={newOptionValue[option.id] || ''}
-                                  onChange={(e) =>
-                                    setNewOptionValue(prev => ({
-                                      ...prev,
-                                      [option.id]: e.target.value
-                                    }))
-                                  }
-                                  placeholder={`Enter value for ${option.name} (e.g., Red)`}
-                                  disabled={loading}
-                                  className="product__info__input"
-                                />
-                                <button
-                                  type="button"
-                                  className="header__button add-option-button"
-                                  onClick={() => addOptionValue(option.id)}
-                                  disabled={loading}
-                                >
-                                  {loading ? 'Adding...' : 'Add Value'}
-                                </button>
-                              </div>
-                            </div>
-                          ))}
-                        </>
+                                <th>Quantity</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {generateCombinations().map((comb, index) => {
+                                const key = comb.map(c => c.valueId).join('-');
+                                return (
+                                  <tr key={index}>
+                                    {comb.map(c => (
+                                      <td key={c.optionId}>{c.valueName}</td>
+                                    ))}
+                                    <td>
+                                      <input
+                                        type="number"
+                                        value={variantQuantities[key] || 0}
+                                        min="0"
+                                        onChange={(e) =>
+                                          handleQuantityChange(key, parseInt(e.target.value, 10))
+                                        }
+                                      />
+                                    </td>
+                                  </tr>
+                                );
+                              })}
+                            </tbody>
+                          </table>
+                        </div>
                       )}
+
 
                       <div className="info__field">
                         <label className="product__info__label">Quantity *</label>

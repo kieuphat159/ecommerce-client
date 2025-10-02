@@ -95,10 +95,6 @@ body {
     margin-bottom: 10px;
 }
 
-.info__field input {
-    
-}
-
 .product__info__label {
     display: block;
     font-size: 14px;
@@ -195,6 +191,50 @@ body {
     margin-top: 10px;
 }
 
+/* Variant and stock table */
+.variant-stock-table {
+    margin-top: 16px;
+}
+
+.variant-stock-table table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: #ffffff;
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+.variant-stock-table th,
+.variant-stock-table td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid #d1d1d1;
+}
+
+.variant-stock-table th {
+    background-color: #f5f5f5;
+    font-weight: 600;
+    font-size: 14px;
+    color: #1a1a1a;
+}
+
+.variant-stock-table td {
+    font-size: 14px;
+    color: #1a1a1a;
+}
+
+.option-value-input {
+    display: flex;
+    gap: 8px;
+    margin-top: 8px;
+}
+
+.new-option-row {
+    display: flex;
+    gap: 8px;
+    padding: 12px;
+}
+
 /* Error and result messages */
 .error,
 .result {
@@ -243,6 +283,7 @@ body {
     border-radius: 50%;
     animation: spin 1s linear infinite;
 }
+
 .modal-overlay {
     position: fixed;
     top: 0; left: 0; right: 0; bottom: 0;
@@ -295,5 +336,10 @@ body {
 
     .header__title {
         margin-bottom: 8px;
+    }
+
+    .variant-stock-table table {
+        display: block;
+        overflow-x: auto;
     }
 }
