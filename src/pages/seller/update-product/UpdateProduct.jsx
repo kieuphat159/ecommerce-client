@@ -49,7 +49,7 @@ const UpdateProduct = ({ sellerId }) => {
       const json = await res.json();
       const apiData = json.data || [];
       const quantities = {};
-      console.log(apiData)
+//       console.log(apiData)
       apiData.forEach(item => {
         quantities[item.option_key] = Number(item.quantity); 
       });
@@ -94,16 +94,33 @@ const UpdateProduct = ({ sellerId }) => {
           'Authorization': `Bearer ${token}`
         }
       });
-      if (response.ok) {
-        const data = await response.json();
-        if (data.success && data.data) {
-          const optionsData = data.data;
-          setOptions(optionsData);
-          optionsData.forEach(option => fetchOptionValues(option.id));
-        }
+      if (!response.ok) {
+        console.warn('fetchOptions response not ok', response.status);
+        return;
+      }
+      const data = await response.json();
+      // console.log for debugging
+      console.log('fetchOptions raw:', data);
+
+      if (data.success && Array.isArray(data.data)) {
+        // normalize mỗi option để luôn có .id
+        const optionsData = data.data.map(raw => {
+          const optId = raw.id ?? raw.option_id ?? raw.optionId;
+          return {
+            ...raw,
+            id: optId,
+            name: raw.name ?? raw.label ?? raw.title ?? ''
+          };
+        });
+        setOptions(optionsData);
+
+        // fetch values cho mọi option (safety)
+        optionsData.forEach(opt => {
+          if (opt.id) fetchOptionValues(opt.id).catch(e => console.error('fetchOptionValues error:', e));
+        });
       }
     } catch (err) {
-      // console.log('Error fetching options: ', err);
+      console.error('Error fetching options: ', err);
     }
   };
 
@@ -130,6 +147,15 @@ const UpdateProduct = ({ sellerId }) => {
     }
   };
 
+  useEffect(() => {
+  options.forEach(opt => {
+    const optId = opt?.id ?? opt?.option_id ?? opt?.optionId;
+    if (optId && !optionValues[optId]) {
+      fetchOptionValues(optId).catch(err => console.error('fetchOptionValues error:', err));
+    }
+  });
+}, [options]);
+
   const addOption = async () => {
     if (!newOptionName.trim()) {
       setError('Option name is required');
@@ -146,11 +172,36 @@ const UpdateProduct = ({ sellerId }) => {
         body: JSON.stringify({ product_id: id, name: newOptionName })
       });
       const data = await response.json();
+      // console.log('addOption response:', data);
+
       if (data.success && data.data) {
-        setOptions(prev => [...prev, data.data]);
+        const raw = data.data;
+        const optId = raw.id ?? raw.option_id ?? raw.optionId;
+        const normalized = {
+          ...raw,
+          id: optId,
+          name: raw.name ?? raw.label ?? raw.title ?? ''
+        };
+
+        // optimistic add so UI thấy ngay
+        setOptions(prev => {
+          // avoid duplicate
+          if (prev.some(o => (o.id ?? o.option_id) === normalized.id)) return prev;
+          return [...prev, normalized];
+        });
+
+        // ensure optionValues has an entry so UI shows "No values added yet"
+        setOptionValues(prev => ({ ...prev, [normalized.id]: prev[normalized.id] ?? [] }));
+
         setNewOptionName('');
         setError('');
-        setOptionValues(prev => ({ ...prev, [data.data.id]: [] }));
+
+        // IMPORTANT: fetch full options list from server to ensure consistency
+        // (and to pick up server-assigned fields)
+        await fetchOptions();
+
+        // Also reset loadedVariant so toggles won't block future fetches if you use that flag elsewhere
+        setLoadedVariant(false);
       } else {
         throw new Error(data.message || 'Failed to add option');
       }
@@ -159,7 +210,6 @@ const UpdateProduct = ({ sellerId }) => {
       setError(err.message || 'Failed to add option');
     }
   };
-
   const addOptionValue = async (option_id) => {
     const value = newOptionValue[option_id]?.trim();
     if (!value) {
@@ -631,7 +681,7 @@ const UpdateProduct = ({ sellerId }) => {
                         <div className="info__field product__variants-manager">
                           <label className="product__info__label">Manage Option Values</label>
                           {options.map(option => (
-                            <div key={option.id} className="option-manager">
+                            <div key={option.id ?? option.option_id ?? option.optionId ?? option.name} className="option-manager">
                               <h4 className="option-name">{option.name}</h4>
                               <div className="current-values">
                                 {(optionValues[option.id]?.length > 0)
