@@ -124,7 +124,6 @@ const UploadProduct = ({sellerId}) => {
   setUploadResult(null);
   
   try {
-    // Validation
     if (!product.name.trim()) {
       throw new Error('Product name is required');
     }
@@ -200,6 +199,11 @@ const UploadProduct = ({sellerId}) => {
 
   return (
     <>
+    {loading && (
+        <div className="order-spinner">
+        <div className="spinner"></div>
+        </div>
+    )}
     <div className="header">
             <h2 className="header__title">Create Product</h2>
             <div>
@@ -338,22 +342,6 @@ const UploadProduct = ({sellerId}) => {
         </button>
       </form>
       
-      {/* Display upload result if available */}
-      {uploadResult && (
-        <div className="upload-result-section" style={{ marginTop: '20px' }}>
-          <h4>Image Upload Result:</h4>
-          <pre style={{ 
-            backgroundColor: '#f5f5f5', 
-            padding: '10px', 
-            borderRadius: '4px',
-            overflow: 'auto',
-            fontSize: '12px'
-          }}>
-            {JSON.stringify(uploadResult, null, 2)}
-          </pre>
-        </div>
-      )}
-      
       {result && (
         <div className="modal-overlay">
           <div className="modal">
@@ -368,14 +356,6 @@ const UploadProduct = ({sellerId}) => {
                 <p><strong>Status:</strong> {result.data.status === 1 ? 'Active' : 'Inactive'}</p>
               </div>
             )}
-            <details >
-              <summary >
-                View Raw Response
-              </summary>
-              <pre >
-                {JSON.stringify(result, null, 2)}
-              </pre>
-            </details>
             <button
               className="btn update-btn--confirm"
               onClick={() => setResult(null)}

@@ -27,6 +27,7 @@
     object-fit: fill;
     display: block;  
     margin-bottom: 20px;
+    border-radius: 50%;
 }
 
 .account__navigation__me div {

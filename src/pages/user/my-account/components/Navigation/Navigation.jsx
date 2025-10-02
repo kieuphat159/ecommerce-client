@@ -46,7 +46,6 @@ export default function AccountNavigation({ userId, activeTab, setActiveTab }) {
                 <div>{name}</div>
             </div>
 
-            {/* Desktop */}
             <div className='account__navigation__button desktop-only'>
                 {menuItems.slice(0,3).map(item => (
                     <button 
@@ -61,7 +60,6 @@ export default function AccountNavigation({ userId, activeTab, setActiveTab }) {
                 <button onClick={() => setShowModal(true)}>Log Out</button>
             </div>
 
-            {/* Mobile custom dropdown */}
             <div className="account__navigation__dropdown mobile-only">
                 <div 
                     className="dropdown-selected"

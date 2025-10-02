@@ -29,11 +29,61 @@ const UpdateProduct = ({ sellerId }) => {
   const [loadedVariant, setLoadedVariant] = useState(false);
   const [newOptionName, setNewOptionName] = useState('');
   const [newOptionValue, setNewOptionValue] = useState({});
+  const [variantQuantities, setVariantQuantities] = useState({});
+
   const navigate = useNavigate();
-  
+
   const [options, setOptions] = useState([]);
   const [optionValues, setOptionValues] = useState({});
   const [currentQuantity, setCurrentQuantity] = useState(0);
+
+  const fetchVariantQuantites = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/seller/product-variants/${id}`, {
+        method: "GET",
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      const json = await res.json();
+      const apiData = json.data || [];
+      const quantities = {};
+      console.log(apiData)
+      apiData.forEach(item => {
+        quantities[item.option_key] = Number(item.quantity); 
+      });
+      setVariantQuantities(quantities);
+    } catch (err) {
+      throw err;
+    }
+  }
+
+  const generateCombinations = () => {
+    if (options.length === 0) return [];
+
+    const valuesArray = options.map(opt => optionValues[opt.id] || []);
+    if (valuesArray.some(arr => arr.length === 0)) return [];
+
+    const cartesian = (arr) =>
+      arr.reduce((a, b) => a.flatMap(d => b.map(e => [...d, e])), [[]]);
+
+    return cartesian(valuesArray).map(comb =>
+      comb.map((val, idx) => ({
+        optionId: options[idx].id,
+        optionName: options[idx].name,
+        valueId: val.id,
+        valueName: val.value
+      }))
+    );
+  };
+
+  const handleQuantityChange = (key, quantity) => {
+    setVariantQuantities(prev => ({
+      ...prev,
+      [key]: quantity
+    }));
+  };
 
   const fetchOptions = async () => {
     try {
@@ -48,12 +98,9 @@ const UpdateProduct = ({ sellerId }) => {
         const data = await response.json();
         if (data.success && data.data) {
           const optionsData = data.data;
-          // console.log('Options: ', optionsData);
           setOptions(optionsData);
           optionsData.forEach(option => fetchOptionValues(option.id));
         }
-      } else {
-        // console.log('Failed to fetch options');
       }
     } catch (err) {
       // console.log('Error fetching options: ', err);
@@ -72,21 +119,17 @@ const UpdateProduct = ({ sellerId }) => {
       if (response.ok) {
         const data = await response.json();
         if (data.success && data.data) {
-          // console.log(`Option values for ${option_id}: `, data.data);
           setOptionValues(prev => ({
             ...prev,
             [option_id]: data.data
           }));
         }
-      } else {
-        // console.log(`Failed to fetch option values for option ${option_id}`);
       }
     } catch (err) {
       // console.log(`Error fetching option values for option ${option_id}: `, err);
     }
   };
 
-  // Add new option
   const addOption = async () => {
     if (!newOptionName.trim()) {
       setError('Option name is required');
@@ -107,6 +150,7 @@ const UpdateProduct = ({ sellerId }) => {
         setOptions(prev => [...prev, data.data]);
         setNewOptionName('');
         setError('');
+        setOptionValues(prev => ({ ...prev, [data.data.id]: [] }));
       } else {
         throw new Error(data.message || 'Failed to add option');
       }
@@ -116,7 +160,6 @@ const UpdateProduct = ({ sellerId }) => {
     }
   };
 
-  // Add new option value
   const addOptionValue = async (option_id) => {
     const value = newOptionValue[option_id]?.trim();
     if (!value) {
@@ -164,11 +207,8 @@ const UpdateProduct = ({ sellerId }) => {
         const data = await response.json();
         if (data.success && data.data) {
           const stocksData = data.data;
-          // console.log('Stock: ', stocksData);
           setStocks(stocksData);
         }
-      } else {
-        // console.log('Failed to fetch stock');
       }
     } catch (err) {
       // console.log('Error fetching stock: ', err);
@@ -184,15 +224,14 @@ const UpdateProduct = ({ sellerId }) => {
             'Authorization': `Bearer ${token}`
           }
         });
-        
+
         if (!response.ok) {
           throw new Error('Failed to fetch product');
         }
-        
+
         const data = await response.json();
         if (data.success && data.data) {
           const productData = data.data;
-          // console.log('Data:', data);
           setProduct({
             name: productData.name || '',
             price: productData.price ? String(productData.price).replace(/[^0-9.]/g, '') : '',
@@ -203,7 +242,6 @@ const UpdateProduct = ({ sellerId }) => {
             sku: productData.sku || ''
           });
           setOriginalProduct(productData);
-          // console.log('Product data: ', productData);
           setCurrentImage(productData.image);
         } else {
           throw new Error(data.message || 'Product not found');
@@ -230,7 +268,7 @@ const UpdateProduct = ({ sellerId }) => {
   const handleFileChange = (e) => {
     const selectedFiles = e.target.files;
     setFiles(selectedFiles);
-    
+
     if (selectedFiles.length > 0) {
       const previewUrls = Array.from(selectedFiles).map(file => URL.createObjectURL(file));
       setPreviewImages(previewUrls);
@@ -263,12 +301,11 @@ const UpdateProduct = ({ sellerId }) => {
           body: formData
         });
       }
-      
+
       const data = await response.json();
       setUploadResult(data);
       return data;
     } catch (err) {
-      // console.log("Error uploading image: ", err);
       throw new Error("Failed to upload image");
     }
   };
@@ -283,7 +320,7 @@ const UpdateProduct = ({ sellerId }) => {
       },
       body: JSON.stringify(productData)
     });
-    
+
     return await response.json();
   };
 
@@ -293,7 +330,7 @@ const UpdateProduct = ({ sellerId }) => {
     setError('');
     setResult(null);
     setUploadResult(null);
-    
+
     try {
       if (!product.name.trim()) {
         throw new Error('Product name is required');
@@ -307,7 +344,7 @@ const UpdateProduct = ({ sellerId }) => {
 
       let imageUploadData = null;
       let imageUrl = currentImage;
-      
+
       if (files.length > 0) {
         imageUploadData = await uploadImage();
         imageUrl = imageUploadData?.url?.[0] || currentImage;
@@ -330,40 +367,40 @@ const UpdateProduct = ({ sellerId }) => {
         throw new Error(updateResult.message || 'Failed to update product');
       }
 
-      if (openStock && product.stock && product.quantity) {
-         console.log("", {
-          entityId: id,
-          stockId: product.stock,
-          quantity: product.quantity,
-          options: Object.keys(optionValues).reduce((acc, optionId) => {
-            acc[optionId] = product[`option_${optionId}`] || null;
-            return acc;
-          }, {})
-        });
-
+      if (openStock && product.stock) {
         const token = localStorage.getItem('token');
-        const response = await fetch(`${import.meta.env.VITE_API_URL}/api/stock/add`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${token}`
-          },
-          body: JSON.stringify({
-            entityId: id,
-            stockId: product.stock,
-            quantity: parseInt(product.quantity, 10),
-            options: Object.keys(optionValues).reduce((acc, optionId) => {
-              acc[optionId] = product[`option_${optionId}`] || null;
-              return acc;
-            }, {})
-          })
-        });
 
-        const stockResult = await response.json();
-        // console.log(">>> [FE] Stock API response:", stockResult);
+        for (const [key, qty] of Object.entries(variantQuantities)) {
+          if (!qty || qty <= 0) continue;
 
-        if (!stockResult.success) {
-          throw new Error(stockResult.message || 'Failed to update stock');
+          const optionIds = key.split('-').map(id => parseInt(id, 10));
+
+          const optionMap = {};
+          optionIds.forEach((valId, idx) => {
+            const optId = options[idx]?.id;
+            if (optId) {
+              optionMap[optId] = valId;
+            }
+          });
+
+          const response = await fetch(`${import.meta.env.VITE_API_URL}/api/stock/add`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "Authorization": `Bearer ${token}`
+            },
+            body: JSON.stringify({
+              entityId: id,
+              stockId: product.stock,
+              quantity: parseInt(qty, 10),
+              options: optionMap
+            })
+          });
+
+          const stockResult = await response.json();
+          if (!stockResult.success) {
+            throw new Error(stockResult.message || 'Failed to update stock');
+          }
         }
       }
 
@@ -401,7 +438,7 @@ const UpdateProduct = ({ sellerId }) => {
       });
 
       const data = await response.json();
-      
+
       if (data.success) {
         alert('Product deleted successfully');
         navigate('/seller');
@@ -418,64 +455,64 @@ const UpdateProduct = ({ sellerId }) => {
 
   const fetchCurrentQuantity = async () => {
     if (!openStock || !product.stock) {
-        setCurrentQuantity(0);
-        return;
+      setCurrentQuantity(0);
+      return;
     }
     if (options.length === 0) {
-        try {
-            const response = await fetch(`${import.meta.env.VITE_API_URL}/api/product-default-quantity/${id}`);
-            const data = await response.json();
-            if (data.success && data.data) {
-                if (Array.isArray(data.data)) {
-                    setCurrentQuantity(data.data[0]?.quantity || 0);
-                } else {
-                    setCurrentQuantity(data.data.quantity || 0);
-                }
-            } else {
-                setCurrentQuantity(0);
-            }
-        } catch (err) {
-            setCurrentQuantity(0);
+      try {
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/api/product-default-quantity/${id}`);
+        const data = await response.json();
+        if (data.success && data.data) {
+          if (Array.isArray(data.data)) {
+            setCurrentQuantity(data.data[0]?.quantity || 0);
+          } else {
+            setCurrentQuantity(data.data.quantity || 0);
+          }
+        } else {
+          setCurrentQuantity(0);
         }
-        return;
+      } catch (err) {
+        setCurrentQuantity(0);
+      }
+      return;
     }
     const selectedOptions = {};
     options.forEach(opt => {
-        const val = product[`option_${opt.id}`];
-        if (val) selectedOptions[opt.id] = val;
+      const val = product[`option_${opt.id}`];
+      if (val) selectedOptions[opt.id] = val;
     });
 
     if (Object.keys(selectedOptions).length === 0) {
-        setCurrentQuantity(0);
-        return;
+      setCurrentQuantity(0);
+      return;
     }
 
     try {
-        const token = localStorage.getItem('token');
-        const res = await fetch(`${import.meta.env.VITE_API_URL}/api/product-variant-id`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`
-            },
-            body: JSON.stringify({ product_id: id, options: selectedOptions })
-        });
-        const data = await res.json();
-        if (data.success && data.variantId) {
-            const stockRes = await fetch(`${import.meta.env.VITE_API_URL}/api/stock/${data.variantId}?stockId=${product.stock}`);
-            const stockData = await stockRes.json();
-            if (stockData.success) {
-                setCurrentQuantity(stockData.data.quantity || 0);
-            } else {
-                setCurrentQuantity(0);
-            }
+      const token = localStorage.getItem('token');
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/product-variant-id`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ product_id: id, options: selectedOptions })
+      });
+      const data = await res.json();
+      if (data.success && data.variantId) {
+        const stockRes = await fetch(`${import.meta.env.VITE_API_URL}/api/stock/${data.variantId}?stockId=${product.stock}`);
+        const stockData = await stockRes.json();
+        if (stockData.success) {
+          setCurrentQuantity(stockData.data.quantity || 0);
         } else {
-            setCurrentQuantity(0);
+          setCurrentQuantity(0);
         }
-    } catch (err) {
+      } else {
         setCurrentQuantity(0);
+      }
+    } catch (err) {
+      setCurrentQuantity(0);
     }
-};
+  };
 
   useEffect(() => {
     fetchCurrentQuantity();
@@ -528,6 +565,149 @@ const UpdateProduct = ({ sellerId }) => {
                     Selected {files.length} new image{files.length !== 1 ? 's' : ''} (will replace current image)
                   </p>
                 )}
+                <div className="info__field">
+                    <button
+                      type="button"
+                      className="add-to-stock-button"
+                      onClick={() => {
+                        setOpenStock(!openStock);
+                        setOpenVariant(!openVariant);
+                        if (!loadedVariant) {
+                          fetchOptions();
+                          setLoadedVariant(true);
+                        }
+                        if (!loadedStock) {
+                          fetchStock();
+                          fetchVariantQuantites();
+                          setLoadedStock(true);
+                        }
+                      }}
+                      disabled={loading}
+                    >
+                      {openStock ? 'Hide Quantity Options' : 'Add Quantity'}
+                    </button>
+                  </div>
+
+                  {openStock && (
+                    <div className="info__field">
+                      <label className="product__info__label">Stock</label>
+                      <select
+                        name="stock"
+                        onChange={handleChange}
+                        disabled={loading}
+                        className="product__info__select"
+                      >
+                        <option value="">Select Stock</option>
+                        {stocks.map(stock => (
+                          <option key={stock.id} value={stock.id}>
+                            {stock.name}
+                          </option>
+                        ))}
+                      </select>
+
+                      <div className="info__field">
+                        <label className="product__info__label">Add New Option</label>
+                        <div className="option-input-container">
+                          <input
+                            type="text"
+                            value={newOptionName}
+                            onChange={(e) => setNewOptionName(e.target.value)}
+                            placeholder="Enter option name (e.g., Color)"
+                            disabled={loading}
+                            className="product__info__input"
+                          />
+                          <button
+                            type="button"
+                            className="header__button add-option-button"
+                            onClick={addOption}
+                            disabled={loading}
+                          >
+                            {loading ? 'Adding...' : 'Add Option'}
+                          </button>
+                        </div>
+                      </div>
+
+                      {options.length > 0 && (
+                        <div className="info__field product__variants-manager">
+                          <label className="product__info__label">Manage Option Values</label>
+                          {options.map(option => (
+                            <div key={option.id} className="option-manager">
+                              <h4 className="option-name">{option.name}</h4>
+                              <div className="current-values">
+                                {(optionValues[option.id]?.length > 0)
+                                  ? optionValues[option.id].map(val => (
+                                      <span key={val.id} className="option-value-tag">
+                                        {val.value}
+                                      </span>
+                                    ))
+                                  : <span className="no-values">No values added yet.</span>}
+                              </div>
+                              <div className="option-value-input-container">
+                                <input
+                                  type="text"
+                                  value={newOptionValue[option.id] || ''}
+                                  onChange={(e) => setNewOptionValue(prev => ({
+                                    ...prev,
+                                    [option.id]: e.target.value
+                                  }))}
+                                  placeholder={`Enter value for ${option.name}`}
+                                  disabled={loading}
+                                  className="product__info__input"
+                                />
+                                <button
+                                  type="button"
+                                  className="header__button add-value-button"
+                                  onClick={() => addOptionValue(option.id)}
+                                  disabled={loading}
+                                >
+                                  Add Value
+                                </button>
+                              </div>
+                              <hr className="option-divider" />
+                            </div>
+                          ))}
+                        </div>
+                      )}
+
+                      {openVariant && options.length > 0 && (
+                        <div className="variant-table">
+                          <table>
+                            <thead>
+                              <tr>
+                                {options.map(opt => (
+                                  <th key={opt.id}>{opt.name}</th>
+                                ))}
+                                <th>Quantity</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {generateCombinations().map((comb, index) => {
+                                const key = comb.map(c => c.valueId).join('-');
+                                return (
+                                  <tr key={index}>
+                                    {comb.map(c => (
+                                      <td key={c.optionId}>{c.valueName}</td>
+                                    ))}
+                                    <td>
+                                      <input
+                                        type="number"
+                                        value={variantQuantities[key] || 0}
+                                        min="0"
+                                        onChange={(e) =>
+                                          handleQuantityChange(key, parseInt(e.target.value, 10))
+                                        }
+                                      />
+                                    </td>
+                                  </tr>
+                                );
+                              })}
+                            </tbody>
+                          </table>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
               </div>
               <div className="product__info">
                 <form onSubmit={handleSubmit}>
@@ -628,130 +808,8 @@ const UpdateProduct = ({ sellerId }) => {
                     </select>
                   </div>
 
-                  <div className="info__field">
-                    <button
-                      type="button"
-                      className="add-to-stock-button"
-                      onClick={() => {
-                        setOpenStock(!openStock);
-                        setOpenVariant(!openVariant);
-                        if (!loadedVariant) {
-                          fetchOptions();
-                          setLoadedVariant(true);
-                        }
-                        if (!loadedStock) {
-                          fetchStock();
-                          setLoadedStock(true);
-                        }
-                      }}
-                      disabled={loading}
-                    >
-                      {openStock ? 'Hide Quantity Options' : 'Add Quantity'}
-                    </button>
-                  </div>
-
-                  {openStock && (
-                    <div className="info__field">
-                      <label className="product__info__label">Stock</label>
-                      <select
-                        name="stock"
-                        onChange={handleChange}
-                        disabled={loading}
-                        className="product__info__select"
-                      >
-                        <option value="">Select Stock</option>
-                        {stocks.map(stock => (
-                          <option key={stock.id} value={stock.id}>
-                            {stock.name}
-                          </option>
-                        ))}
-                      </select>
-
-                      <div className="info__field">
-                        <label className="product__info__label">Add New Option</label>
-                        <div style={{ display: 'flex', gap: '8px' }}>
-                          <input
-                            type="text"
-                            value={newOptionName}
-                            onChange={(e) => setNewOptionName(e.target.value)}
-                            placeholder="Enter option name (e.g., Color)"
-                            disabled={loading}
-                            className="product__info__input"
-                          />
-                          <button
-                            type="button"
-                            className="header__button add-option-button"
-                            onClick={addOption}
-                            disabled={loading}
-                          >
-                            {loading ? 'Adding...' : 'Add Option'}
-                          </button>
-                        </div>
-                      </div>
-
-                      {openVariant && (
-                        <>
-                          {options.map(option => (
-                            <div key={option.id} className="info__field">
-                              <label className="product__info__label">{option.name}</label>
-                              <select
-                                name={`option_${option.id}`}
-                                onChange={handleChange}
-                                disabled={loading}
-                                className="product__info__select"
-                              >
-                                <option value="">None</option>
-                                {optionValues[option.id]?.map(value => (
-                                  <option key={value.id} value={value.id}>
-                                    {value.value}
-                                  </option>
-                                ))}
-                              </select>
-                              <div className="info__field" style={{ display: 'flex', gap: '8px' }}>
-                                <input
-                                  type="text"
-                                  value={newOptionValue[option.id] || ''}
-                                  onChange={(e) =>
-                                    setNewOptionValue(prev => ({
-                                      ...prev,
-                                      [option.id]: e.target.value
-                                    }))
-                                  }
-                                  placeholder={`Enter value for ${option.name} (e.g., Red)`}
-                                  disabled={loading}
-                                  className="product__info__input"
-                                />
-                                <button
-                                  type="button"
-                                  className="header__button add-option-button"
-                                  onClick={() => addOptionValue(option.id)}
-                                  disabled={loading}
-                                >
-                                  {loading ? 'Adding...' : 'Add Value'}
-                                </button>
-                              </div>
-                            </div>
-                          ))}
-                        </>
-                      )}
-
-                      <div className="info__field">
-                        <label className="product__info__label">Quantity *</label>
-                        <input
-                          type="number"
-                          name="quantity"
-                          value={product.quantity || '0'}
-                          onChange={handleChange}
-                          required
-                          disabled={loading}
-                          placeholder="0"
-                          className="product__info__input"
-                        />
-                        <p>Current quantity in selected stock: {currentQuantity}</p>
-                      </div>
-                    </div>
-                  )}
-
+{/** */}
+                  
                   <div className="info__field">
                     <label className="product__info__label">Status</label>
                     <select
@@ -766,7 +824,7 @@ const UpdateProduct = ({ sellerId }) => {
                     </select>
                   </div>
 
-                  <button type="submit" className="submit__button" disabled={loading}>
+                  <button type="submit" className="submit__button upd-submit" disabled={loading}>
                     {loading ? 'Updating Product...' : 'Update Product'}
                   </button>
                 </form>
@@ -801,7 +859,6 @@ const UpdateProduct = ({ sellerId }) => {
                 <button
                   className="btn update-btn--confirm"
                   onClick={() => setResult(null)}
-                  style={{marginTop: '16px'}}
                 >
                   Close
                 </button>

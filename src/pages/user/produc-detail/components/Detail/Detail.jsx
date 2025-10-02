@@ -61,7 +61,6 @@ export default function Detail() {
             if (totalData.success) {
                 const total = totalData.data?.total_quantity || 0;
                 setTotalQuantity(total);
-                setCurrentQuantity(total);
             } else {
                 setTotalQuantity(0);
             }
@@ -71,37 +70,6 @@ export default function Detail() {
             setVariantId(0);
             setTotalQuantity(0);
         }
-    };
-
-
-    const calculateCurrentQuantity = () => {
-        if (options.length === 0) {
-            fetchDefaultQuantity();
-            return;
-        }
-
-        const selectedOptionIds = Object.keys(selectedVariants);
-        if (selectedOptionIds.length !== options.length) {
-            setCurrentQuantity(totalQuantity);
-            return;
-        }
-
-        let minQuantity = Infinity;
-        
-        for (const optionKey in selectedVariants) {
-            const optionId = optionKey.replace('option_', '');
-            const valueId = selectedVariants[optionKey];
-            
-            const option = options.find(opt => opt.id.toString() === optionId);
-            if (option) {
-                const value = option.values.find(val => val.id.toString() === valueId);
-                if (value && value.quantity < minQuantity) {
-                    minQuantity = value.quantity;
-                }
-            }
-        }
-
-        setCurrentQuantity(minQuantity === Infinity ? 0 : minQuantity);
     };
 
     const handleChange = (e) => {
@@ -129,11 +97,9 @@ export default function Detail() {
                     setOptions(data.data);
                 }
             } else {
-                // console.log('Failed to fetch options');
                 setError('Failed to fetch product options');
             }
         } catch (err) {
-            // console.log('Error fetching options: ', err);
             setError('Failed to fetch product options');
         } finally {
             setLoading(false);
@@ -177,6 +143,26 @@ export default function Detail() {
                 setPricePerUnit(parseFloat(data.data.price));
             }
         } catch (err) {
+            // console.error(err)
+        }
+    };
+    
+    const fetchVariantQuantity = async (vId) => {
+        try {
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/api/product-variant/${vId}`); 
+            const data = await response.json();
+            
+            if (data.success && data.data) {
+                const qty = data.data.quantity ?? 0; 
+                setCurrentQuantity(qty);
+                
+                setNumberOfProduct(prev => Math.min(prev, qty)); 
+            } else {
+                setCurrentQuantity(0);
+            }
+        } catch (err) {
+            console.error('Error fetching variant quantity:', err);
+            setCurrentQuantity(0);
         }
     };
 
@@ -184,9 +170,6 @@ export default function Detail() {
         setTotalPrice((pricePerUnit * numberOfProduct).toFixed(2));
     }, [pricePerUnit, numberOfProduct]);
 
-    useEffect(() => {
-        calculateCurrentQuantity();
-    }, [selectedVariants, options]);
 
     useEffect(() => {
         const fetchProduct = async () => {
@@ -209,26 +192,50 @@ export default function Detail() {
         if (id) {
             fetchProduct();
             fetchOptions();
+            fetchDefaultQuantity(); 
         }
     }, [id]);
 
     useEffect(() => {
-        const updatePrice = async () => {
+        const updateVariantInfo = async () => {
             if (options.length === 0) {
+                if (Object.keys(product).length > 0 && product.price) {
+                    setPricePerUnit(parseFloat(product.price.replace(/[^0-9.-]+/g, "")));
+                }
+                return;
+            }
+
+            if (Object.keys(selectedVariants).length !== options.length) {
+                setCurrentQuantity(totalQuantity);
                 if (product.price) {
                     setPricePerUnit(parseFloat(product.price.replace(/[^0-9.-]+/g, "")));
                 }
-            } else if (Object.keys(selectedVariants).length === options.length) {
-                // Đã chọn đủ option, lấy giá variant
-                const fetchedVariantId = await fetchVariantId();
-                if (fetchedVariantId) {
-                    setVariantId(fetchedVariantId);
-                    await fetchVariantPrice(fetchedVariantId);
+                setVariantId(0);
+                return;
+            }
+
+            const fetchedVariantId = await fetchVariantId();
+            
+            if (fetchedVariantId) {
+                setVariantId(fetchedVariantId);
+                
+                await fetchVariantQuantity(fetchedVariantId);
+                
+                await fetchVariantPrice(fetchedVariantId);
+            } else {
+                setCurrentQuantity(0);
+                setVariantId(0);
+                if (product.price) {
+                    setPricePerUnit(parseFloat(product.price.replace(/[^0-9.-]+/g, "")));
                 }
             }
         };
-        updatePrice();
-    }, [selectedVariants, options, product]);
+        if (id && Object.keys(product).length > 0) {
+             updateVariantInfo();
+        }
+    }, [selectedVariants, options, product, totalQuantity]);
+
+    
     const renderAttribute = (key, value) => {
         return (
             <div key={key} id="detail__attr-content" className={`detail__${key.toLowerCase()}`}>
@@ -316,12 +323,12 @@ export default function Detail() {
     )
 
     const handleAddToCart = () => {
-    if (currentQuantity === 0) {
-        setShowVariantModal(true);
-    } else {
-        debounceAddToCart();
-    }
-};
+        if (currentQuantity === 0) {
+            setShowVariantModal(true);
+        } else {
+            debounceAddToCart();
+        }
+    };
 
 
     return (
@@ -418,7 +425,7 @@ export default function Detail() {
                     </div>
                 )}
             </div>
-      
+        
             {showVariantModal && (
             <div className="detail-modal-overlay">
                 <div className="detail-modal">
