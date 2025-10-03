@@ -16,6 +16,7 @@ export default function OrderDetail(setOrderDetail) {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [pendingStatus, setPendingStatus] = useState('');
   const [currentStatus, setCurrentStatus] = useState('');
+  const [showModalFail, setShowModalFail] = useState(false);
 
   const handleDeleteConfirm = async () => {
     setShowDeleteConfirm(false);
@@ -86,7 +87,7 @@ export default function OrderDetail(setOrderDetail) {
         setCurrentStatus(pendingStatus);
         setShowModal(false);
       } else {
-        alert('Failed to update status!');
+        setShowModalFail(true);
       }
     } catch (error) {
       alert('Error updating status!');
@@ -199,6 +200,16 @@ export default function OrderDetail(setOrderDetail) {
             <div className="modal-actions">
               <button className="btn btn-cancel" onClick={handleCancel}>Cancel</button>
               <button className="btn btn-confirm" onClick={handleConfirm}>Confirm</button>
+            </div>
+          </div>
+        </div>
+      )}
+      {showModalFail && (
+        <div className="modal-overlay">
+          <div className="modal">
+            <h3>Change status failed</h3>
+            <div className="modal-actions">
+              <button className="btn btn-confirm" onClick={() => setShowModalFail(false)}>Cancel</button>
             </div>
           </div>
         </div>

@@ -30,12 +30,34 @@ const UpdateProduct = ({ sellerId }) => {
   const [newOptionName, setNewOptionName] = useState('');
   const [newOptionValue, setNewOptionValue] = useState({});
   const [variantQuantities, setVariantQuantities] = useState({});
+  const [categories, setCategories] = useState([]);
+  const [showDeleteSuccess, setShowDeleteSuccess] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   const navigate = useNavigate();
 
   const [options, setOptions] = useState([]);
   const [optionValues, setOptionValues] = useState({});
   const [currentQuantity, setCurrentQuantity] = useState(0);
+
+  const fetchCategories = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/categories`, {
+        method: "GET",
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      const data = await res.json();
+      if (data.success) {
+        setCategories(data.data);
+        // console.log(res.data);
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  }
 
   const fetchVariantQuantites = async () => {
     try {
@@ -183,24 +205,18 @@ const UpdateProduct = ({ sellerId }) => {
           name: raw.name ?? raw.label ?? raw.title ?? ''
         };
 
-        // optimistic add so UI thấy ngay
         setOptions(prev => {
           // avoid duplicate
           if (prev.some(o => (o.id ?? o.option_id) === normalized.id)) return prev;
           return [...prev, normalized];
         });
 
-        // ensure optionValues has an entry so UI shows "No values added yet"
         setOptionValues(prev => ({ ...prev, [normalized.id]: prev[normalized.id] ?? [] }));
 
         setNewOptionName('');
         setError('');
-
-        // IMPORTANT: fetch full options list from server to ensure consistency
-        // (and to pick up server-assigned fields)
         await fetchOptions();
 
-        // Also reset loadedVariant so toggles won't block future fetches if you use that flag elsewhere
         setLoadedVariant(false);
       } else {
         throw new Error(data.message || 'Failed to add option');
@@ -306,6 +322,7 @@ const UpdateProduct = ({ sellerId }) => {
 
     if (id) {
       fetchProduct();
+      fetchCategories();
     }
   }, [id, sellerId]);
 
@@ -471,9 +488,6 @@ const UpdateProduct = ({ sellerId }) => {
   };
 
   const handleDelete = async () => {
-    if (!window.confirm('Are you sure you want to delete this product? This action cannot be undone.')) {
-      return;
-    }
 
     setLoading(true);
     setError('');
@@ -490,7 +504,7 @@ const UpdateProduct = ({ sellerId }) => {
       const data = await response.json();
 
       if (data.success) {
-        alert('Product deleted successfully');
+        setShowDeleteSuccess(true);
         navigate('/seller');
       } else {
         throw new Error(data.message || 'Failed to delete product');
@@ -595,7 +609,7 @@ const UpdateProduct = ({ sellerId }) => {
               </button>
               <button
                 className="header__button header__button--delete"
-                onClick={handleDelete}
+                onClick={() => setShowDeleteConfirm(true)}
                 disabled={loading}
               >
                 {loading ? 'Processing...' : 'Delete Product'}
@@ -849,12 +863,15 @@ const UpdateProduct = ({ sellerId }) => {
                       className="product__info__select"
                     >
                       <option value="">Select Category (Optional)</option>
-                      <option value="Living Room">Living Room</option>
+                      {categories.map(category => (
+                        <option key={category.id} value={category.name}>{category.name}</option>
+                      ))}
+                      {/* <option value="Living Room">Living Room</option>
                       <option value="Bedroom">Bedroom</option>
                       <option value="Kitchen">Kitchen</option>
                       <option value="Bathroom">Bathroom</option>
                       <option value="Office">Office</option>
-                      <option value="Outdoor">Outdoor</option>
+                      <option value="Outdoor">Outdoor</option> */}
                     </select>
                   </div>
 
@@ -916,6 +933,31 @@ const UpdateProduct = ({ sellerId }) => {
             </div>
           )}
         </>
+      )}
+        {showDeleteSuccess && (
+          <div className="modal-overlay">
+          <div className="modal">
+              <h3>Product deleted successfully!</h3>
+
+              <div className="modal-actions">
+                  <button className="btn btn-confirm" onClick={() => setShowDeleteSuccess(false)}>Cancel</button>
+              </div>
+          </div>
+          </div>
+      )}
+      {showDeleteConfirm && (
+        <div className="modal-overlay">
+          <div className="modal">
+            <h3>Confirm completing order</h3>
+            <p>
+              Are you sure you want to delete this product?
+            </p>
+            <div className="modal-actions">
+              <button className="btn btn-cancel" onClick={() => setShowDeleteConfirm(false)}>Cancel</button>
+              <button className="btn btn-confirm" onClick={handleDelete}>Confirm</button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );
