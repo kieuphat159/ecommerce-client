@@ -12,6 +12,7 @@ export default function Products({ sellerId }) {
     const [revenue, setRevenue] = useState(0);
     const [deleteLoading, setDeleteLoading] = useState(false);
     const [totalItem, setTotalItem] = useState(0);
+    const [showDeleteSuccess, setShowDeleteSuccess] = useState(false);
     
   const fetchRevenue = async () => {
     try{
@@ -30,7 +31,7 @@ export default function Products({ sellerId }) {
   const StatsHeader = () => {
     const stats = [
       { label: 'Revenue', value: `$${revenue}`, change: '+ 22%', type: 'positive' },
-      { label: 'Orders', value: totalItem, change: '+ 5.7%', type: 'positive' },
+      { label: 'Orders', value: 55, change: '+ 5.7%', type: 'positive' },
       { label: 'Visitors', value: '7,283', change: '18%', type: 'negative' },
       { label: 'Conversion', value: '28%', change: '+ 12%', type: 'positive' }
     ];
@@ -131,7 +132,7 @@ export default function Products({ sellerId }) {
                 setRealProducts((prev) => prev.filter((p) => p.id !== productToDelete.id));
                 setShowConfirmModal(false);
                 setProductToDelete(null);
-                alert('Product deleted successfully!');
+                setShowDeleteSuccess(true);
             } else {
                 throw new Error(data.message || 'Failed to delete product');
             }
@@ -232,6 +233,18 @@ export default function Products({ sellerId }) {
                     </div>
                     {renderPagination()}
                 </>
+            )}
+
+            {showDeleteSuccess && (
+                <div className="modal-overlay">
+                <div className="modal">
+                    <h3>Product deleted successfully!</h3>
+
+                    <div className="modal-actions">
+                        <button className="btn btn-confirm" onClick={() => setShowDeleteSuccess(false)}>Cancel</button>
+                    </div>
+                </div>
+                </div>
             )}
 
             {showConfirmModal && (

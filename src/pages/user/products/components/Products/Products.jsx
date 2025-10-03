@@ -11,7 +11,13 @@ export default function Products() {
     const [error, setError] = useState('');
     const [currentPage, setCurrentPage] = useState(1);  
     const [totalPages, setTotalPages] = useState(1);
+    const [openSize, setOpenSize] = useState(false)
+    const [size, setSize] = useState('All');
     const navigate = useNavigate();
+
+    const sizes = [
+        {name: 'S'}, {name: 'M'}, {name: 'L'}
+    ];
 
     const getCategories = async () => {
         try {
@@ -37,13 +43,17 @@ export default function Products() {
         }
     };
 
-    const getProducts = async (page = 1, limit = 8, categoryName = category) => {
+    const getProducts = async (page = 1, limit = 8, categoryName = category, sizeName = size) => {
         try {
             setLoading(true);
 
             let url = `${import.meta.env.VITE_API_URL}/api/products?limit=${limit}&page=${page}`;
+
             if (categoryName && categoryName !== 'All') {
                 url += `&category=${encodeURIComponent(categoryName)}`;
+            }
+            if (sizeName && sizeName !== 'All') {
+                url += `&size=${encodeURIComponent(sizeName)}`;
             }
 
             const response = await fetch(url, {
@@ -54,7 +64,6 @@ export default function Products() {
             if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
 
             const data = await response.json();
-            // console.log("Products fetched:", data);
 
             if (data.success) {
                 setRealProducts(data.data);
@@ -68,15 +77,23 @@ export default function Products() {
             console.error("Error fetching products:", err);
             setError("Failed to load products. Please try again.");
         } finally {
-           setLoading(false);
+        setLoading(false);
         }
     };
+
 
     const handleCategoryChange = (categoryName) => {
         setCategory(categoryName);
         setOpenCategory(false);
-        getProducts(1, 8, categoryName);
+        getProducts(1, 8, categoryName, size);
     };
+
+    const handleSizeChange = (sizeName) => {
+        setSize(sizeName);
+        setOpenSize(false);
+        getProducts(1, 8, category, sizeName);
+    };
+
 
 
     const handlePageChange = (page) => {
@@ -138,6 +155,49 @@ export default function Products() {
                                                 }}
                                             >
                                                 {cat.name}
+                                            </a>
+                                        ))
+                                    ) : (
+                                        <span className="dropdown__option">No categories</span>
+                                    )}
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                    <div>
+                        <label>Size</label>
+                        <div className='dropdown'>
+                            <button 
+                                className='dropdown__button' 
+                                onClick={() => setOpenSize(!openSize)}
+                                disabled={loading}
+                            >
+                                {category}
+                            </button>
+                            {openSize && (
+                                <div className="dropdown__menu">
+                                    <a
+                                        href="#"
+                                        className="dropdown__option"
+                                        onClick={(e) => {
+                                            e.preventDefault();
+                                            handleSizeChange('All');
+                                        }}
+                                    >
+                                        All
+                                    </a>
+                                    {sizes.length > 0 ? (
+                                        sizes.map((size) => (
+                                            <a
+                                                key={size.name}
+                                                href="#"
+                                                className="dropdown__option"
+                                                onClick={(e) => {
+                                                    e.preventDefault();
+                                                    handleSizeChange(size.name);
+                                                }}
+                                            >
+                                                {size.name}
                                             </a>
                                         ))
                                     ) : (

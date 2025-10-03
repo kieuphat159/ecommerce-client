@@ -235,6 +235,7 @@ hr {
 
 .product__variants-title {
   font-weight: 600;
+  margin: 30px 0 15px;
 }
 
 @media (max-width: 768px) {

@@ -20,14 +20,16 @@ export default function Navigation({userId}) {
 
     const getCartQuantity = async () => {
         const user = localStorage.getItem("userId");
-        if (!user || user.role !== 'customer') return;
+        const role = localStorage.getItem("role");
+        console.log(user.role);
+        if (!user || role !== 'customer') return;
         try {
             const response =  await AuthService.apiCall(`/user/get-cart-quantity/${user}`, {
                 method: "GET",
                 headers: { "Content-Type": "application/json" }
             });
             if (response.success) {
-                // console.log('Cart data: ', response.data);
+                console.log('Cart data: ', response.data);
                 setCartQuantity(response.data);
             }
         } catch (err) {
