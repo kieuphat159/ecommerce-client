@@ -20,6 +20,7 @@ export default function Detail() {
     const [variantId, setVariantId] = useState(0);
     const [showVariantModal, setShowVariantModal] = useState(false);
     const [showSuccessModal, setShowSuccessModal] = useState(false);
+    const [showFailModal, setShowFailModal] = useState(false)
     const [showLoginModal, setShowLoginModal] = useState(false);
     const [totalQuantity, setTotalQuantity] = useState(0);
 
@@ -308,7 +309,7 @@ export default function Detail() {
             if (res.ok && result.success) {
                 setShowSuccessModal(true);
             } else {
-                alert(result.message || 'Failed to add to cart');
+                setShowFailModal(true);
             }
         } catch (err) {
             // console.log('Err: ', err);
@@ -440,6 +441,19 @@ export default function Detail() {
                     <h3>Added to cart successfully!</h3>
                     <button onClick={() => {
                         setShowSuccessModal(false);
+                        //window.location.reload();
+                    }}>
+                        OK</button>
+                </div>
+            </div>
+            )}
+
+            {showFailModal && (
+            <div className="detail-modal-overlay">
+                <div className="detail-modal">
+                    <h3>Failed to add to cart!</h3>
+                    <button onClick={() => {
+                        setShowFailModal(false);
                         //window.location.reload();
                     }}>
                         OK</button>
