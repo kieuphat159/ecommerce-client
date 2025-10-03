@@ -350,11 +350,10 @@ export default function Detail() {
                 )}
                     
                 {options.length > 0 && (
-                    <div className="product__info__field">
                         <>
                             <h3 className="product__variants-title">Product Options</h3>
                             {options.map(option => (
-                                <div key={option.id} className="product__info__field">
+                                <div key={option.id} className="">
                                     <label className="product__info__label">{option.name}</label>
                                     
                                     {option.values?.map(value => {
@@ -379,7 +378,6 @@ export default function Detail() {
                             ))}
                             
                         </>
-                    </div>
                 )}
                 <p className={`product__quantity ${currentQuantity === 0 ? `out-of-stock`: ``}`}>
                     {totalQuantity === 0 ? 'Out of stock' : `Available Quantity: ${currentQuantity}`}
