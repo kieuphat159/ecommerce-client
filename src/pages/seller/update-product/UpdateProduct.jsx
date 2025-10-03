@@ -602,7 +602,7 @@ const UpdateProduct = ({ sellerId }) => {
             <div>
               <button
                 className="header__button"
-                onClick={() => navigate('/seller')}
+                onClick={() => navigate(-1)}
                 disabled={loading}
               >
                 Back
