@@ -3,6 +3,7 @@ import { useState, useEffect, useMemo } from 'react'
 import { useParams } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import { debounce } from "/src/components/Debounce"
+import { updateCartQuantity } from "../../../home/components/Navigation/Navigation";
 
 export default function Detail() {
     const [loading, setLoading] = useState(false);
@@ -307,6 +308,7 @@ export default function Detail() {
 
             const result = await res.json();
             if (res.ok && result.success) {
+                updateCartQuantity(result.data);
                 setShowSuccessModal(true);
             } else {
                 setShowFailModal(true);

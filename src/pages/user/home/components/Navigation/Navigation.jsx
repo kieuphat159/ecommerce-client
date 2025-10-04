@@ -2,11 +2,18 @@ import "./Navigation.css";
 import { Link, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import useAuth from "../../../../../hooks/useAuth";
-import AuthService from '/src/services/authService'
+import AuthService from "/src/services/authService";
 
-export default function Navigation({userId}) {
+export function updateCartQuantity(newValue) {
+    localStorage.setItem("cartQuantity", newValue);
+    window.dispatchEvent(new CustomEvent("cartQuantityChange", { detail: newValue }));
+}
+
+
+export default function Navigation({ userId }) {
     const navigate = useNavigate();
     const { isAuthenticated, user, logout } = useAuth();
+
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [isShopOpen, setIsShopOpen] = useState(false);
     const [isProductOpen, setIsProductOpen] = useState(false);
@@ -21,25 +28,43 @@ export default function Navigation({userId}) {
     const getCartQuantity = async () => {
         const user = localStorage.getItem("userId");
         const role = localStorage.getItem("role");
-        console.log(user.role);
-        if (!user || role !== 'customer') return;
+        if (!user || role !== "customer") return;
         try {
-            const response =  await AuthService.apiCall(`/user/get-cart-quantity/${user}`, {
-                method: "GET",
-                headers: { "Content-Type": "application/json" }
-            });
+            const response = await AuthService.apiCall(
+                `/user/get-cart-quantity/${user}`,
+                {
+                    method: "GET",
+                    headers: { "Content-Type": "application/json" },
+                }
+            );
             if (response.success) {
-                console.log('Cart data: ', response.data);
                 setCartQuantity(response.data);
+                updateCartQuantity(response.data); // đồng bộ localStorage + event
             }
         } catch (err) {
-            // console.log('Err: ', err);
+            console.log("Err: ", err);
         }
-    }
+    };
 
     useEffect(() => {
         getCartQuantity();
-    }, [userId])
+    }, [userId]);
+
+    useEffect(() => {
+        const handleChange = (e) => {
+            const qty = e?.detail ?? localStorage.getItem("cartQuantity");
+            setCartQuantity(qty ? parseInt(qty, 10) : 0);
+        };
+
+        window.addEventListener("storage", handleChange);
+        window.addEventListener("cartQuantityChange", handleChange);
+
+        return () => {
+            window.removeEventListener("storage", handleChange);
+            window.removeEventListener("cartQuantityChange", handleChange);
+        };
+    }, []);
+
 
     const signOut = () => {
         logout();
@@ -56,69 +81,128 @@ export default function Navigation({userId}) {
 
     const handleSearch = (e) => {
         e.preventDefault();
-        // console.log("Searching for:", searchQuery);
     };
 
     return (
         <nav className="navigation">
-            <button className={`navigation__hamburger ${isMenuOpen ? 'close' : ''}`} onClick={toggleMenu}>
+            <button
+                className={`navigation__hamburger ${
+                    isMenuOpen ? "close" : ""
+                }`}
+                onClick={toggleMenu}
+            >
                 <span className="navigation__hamburger-line"></span>
                 <span className="navigation__hamburger-line"></span>
                 <span className="navigation__hamburger-line"></span>
             </button>
-            
-            <div className="navigation__logo" onClick={() => navigate('/')}>3legant.</div>
-            
+
+            <div className="navigation__logo" onClick={() => navigate("/")}>
+                3legant.
+            </div>
+
             <div className="navigation__desktop-menu">
-                <a href="/" className="navigation__link">Home</a>
-                <a href="/shop" className="navigation__link">Shop</a>
-                <a href="/products" className="navigation__link">Product</a>
-                <a href="/contact-us" className="navigation__link">Contact Us</a>
+                <a href="/" className="navigation__link">
+                    Home
+                </a>
+                <a href="/shop" className="navigation__link">
+                    Shop
+                </a>
+                <a href="/products" className="navigation__link">
+                    Product
+                </a>
+                <a href="/contact-us" className="navigation__link">
+                    Contact Us
+                </a>
             </div>
 
             <div className="navigation__actions">
                 {user?.role === "seller" && (
                     <Link to="/seller" className="navigation__action">
-                        <img src="/assets/dashboard.svg" className="navigation__icon" alt="Dashboard" />
+                        <img
+                            src="/assets/dashboard.svg"
+                            className="navigation__icon"
+                            alt="Dashboard"
+                        />
                     </Link>
                 )}
 
                 {!isAuthenticated && (
                     <Link to="/signin" className="navigation__action">
-                        <img src="/assets/profile.png" className="navigation__icon" alt="Sign in" />
+                        <img
+                            src="/assets/profile.png"
+                            className="navigation__icon"
+                            alt="Sign in"
+                        />
                     </Link>
                 )}
 
-                {isAuthenticated && user.role === 'customer' && (
+                {isAuthenticated && user.role === "customer" && (
                     <>
-                        <Link to={`/profile/${user.userId}`} className="navigation__action">
-                            <img src="/assets/profile.png" className="navigation__icon" alt="Profile" />
+                        <Link
+                            to={`/profile/${user.userId}`}
+                            className="navigation__action"
+                        >
+                            <img
+                                src="/assets/profile.png"
+                                className="navigation__icon"
+                                alt="Profile"
+                            />
                         </Link>
-                        <button className="navigation__button" onClick={() => setShowModal(true)}>Sign out</button>
-                        <button onClick={handleCartClick} className="navigation__action navigation__button">
-                            <img src="/assets/cart.png" className="navigation__icon" alt="Cart" />
+                        <button
+                            className="navigation__button"
+                            onClick={() => setShowModal(true)}
+                        >
+                            Sign out
+                        </button>
+                        <button
+                            onClick={handleCartClick}
+                            className="navigation__action navigation__button"
+                        >
+                            <img
+                                src="/assets/cart.png"
+                                className="navigation__icon"
+                                alt="Cart"
+                            />
                             {cartQuantity > 0 && (
-                                <span className="cart__badge">{cartQuantity}</span>
+                                <span className="cart__badge">
+                                    {cartQuantity}
+                                </span>
                             )}
                         </button>
                     </>
                 )}
 
-                {isAuthenticated && user.role === 'seller' &&(
+                {isAuthenticated && user.role === "seller" && (
                     <>
-
-                        <button className="navigation__button" onClick={() => setShowModal(true)}>Sign out</button>
+                        <button
+                            className="navigation__button"
+                            onClick={() => setShowModal(true)}
+                        >
+                            Sign out
+                        </button>
                     </>
                 )}
-
-
             </div>
 
-            {isMenuOpen && <div className="navigation__overlay" onClick={toggleMenu}></div>}
+            {isMenuOpen && (
+                <div
+                    className="navigation__overlay"
+                    onClick={toggleMenu}
+                ></div>
+            )}
 
-            <div className={`navigation__mobile-menu ${isMenuOpen ? 'active' : ''}`}>
+            <div
+                className={`navigation__mobile-menu ${
+                    isMenuOpen ? "active" : ""
+                }`}
+            >
                 <div className="navigation__mobile-header">
-                    <div className="navigation__mobile-logo" onClick={() => navigate('/')}>3legant.</div>
+                    <div
+                        className="navigation__mobile-logo"
+                        onClick={() => navigate("/")}
+                    >
+                        3legant.
+                    </div>
                     <button className="navigation__close" onClick={toggleMenu}>
                         <span className="navigation__close-icon">×</span>
                     </button>
@@ -126,9 +210,13 @@ export default function Navigation({userId}) {
 
                 <form className="navigation__search" onSubmit={handleSearch}>
                     <div className="navigation__search-container">
-                        <img src="/assets/search.png" className="navigation__search-icon" alt="Search" />
-                        <input 
-                            type="text" 
+                        <img
+                            src="/assets/search.png"
+                            className="navigation__search-icon"
+                            alt="Search"
+                        />
+                        <input
+                            type="text"
                             placeholder="Search"
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
@@ -138,27 +226,49 @@ export default function Navigation({userId}) {
                 </form>
 
                 <div className="navigation__mobile-links">
-                    <Link to="/" className="navigation__mobile-link" onClick={toggleMenu}>
+                    <Link
+                        to="/"
+                        className="navigation__mobile-link"
+                        onClick={toggleMenu}
+                    >
                         Home
                     </Link>
-                    
+
                     <div className="navigation__dropdown">
-                        <button 
+                        <button
                             className="navigation__dropdown-button"
                             onClick={toggleShop}
                         >
                             Shop
-                            <span className={`navigation__dropdown-arrow ${isShopOpen ? 'open' : ''}`}>▼</span>
+                            <span
+                                className={`navigation__dropdown-arrow ${
+                                    isShopOpen ? "open" : ""
+                                }`}
+                            >
+                                ▼
+                            </span>
                         </button>
                         {isShopOpen && (
                             <div className="navigation__dropdown-content">
-                                <Link to="/shop/furniture" className="navigation__dropdown-link" onClick={toggleMenu}>
+                                <Link
+                                    to="/shop/furniture"
+                                    className="navigation__dropdown-link"
+                                    onClick={toggleMenu}
+                                >
                                     Furniture
                                 </Link>
-                                <Link to="/shop/decor" className="navigation__dropdown-link" onClick={toggleMenu}>
+                                <Link
+                                    to="/shop/decor"
+                                    className="navigation__dropdown-link"
+                                    onClick={toggleMenu}
+                                >
                                     Decor
                                 </Link>
-                                <Link to="/shop/lighting" className="navigation__dropdown-link" onClick={toggleMenu}>
+                                <Link
+                                    to="/shop/lighting"
+                                    className="navigation__dropdown-link"
+                                    onClick={toggleMenu}
+                                >
                                     Lighting
                                 </Link>
                             </div>
@@ -166,82 +276,149 @@ export default function Navigation({userId}) {
                     </div>
 
                     <div className="navigation__dropdown">
-                        <button 
+                        <button
                             className="navigation__dropdown-button"
                             onClick={toggleProduct}
                         >
                             Product
-                            <span className={`navigation__dropdown-arrow ${isProductOpen ? 'open' : ''}`}>▼</span>
+                            <span
+                                className={`navigation__dropdown-arrow ${
+                                    isProductOpen ? "open" : ""
+                                }`}
+                            >
+                                ▼
+                            </span>
                         </button>
                         {isProductOpen && (
                             <div className="navigation__dropdown-content">
-                                <Link to="/products/" className="navigation__dropdown-link" onClick={toggleMenu}>
+                                <Link
+                                    to="/products/"
+                                    className="navigation__dropdown-link"
+                                    onClick={toggleMenu}
+                                >
                                     New Arrivals
                                 </Link>
-                                <Link to="/products/" className="navigation__dropdown-link" onClick={toggleMenu}>
+                                <Link
+                                    to="/products/"
+                                    className="navigation__dropdown-link"
+                                    onClick={toggleMenu}
+                                >
                                     Sale Items
                                 </Link>
-                                <Link to="/products/" className="navigation__dropdown-link" onClick={toggleMenu}>
+                                <Link
+                                    to="/products/"
+                                    className="navigation__dropdown-link"
+                                    onClick={toggleMenu}
+                                >
                                     Featured
                                 </Link>
                             </div>
                         )}
                     </div>
 
-                    <Link to="/contact-us" className="navigation__mobile-link" onClick={toggleMenu}>
+                    <Link
+                        to="/contact-us"
+                        className="navigation__mobile-link"
+                        onClick={toggleMenu}
+                    >
                         Contact Us
                     </Link>
-                    {isAuthenticated && user.role === 'customer' && (
-                    <Link to={`/profile/${user.userId}`} className="navigation__mobile-link" onClick={toggleMenu}>
-                        Profile
-                    </Link>
+                    {isAuthenticated && user.role === "customer" && (
+                        <Link
+                            to={`/profile/${user.userId}`}
+                            className="navigation__mobile-link"
+                            onClick={toggleMenu}
+                        >
+                            Profile
+                        </Link>
                     )}
                 </div>
 
                 <div className="navigation__mobile-bottom">
                     <div className="navigation__mobile-actions">
-                        <button onClick={handleCartClick} className="navigation__mobile-action">
-                            <img src="/assets/cart.png" className="navigation__mobile-icon" alt="Cart" />
+                        <button
+                            onClick={handleCartClick}
+                            className="navigation__mobile-action"
+                        >
+                            <img
+                                src="/assets/cart.png"
+                                className="navigation__mobile-icon"
+                                alt="Cart"
+                            />
                             <span>Cart</span>
                             {cartQuantity > 0 && (
-                                <span className="navigation__badge">{cartQuantity}</span>
+                                <span className="navigation__badge">
+                                    {cartQuantity}
+                                </span>
                             )}
                         </button>
                     </div>
 
                     {!isAuthenticated ? (
-                        <Link to="/signin" className="navigation__signin-button" onClick={toggleMenu}>
+                        <Link
+                            to="/signin"
+                            className="navigation__signin-button"
+                            onClick={toggleMenu}
+                        >
                             Sign In
                         </Link>
                     ) : (
-                        <button className="navigation__signin-button" onClick={() => setShowModal(true)}>
+                        <button
+                            className="navigation__signin-button"
+                            onClick={() => setShowModal(true)}
+                        >
                             Sign Out
                         </button>
                     )}
 
                     <div className="navigation__social">
                         <a href="#" className="navigation__social-link">
-                            <img src="/assets/instagram.png" className="navigation__social-icon" alt="Instagram" />
+                            <img
+                                src="/assets/instagram.png"
+                                className="navigation__social-icon"
+                                alt="Instagram"
+                            />
                         </a>
                         <a href="#" className="navigation__social-link">
-                            <img src="/assets/facebook.png" className="navigation__social-icon" alt="Facebook" />
+                            <img
+                                src="/assets/facebook.png"
+                                className="navigation__social-icon"
+                                alt="Facebook"
+                            />
                         </a>
                         <a href="#" className="navigation__social-link">
-                            <img src="/assets/youtube.png" className="navigation__social-icon" alt="YouTube" />
+                            <img
+                                src="/assets/youtube.png"
+                                className="navigation__social-icon"
+                                alt="YouTube"
+                            />
                         </a>
                     </div>
                 </div>
             </div>
+
             {showModal && (
-            <div className="modal-overlay">
-                <div className="modal">
-                    <h3 className="confirm">Confirm signing out</h3>
-                    <p className="sure">Are you sure you want to sign out ?</p>
-                    <div className="modal-actions">
-                    <button className="btn btn-cancel" onClick={() => setShowModal(false)}>Cancel</button>
-                    <button className="btn btn-confirm" onClick={signOut}>Sign out</button>
+                <div className="modal-overlay">
+                    <div className="modal">
+                        <h3 className="confirm">Confirm signing out</h3>
+                        <p className="sure">
+                            Are you sure you want to sign out ?
+                        </p>
+                        <div className="modal-actions">
+                            <button
+                                className="btn btn-cancel"
+                                onClick={() => setShowModal(false)}
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                className="btn btn-confirm"
+                                onClick={signOut}
+                            >
+                                Sign out
+                            </button>
+                        </div>
                     </div>
-                </div>
                 </div>
             )}
         </nav>
