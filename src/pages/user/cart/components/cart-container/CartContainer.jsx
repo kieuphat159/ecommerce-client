@@ -5,6 +5,7 @@ import ContentDetail from "../content-detail/ContentDetail";
 import OrderComplete from "../order-complete/OrderComplete";
 import AuthService from "/src/services/authService";
 import { debounce } from "../../../../../components/Debounce"; 
+import { updateCartQuantity } from "../../../home/components/Navigation/Navigation";
 
 export default function CartContainer({ userId }) {
   const [active, setActive] = useState(1);
@@ -67,6 +68,7 @@ export default function CartContainer({ userId }) {
         { method: "DELETE" }
       );
       if (data.success) {
+        updateCartQuantity(data.data);
         const removedIndex = realProducts.findIndex(p => p.cart_item_id === cartItemId);
         setRealProducts(prev => prev.filter(p => p.cart_item_id !== cartItemId));
         if (removedIndex !== -1) {
@@ -108,9 +110,12 @@ export default function CartContainer({ userId }) {
           })
         }
       );
-
+      
       if (!data.success) {
         console.error("Update quantity failed:", data.message || data.error);
+      } else {
+        // console.log(data.data);
+        updateCartQuantity(data.data);
       }
     } catch (err) {
       console.error("Error updating quantity:", err);
