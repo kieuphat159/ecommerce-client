@@ -25,6 +25,7 @@ function App() {
           <Route path="/signup" element={<SignUpPage />} />
           <Route path="/products" element={<ProductsPage />} />
           <Route path="/product/:id" element={<ProductDetailPage/>} />
+          {/* just a test */}
 
           <Route path="/api/auth/user/*" element={
             <ProtectedRoute requiredRole='customer'>
